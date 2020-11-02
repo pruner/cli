@@ -1,6 +1,7 @@
 import * as ora from "ora";
-import Provider from "./Provider";
-import { writeToFile } from "./utils";
+import { writeToPrunerFile } from "./io";
+import {Provider} from "./providers";
+import { useSpinner } from "./utils";
 
 export async function run(provider: Provider<any>) {
     await useSpinner("Running tests", async () => {
@@ -11,16 +12,6 @@ export async function run(provider: Provider<any>) {
         }
         
         const state = await provider.gatherState();
+        await writeToPrunerFile(`${provider.name}.json`, JSON.stringify(state, null, ' '));
     });
-}
-
-async function useSpinner<T>(text: string, callback: () => Promise<T>) {
-    const spinner = ora(text);
-    spinner.start();
-
-    try {
-        return await callback();
-    } finally {
-        spinner.stop();
-    }
 }

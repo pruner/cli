@@ -1,9 +1,9 @@
 import { join } from "path";
-import { readFile, writeFile } from "fs/promises";
-import Provider from "../Provider";
-import { glob } from "../utils";
+import { readFile } from "fs/promises";
+import {Provider} from "../providers";
 import { parseStringPromise } from "xml2js";
 import * as execa from "execa";
+import { glob } from "../io";
 
 type State = Array<{
     CoverageSession: Array<{
