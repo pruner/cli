@@ -3,7 +3,7 @@ import { readFile, writeFile } from "fs/promises";
 import Provider from "../Provider";
 import { glob } from "../utils";
 import { parseStringPromise } from "xml2js";
-import execa, { ExecaChildProcess } from "execa";
+import * as execa from "execa";
 
 type State = Array<{
     CoverageSession: Array<{
@@ -60,7 +60,7 @@ export default class DotNetProvider implements Provider<State> {
         return "dotnet";
     }
     
-    async run(previousState: State): Promise<ExecaChildProcess> {
+    async run(previousState: State): Promise<execa.ExecaReturnValue<string>> {
         const attributes = [
             "TestMethod",
             "Test",
@@ -72,7 +72,7 @@ export default class DotNetProvider implements Provider<State> {
             .map(attribute => `[${attribute}]`)
             .join('|');
             
-        return await execa(
+        const result = await execa(
             "dotnet",
             [
                 "test",
@@ -84,6 +84,7 @@ export default class DotNetProvider implements Provider<State> {
             {
                 cwd: this.workingDirectory
             });
+        return result;
     }
 
     async gatherState() {

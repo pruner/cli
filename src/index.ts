@@ -1,11 +1,11 @@
 import yargs from 'yargs';
 import DotNetCommand from './dotnet/DotNetCommand';
-var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
+import InitCommand from './init/InitCommand';
 
-yargs(argv)
+export default yargs(process.argv.slice(2))
   .scriptName("pruner")
-  .command(InitCommand)
-  .command(DotNetCommand)
+  .command(InitCommand as any)
+  .command(DotNetCommand as any)
   .demandCommand(1)
   .help()
   .argv

@@ -1,4 +1,4 @@
-import ora from "ora";
+import * as ora from "ora";
 import Provider from "./Provider";
 import { writeToFile } from "./utils";
 

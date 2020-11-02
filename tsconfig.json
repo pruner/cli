@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
-        "target": "ESNext",
-        "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true
+        "target": "ES6",
+        "moduleResolution": "node"
     }
 }
