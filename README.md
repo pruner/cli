@@ -3,6 +3,8 @@ The Pruner CLI that reduces the amount of time spent running tests.
 
 # To do
 - Providers (dotnet)
+- Sample test projects
+- Unit tests
 
 `pruner dotnet`
 

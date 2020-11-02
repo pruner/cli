@@ -1,9 +1,30 @@
-import { CommandHandlerDefinition } from "https://deno.land/x/yargs@v16.1.0-deno/lib/command.ts";
-import { YargsType } from "https://deno.land/x/yargs@v16.1.0-deno/types.ts";
+import yargs, { CommandModule } from "yargs";
+import { run } from "../runner";
+import DotNetProvider from "./DotNetProvider";
+
+type Args = {
+    ["working-directory"]: string;
+    ["project-directory-glob"]: string;
+}
 
 export default {
     command: "dotnet",
-    describe: "Run tests for dotnet.",
-    builder: (yargs: YargsType) => yargs
-        .command()
-} as CommandHandlerDefinition;
+    describe: "Use the .NET provider.",
+    builder: yargs => yargs
+        .option("project-directory-glob", {
+            type: "string",
+            alias: "p",
+            default: '**/*.Tests'
+        })
+        .option("working-directory", {
+            type: "string",
+            alias: 'w',
+            default: ''
+        }),
+    handler: async (args: Args) => {
+        const provider = new DotNetProvider(
+            args["working-directory"],
+            args["project-directory-glob"]);
+        await run(provider);
+    }
+} as CommandModule<typeof yargs, Args>;
