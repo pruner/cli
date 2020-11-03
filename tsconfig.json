@@ -2,7 +2,9 @@
     "compilerOptions": {
         "outDir": "./dist",
         "target": "ES6",
+        "lib": ["ESNext"],
         "module": "CommonJS",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true
     }
 }

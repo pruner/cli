@@ -1,0 +1,678 @@
+[
+ {
+  "trackedMethods": [],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\Program.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\Program.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\src\\Sample\\SomeOtherClass.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\.nuget\\packages\\microsoft.net.test.sdk\\16.5.0\\build\\netcoreapp2.1\\Microsoft.NET.Test.Sdk.Program.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\.nuget\\packages\\microsoft.net.test.sdk\\16.5.0\\build\\netcoreapp2.1\\Microsoft.NET.Test.Sdk.Program.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()"
+  ],
+  "filePath": "C:\\Users\\Mathias Lorenzen\\source\\repos\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleTests.cs",
+  "lineNumbers": []
+ },
+ {
+  "trackedMethods": [],
+  "lineNumbers": []
+ }
+]

@@ -1,7 +1,7 @@
 import yargs, { CommandModule } from "yargs";
 import * as prompts from "prompts";
 import { getGitTopDirectory } from "../git";
-import { useSpinner } from "../utils";
+import { useSpinner } from "../misc";
 import { allProviders } from "../providers";
 import { writeToFile, writeToPrunerFile } from "../io";
 import { join } from "path";

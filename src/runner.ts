@@ -1,11 +1,31 @@
 import * as ora from "ora";
-import { writeToPrunerFile } from "./io";
+import { readFromPrunerFile, writeToPrunerFile } from "./io";
 import {Provider} from "./providers";
-import { useSpinner } from "./utils";
+import { useSpinner } from "./misc";
+import { getCurrentDiffText } from "./git";
+import parseGitDiff from 'git-diff-parser';
 
 export async function run(provider: Provider<any>) {
     await useSpinner("Running tests", async () => {
-        const result = await provider.run();
+        const stateFileName = `${provider.name}.json`;
+        const previousState = JSON.parse(await readFromPrunerFile(stateFileName));
+
+        const gitDiff = parseGitDiff(await getCurrentDiffText());
+        const changedLines = gitDiff
+            .commits
+            .flatMap(x => x.files)
+            .flatMap(x => [
+                {
+                    lineNumbers: x.lines.map(x => x.ln1),
+                    name: x.oldName
+                },
+                {
+                    lineNumbers: x.lines.map(x => x.ln2),
+                    name: x.name
+                }
+            ]);
+
+        const result = await provider.run(previousState, changedLines);
         if(result.exitCode !== 0) {
             console.error("Could not run tests.\n" + result.stdout + "\n" + result.stderr);
             return;

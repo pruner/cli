@@ -1,7 +1,9 @@
-import * as execa from "execa";
+import execa from "execa";
 
 async function runGitCommand(...args: string[]) {
-    const result = await execa("git", args);
+    const result = await execa("git", args, {
+        reject: false
+    });
     if(result.exitCode !== 0)
         throw result;
 
@@ -18,4 +20,9 @@ export async function getGitVersion() {
 
 export async function getGitTopDirectory() {
     return await runGitCommand("rev-parse", "--show-toplevel");
+}
+
+export async function getCurrentDiffText() {
+    const result = await runGitCommand("diff");
+    return result;
 }
