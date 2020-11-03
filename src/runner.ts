@@ -1,35 +1,18 @@
-import * as ora from "ora";
 import { readFromPrunerFile, writeToPrunerFile } from "./io";
-import {Provider} from "./providers";
-import { useSpinner } from "./misc";
+import {ProviderClass} from "./providers";
+import { useSpinner } from "./console";
 import { getCurrentDiffText } from "./git";
-import parseGitDiff, { Line } from 'git-diff-parser';
-import _ from "lodash";
-import chalk from "chalk";
+import * as parseGitDiff from 'git-diff-parser';
+import * as _ from "lodash";
+import * as chalk from "chalk";
 
-export async function run(provider: Provider<any>) {
+export async function run(Provider: ProviderClass<any, any>) {
     await useSpinner("Running tests", async () => {
-        const stateFileName = `${provider.name}.json`;
-        const previousState = JSON.parse(await readFromPrunerFile(stateFileName));
+        const previousState = await readState(Provider);
 
-        const gitDiff = parseGitDiff(await getCurrentDiffText());
+        const provider = await createProvider(Provider);
 
-        const changedLines = gitDiff
-            .commits
-            .flatMap(x => x.files)
-            .flatMap(x => ({
-                lineNumbers: _.chain(x.lines)
-                    .filter(line => 
-                        line.type === "added" ||
-                        line.type === "deleted")
-                    .flatMap(y => [y.ln1, y.ln2])
-                    .filter(y => !!y)
-                    .uniq()
-                    .value(),
-                name: x.name || x.oldName
-            }))
-            .filter(x => !!x.name && x.lineNumbers.length > 0);
-
+        const changedLines = await getChangedLinesInGit();
         const result = await provider.run(previousState, changedLines);
         if(result.exitCode !== 0) {
             console.error(chalk.red("Could not run tests.") + "\n" + chalk.yellow(result.stdout) + "\n" + chalk.red(result.stderr));
@@ -41,6 +24,49 @@ export async function run(provider: Provider<any>) {
         
         const state = await provider.gatherState();
         const mergedState = await provider.mergeState(previousState, state);
-        await writeToPrunerFile(`${provider.name}.json`, JSON.stringify(mergedState, null, ' '));
+
+        await persistState(Provider, mergedState);
     });
+}
+
+async function persistState(Provider: ProviderClass<any, any>, state: any) {
+    const stateFileName = getStateFileName(Provider);
+    await writeToPrunerFile(stateFileName, JSON.stringify(state, null, ' '));
+}
+
+async function readState(Provider: ProviderClass<any, any>) {
+    const stateFileName = getStateFileName(Provider);
+    return JSON.parse(await readFromPrunerFile(stateFileName));
+}
+
+function getStateFileName(Provider: ProviderClass<any, any>) {
+    return `${Provider.providerName}.json`;
+}
+
+async function getChangedLinesInGit() {
+    const gitDiff = parseGitDiff(await getCurrentDiffText());
+
+    const changedLines = gitDiff
+        .commits
+        .flatMap(x => x.files)
+        .flatMap(x => ({
+            lineNumbers: _.chain(x.lines)
+                .filter(line => line.type === "added" ||
+                    line.type === "deleted")
+                .flatMap(y => [y.ln1, y.ln2])
+                .filter(y => !!y)
+                .uniq()
+                .value(),
+            name: x.name || x.oldName
+        }))
+        .filter(x => !!x.name && x.lineNumbers.length > 0);
+    return changedLines;
+}
+
+async function createProvider(Provider: ProviderClass<any, any>) {
+    const settings = JSON.parse(await readFromPrunerFile("settings.json"));
+    const providerSettings = settings[Provider.providerName];
+
+    const provider = new Provider(providerSettings);
+    return provider;
 }

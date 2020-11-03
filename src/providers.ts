@@ -1,4 +1,5 @@
 import { ExecaChildProcess, ExecaReturnValue } from "execa";
+import * as prompts from "prompts";
 import DotNetProvider from "./dotnet/DotNetProvider";
 
 export type ChangedFiles = Array<{
@@ -6,14 +7,26 @@ export type ChangedFiles = Array<{
     name: string
 }>;
 
-export interface Provider<TState> {
-    name: string;
+export type SettingsQuestions<TSettings> = TSettings extends {[key: string]: any} ? 
+    {
+        [TKey in keyof TSettings]: Omit<prompts.PromptObject<TSettings[TKey]>, "name">;
+    } :
+    never;
 
+export interface Provider<TState> {
     run(previousState: TState, changedFiles: ChangedFiles): Promise<ExecaReturnValue<string>>;
     gatherState(): Promise<TState>;
     mergeState(previousState: TState, newState: TState): Promise<TState>;
 }
 
-export const allProviders: Array<Provider<any>> = [
-    new DotNetProvider(null, null)
+export type ProviderClass<TState, TSettings> = {
+    providerName: string;
+
+    new(settings: TSettings): Provider<TState>;
+    
+    getInitQuestions(): SettingsQuestions<TSettings>;
+}
+
+export const allProviders: ProviderClass<any, any>[] = [
+    DotNetProvider
 ];

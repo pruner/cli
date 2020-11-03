@@ -1,4 +1,4 @@
-import ora from 'ora';
+import * as ora from 'ora';
 
 export async function useSpinner<T>(text: string, callback: () => Promise<T>) {
     const spinner = ora(text);

@@ -1,1 +1,8 @@
-{}
+{
+	"dotnet": [
+		{
+			"workingDirectory": "tests/dotnet/sample",
+			"projectDirectoryGlob": "**/*.Tests"
+		}
+	]
+}

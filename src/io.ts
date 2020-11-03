@@ -77,6 +77,6 @@ export async function readFromPrunerFile(path: string) {
 export function normalizePathSeparators(path: string) {
     if(!path)
         return "";
-        
+
     return path.replace(/\\/g, "/");
 }

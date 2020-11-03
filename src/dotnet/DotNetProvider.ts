@@ -1,21 +1,55 @@
 import { join } from "path";
 import { readFile } from "fs/promises";
-import {ChangedFiles, Provider} from "../providers";
+import {ChangedFiles, Provider, SettingsQuestions} from "../providers";
 import { parseStringPromise } from "xml2js";
-import execa from "execa";
+import * as execa from "execa";
 import { glob, normalizePathSeparators } from "../io";
 import { Root } from "./AltCoverTypes";
-import _ from "lodash";
+import * as _ from "lodash";
 import { getGitTopDirectory } from "../git";
 
-export default class DotNetProvider implements Provider<State> {
-    constructor(
-        private readonly workingDirectory: string,
-        private readonly projectDirectoryGlob: string
-    ) {}
+type State = {
+    tests: {
+        name: string;
+        id: number;
+    }[];
+    files: {
+        id: number;
+        path: string;
+    }[];
+    coverage: {
+        testIds: number[];
+        fileId: number;
+        lineNumber: number;
+    }[];
+};
 
-    public get name() {
+type Settings = {
+    workingDirectory: string,
+    projectDirectoryGlob: string
+}
+
+export default class DotNetProvider implements Provider<State> {
+    constructor(private readonly settings: Settings) {}
+
+    public static get providerName() {
         return "dotnet";
+    }
+
+    public static getInitQuestions(): SettingsQuestions<Settings> {
+        return {
+            workingDirectory: {
+                type: "text",
+                message: "What working directory would you like to use?",
+                hint: "The directory where you would normally run 'dotnet test' from."
+            },
+            projectDirectoryGlob: {
+                type: "text",
+                initial: "**/*.Tests",
+                message: "What glob can be used to find your test project folders?",
+                hint: "The glob to use for finding individual test project folders."
+            }
+        }
     }
     
     public async run(previousState: State, changedFiles: ChangedFiles): Promise<execa.ExecaReturnValue<string>> {
@@ -49,8 +83,6 @@ export default class DotNetProvider implements Provider<State> {
             .map(x => `(${x})`)
             .join('|');
             
-        console.log(filterArgument);
-        
         const result = await execa(
             "dotnet",
             [
@@ -63,7 +95,7 @@ export default class DotNetProvider implements Provider<State> {
                 "/p:AltCoverXmlReport=coverage.xml"
             ], 
             {
-                cwd: this.workingDirectory,
+                cwd: this.settings.workingDirectory,
                 reject: false
             });
         return result;
@@ -82,12 +114,12 @@ export default class DotNetProvider implements Provider<State> {
         const projectRootDirectory = await getGitTopDirectory();
 
         const projectDirectoryPaths = await glob(
-            this.workingDirectory,
-            this.projectDirectoryGlob);
+            this.settings.workingDirectory,
+            this.settings.projectDirectoryGlob);
 
         const coverageFileBuffers = await Promise.all(projectDirectoryPaths
             .map(directoryPath => join(
-                this.workingDirectory,
+                this.settings.workingDirectory,
                 directoryPath,
                 "coverage.xml"))
             .map(filePath => readFile(filePath)));
@@ -215,19 +247,3 @@ export default class DotNetProvider implements Provider<State> {
         };
     }
 }
-
-type State = {
-    tests: {
-        name: string;
-        id: number;
-    }[];
-    files: {
-        id: number;
-        path: string;
-    }[];
-    coverage: {
-        testIds: number[];
-        fileId: number;
-        lineNumber: number;
-    }[];
-};
