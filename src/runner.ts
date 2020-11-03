@@ -10,22 +10,23 @@ export async function run(Provider: ProviderClass<any, any>) {
     await useSpinner("Running tests", async () => {
         const previousState = await readState(Provider);
 
-        const provider = await createProvider(Provider);
+        const providers = await createProviders(Provider);
+        for(let provider of providers) {
+            const changedLines = await getChangedLinesInGit();
+            const result = await provider.run(previousState, changedLines);
+            if(result.exitCode !== 0) {
+                console.error(chalk.red("Could not run tests.") + "\n" + chalk.yellow(result.stdout) + "\n" + chalk.red(result.stderr));
+                return;
+            }
 
-        const changedLines = await getChangedLinesInGit();
-        const result = await provider.run(previousState, changedLines);
-        if(result.exitCode !== 0) {
-            console.error(chalk.red("Could not run tests.") + "\n" + chalk.yellow(result.stdout) + "\n" + chalk.red(result.stderr));
-            return;
+            console.log(chalk.green("Tests ran successfully:"));
+            console.log(chalk.white(result.stdout));
+            
+            const state = await provider.gatherState();
+            const mergedState = await provider.mergeState(previousState, state);
+
+            await persistState(Provider, mergedState);
         }
-
-        console.log(chalk.green("Tests ran successfully:"));
-        console.log(chalk.white(result.stdout));
-        
-        const state = await provider.gatherState();
-        const mergedState = await provider.mergeState(previousState, state);
-
-        await persistState(Provider, mergedState);
     });
 }
 
@@ -63,10 +64,9 @@ async function getChangedLinesInGit() {
     return changedLines;
 }
 
-async function createProvider(Provider: ProviderClass<any, any>) {
+async function createProviders(Provider: ProviderClass<any, any>) {
     const settings = JSON.parse(await readFromPrunerFile("settings.json"));
-    const providerSettings = settings[Provider.providerName];
+    const providerSettings = settings[Provider.providerName] as any[];
 
-    const provider = new Provider(providerSettings);
-    return provider;
+    return providerSettings.map(x => new Provider(x));
 }

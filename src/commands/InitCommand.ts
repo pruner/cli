@@ -6,6 +6,7 @@ import { allProviders, ProviderClass } from "../providers";
 import * as chalk from "chalk";
 import * as prompts from "prompts";
 import * as _ from "lodash";
+import { Command } from "./Command";
 
 type Args = {
     provider: string
@@ -18,7 +19,7 @@ export default {
         .positional("provider", {
             choices: allProviders.map(x => x.providerName)
         }),
-    handler: async (args: Args) => {
+    handler: async (args) => {
         const topDirectoryPath = await getGitTopDirectory();
         if(!topDirectoryPath) {
             console.error("Pruner requires that the current directory is in GIT.");
@@ -39,7 +40,7 @@ export default {
 
         console.log(chalk.green("Pruner has been initialized!"));
     }
-} as CommandModule<typeof yargs, Args>;
+} as Command<Args>;
 
 async function persistProviderSettings(topDirectoryPath: string, existingSettings: any) {
     const settingsPath = getSettingsPath(topDirectoryPath);

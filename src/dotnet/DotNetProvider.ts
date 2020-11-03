@@ -82,7 +82,7 @@ export default class DotNetProvider implements Provider<State> {
             .filter(x => !!x)
             .map(x => `(${x})`)
             .join('|');
-            
+
         const result = await execa(
             "dotnet",
             [
