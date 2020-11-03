@@ -69,7 +69,10 @@ export default class DotNetProvider implements Provider<State> {
         return result;
     }
 
-    private getFilterArgument(tests: { name: string; id: number; }[], operandSettings: { join: string; compare: string; }) {
+    private getFilterArgument(
+        tests: { name: string; id: number; }[], 
+        operandSettings: { join: string; compare: string; }) 
+    {
         return tests
             .map(x => `FullyQualifiedName${operandSettings.compare}${x.name}`)
             .join(operandSettings.join);
