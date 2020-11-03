@@ -1,107 +1,93 @@
 {
  "tests": [
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_60s_HelloWorld()",
+   "name": "Sample.Tests.SampleTests.Test_60s_HelloWorld",
    "id": 1
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_30s_HelloWorld()",
+   "name": "Sample.Tests.SampleTests.Test_30s_HelloWorld",
    "id": 2
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_10s_HelloWorld()",
+   "name": "Sample.Tests.SampleTests.Test_10s_HelloWorld",
    "id": 3
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_5s_HelloWorld()",
+   "name": "Sample.Tests.SampleTests.Test_5s_HelloWorld",
    "id": 4
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_3s_HelloWorld()",
+   "name": "Sample.Tests.SampleTests.Test_3s_HelloWorld",
    "id": 5
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_1s_HelloWorld()",
+   "name": "Sample.Tests.SampleTests.Test_1s_HelloWorld",
    "id": 6
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_60s_HelloDarkness()",
+   "name": "Sample.Tests.SampleTests.Test_60s_HelloDarkness",
    "id": 7
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_30s_HelloDarkness()",
+   "name": "Sample.Tests.SampleTests.Test_30s_HelloDarkness",
    "id": 8
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_10s_HelloDarkness()",
+   "name": "Sample.Tests.SampleTests.Test_10s_HelloDarkness",
    "id": 9
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_5s_HelloDarkness()",
+   "name": "Sample.Tests.SampleTests.Test_5s_HelloDarkness",
    "id": 10
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_3s_HelloDarkness()",
+   "name": "Sample.Tests.SampleTests.Test_3s_HelloDarkness",
    "id": 11
   },
   {
-   "name": "System.Void Sample.Tests.SampleTests::Test_1s_HelloDarkness()",
+   "name": "Sample.Tests.SampleTests.Test_1s_HelloDarkness",
    "id": 12
   }
  ],
  "files": [
   {
    "id": 1,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/Program.cs"
+   "path": "tests/dotnet/sample/Sample/Program.cs"
   },
   {
    "id": 2,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/SomeClass.cs"
+   "path": "tests/dotnet/sample/Sample/SomeClass.cs"
   },
   {
    "id": 3,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/SomeNotUsedClass.cs"
+   "path": "tests/dotnet/sample/Sample/SomeNotUsedClass.cs"
   },
   {
    "id": 4,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/SomeOtherClass.cs"
+   "path": "tests/dotnet/sample/Sample/SomeOtherClass.cs"
   },
   {
    "id": 1,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/Program.cs"
+   "path": "tests/dotnet/sample/Sample/Program.cs"
   },
   {
    "id": 2,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/SomeClass.cs"
+   "path": "tests/dotnet/sample/Sample/SomeClass.cs"
   },
   {
    "id": 3,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/SomeNotUsedClass.cs"
+   "path": "tests/dotnet/sample/Sample/SomeNotUsedClass.cs"
   },
   {
    "id": 4,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample/SomeOtherClass.cs"
-  },
-  {
-   "id": 5,
-   "path": "C:/Users/Mathias Lorenzen/.nuget/packages/microsoft.net.test.sdk/16.5.0/build/netcoreapp2.1/Microsoft.NET.Test.Sdk.Program.cs"
+   "path": "tests/dotnet/sample/Sample/SomeOtherClass.cs"
   },
   {
    "id": 6,
-   "path": "C:/Users/Mathias Lorenzen/source/repos/cli/tests/dotnet/sample/Sample.Tests/SampleTests.cs"
+   "path": "tests/dotnet/sample/Sample.Tests/SampleTests.cs"
   }
  ],
  "coverage": [
-  {
-   "testIds": [],
-   "fileId": 1,
-   "lineNumber": 8
-  },
-  {
-   "testIds": [],
-   "fileId": 1,
-   "lineNumber": 10
-  },
   {
    "testIds": [
     1,
@@ -109,13 +95,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 2,
    "lineNumber": 10
@@ -127,13 +107,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 2,
    "lineNumber": 11
@@ -176,72 +150,15 @@
   },
   {
    "testIds": [
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
-   ],
-   "fileId": 2,
-   "lineNumber": 14
-  },
-  {
-   "testIds": [
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
-   ],
-   "fileId": 2,
-   "lineNumber": 15
-  },
-  {
-   "testIds": [
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
-   ],
-   "fileId": 2,
-   "lineNumber": 16
-  },
-  {
-   "testIds": [
     1,
     2,
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 2,
    "lineNumber": 17
-  },
-  {
-   "testIds": [],
-   "fileId": 3,
-   "lineNumber": 9
-  },
-  {
-   "testIds": [],
-   "fileId": 3,
-   "lineNumber": 10
-  },
-  {
-   "testIds": [],
-   "fileId": 3,
-   "lineNumber": 11
   },
   {
    "testIds": [
@@ -467,144 +384,12 @@
   },
   {
    "testIds": [
-    7
-   ],
-   "fileId": 6,
-   "lineNumber": 51
-  },
-  {
-   "testIds": [
-    7
-   ],
-   "fileId": 6,
-   "lineNumber": 52
-  },
-  {
-   "testIds": [
-    7
-   ],
-   "fileId": 6,
-   "lineNumber": 53
-  },
-  {
-   "testIds": [
-    8
-   ],
-   "fileId": 6,
-   "lineNumber": 57
-  },
-  {
-   "testIds": [
-    8
-   ],
-   "fileId": 6,
-   "lineNumber": 58
-  },
-  {
-   "testIds": [
-    8
-   ],
-   "fileId": 6,
-   "lineNumber": 59
-  },
-  {
-   "testIds": [
-    9
-   ],
-   "fileId": 6,
-   "lineNumber": 63
-  },
-  {
-   "testIds": [
-    9
-   ],
-   "fileId": 6,
-   "lineNumber": 64
-  },
-  {
-   "testIds": [
-    9
-   ],
-   "fileId": 6,
-   "lineNumber": 65
-  },
-  {
-   "testIds": [
-    10
-   ],
-   "fileId": 6,
-   "lineNumber": 69
-  },
-  {
-   "testIds": [
-    10
-   ],
-   "fileId": 6,
-   "lineNumber": 70
-  },
-  {
-   "testIds": [
-    10
-   ],
-   "fileId": 6,
-   "lineNumber": 71
-  },
-  {
-   "testIds": [
-    11
-   ],
-   "fileId": 6,
-   "lineNumber": 75
-  },
-  {
-   "testIds": [
-    11
-   ],
-   "fileId": 6,
-   "lineNumber": 76
-  },
-  {
-   "testIds": [
-    11
-   ],
-   "fileId": 6,
-   "lineNumber": 77
-  },
-  {
-   "testIds": [
-    12
-   ],
-   "fileId": 6,
-   "lineNumber": 81
-  },
-  {
-   "testIds": [
-    12
-   ],
-   "fileId": 6,
-   "lineNumber": 82
-  },
-  {
-   "testIds": [
-    12
-   ],
-   "fileId": 6,
-   "lineNumber": 83
-  },
-  {
-   "testIds": [
     1,
     2,
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 88
@@ -616,13 +401,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 89
@@ -634,13 +413,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 90
@@ -652,13 +425,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 91
@@ -670,13 +437,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 92
@@ -688,13 +449,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 93
@@ -706,13 +461,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 89
@@ -724,13 +473,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 89
@@ -742,13 +485,7 @@
     3,
     4,
     5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    6
    ],
    "fileId": 6,
    "lineNumber": 94
