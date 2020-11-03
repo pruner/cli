@@ -123,7 +123,7 @@ export default class DotNetProvider implements Provider<State> {
                         ?.id,
                     lineNumber: l
                 })))
-            .filter(x => !!x.fileId)
+            .filter(x => !!x.fileId && x.testIds.length > 0)
             .value();
 
         const result = {
@@ -135,7 +135,9 @@ export default class DotNetProvider implements Provider<State> {
     }
 
     private async getTestsToRun(previousState: State, changedFiles: ChangedFiles) {
-        const relevantFiles = previousState.files;
+        for(let file of previousState.files) {
+            
+        }
     }
 }
 
