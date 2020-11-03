@@ -1,11 +1,12 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { readFile } from "fs/promises";
 import {ChangedFiles, Provider} from "../providers";
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
-import { glob, writeToPrunerFile } from "../io";
+import { getPrunerPath, glob, normalizePathSeparators, writeToPrunerFile } from "../io";
 import { ModuleModule, Root } from "./AltCoverTypes";
 import _ from "lodash";
+import { getGitTopDirectory } from "../git";
 
 export default class DotNetProvider implements Provider<State> {
     constructor(
@@ -50,6 +51,8 @@ export default class DotNetProvider implements Provider<State> {
     }
 
     public async gatherState() {
+        const projectRootDirectory = await getGitTopDirectory();
+
         const projectDirectoryPaths = await glob(
             this.workingDirectory,
             this.projectDirectoryGlob);
@@ -71,18 +74,21 @@ export default class DotNetProvider implements Provider<State> {
             .map(x => x.CoverageSession)
             .flatMap(x => x.Modules)
             .flatMap(x => x.Module)
+            .filter(x => !!x)
             .value();
 
         const files = _.chain(modules)
             .flatMap(x => x.Files)
             .flatMap(x => x.File)
             .map(x => x?.$)
+            .filter(x => !!x)
             .value();
 
         const trackedMethods = _.chain(modules)
             .flatMap(x => x.TrackedMethods)
             .flatMap(x => x.TrackedMethod)
             .map(x => x?.$)
+            .filter(x => !!x)
             .value();
 
         const coverageData = _.chain(modules)
@@ -92,18 +98,31 @@ export default class DotNetProvider implements Provider<State> {
             .flatMap(x => x.Method)
             .flatMap(x => x.SequencePoints)
             .flatMap(x => x.SequencePoint)
+            .filter(x => !!x)
             .flatMap(x => ({
-                trackedMethods: _.chain(x?.TrackedMethodRefs || [])
+                trackedMethods: _.chain(x.TrackedMethodRefs || [])
                     .flatMap(m => m.TrackedMethodRef)
                     .map(m => m.$)
                     .map(m => trackedMethods.find(y => y?.uid === m?.uid))
                     .map(m => m.name)
                     .value(),
-                filePath: files
-                    .find(f => f.uid === x?.$?.fileid)
-                    ?.fullPath,
-                lineNumbers: new Array((+x?.$?.el || 0) - (+x?.$?.sl || 0))
-                    .map((_, i) => +x.$.sl + i)
+                filePath: normalizePathSeparators(files
+                    .find(f => f.uid === x.$?.fileid)
+                    ?.fullPath),
+                lineNumbers: _.range(+x.$.sl, +x.$.el + 1)
+            }))
+            .groupBy(x => x.filePath)
+            .filter(x => x[0].filePath.startsWith(projectRootDirectory))
+            .map(x => ({
+                tests: _.chain(x)
+                    .flatMap(y => y.trackedMethods)
+                    .uniq()
+                    .value(),
+                filePath: x[0].filePath.substring(projectRootDirectory.length + 1),
+                lineNumbers: _.chain(x)
+                    .flatMap(y => y.lineNumbers)
+                    .uniq()
+                    .value()
             }))
             .value();
 
@@ -111,12 +130,12 @@ export default class DotNetProvider implements Provider<State> {
     }
 
     private async getTestsToRun(previousState: State, changedFiles: ChangedFiles) {
-        await writeToPrunerFile("changed", JSON.stringify(changedFiles, null, ' '));
+        
     }
 }
 
 type State = Array<{
-    trackedMethods: string[],
+    tests: string[],
     filePath: string,
     lineNumbers: number[]
 }>;

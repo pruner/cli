@@ -16,14 +16,19 @@ export async function run(provider: Provider<any>) {
             .flatMap(x => x.files)
             .flatMap(x => [
                 {
-                    lineNumbers: x.lines.map(x => x.ln1),
+                    lineNumbers: x.lines
+                        .map(y => y.ln1)
+                        .filter(y => !!y),
                     name: x.oldName
                 },
                 {
-                    lineNumbers: x.lines.map(x => x.ln2),
+                    lineNumbers: x.lines
+                        .map(y => y.ln2)
+                        .filter(y => !!y),
                     name: x.name
                 }
-            ]);
+            ])
+            .filter(x => !!x.name);
 
         const result = await provider.run(previousState, changedLines);
         if(result.exitCode !== 0) {

@@ -56,7 +56,7 @@ export async function getPrunerPath() {
     while(currentPath.indexOf(sep) > -1) {
         const directories = await readdir(currentPath);
         if(!!directories.find(x => basename(x) === ".pruner"))
-            return join(currentPath, ".pruner");
+            return normalizePathSeparators(join(currentPath, ".pruner"));
 
         currentPath = dirname(currentPath);
     }
@@ -72,4 +72,8 @@ export async function writeToPrunerFile(path: string, contents: string) {
 export async function readFromPrunerFile(path: string) {
     const prunerDirectory = await getPrunerPath();
     return await readFromFile(join(prunerDirectory, path));
+}
+
+export function normalizePathSeparators(path: string) {
+    return path.replace(/\\/g, "/");
 }
