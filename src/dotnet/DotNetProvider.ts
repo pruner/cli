@@ -52,7 +52,7 @@ export default class DotNetProvider implements Provider<State> {
         }
     }
     
-    public async run(previousState: State, changedFiles: ChangedFiles): Promise<execa.ExecaReturnValue<string>> {
+    public async executeTestProcess(previousState: State, changedFiles: ChangedFiles): Promise<execa.ExecaReturnValue<string>> {
         const testsToRun = await this.getTestsToRun(
             previousState, 
             changedFiles);

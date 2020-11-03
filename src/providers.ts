@@ -14,7 +14,7 @@ export type SettingsQuestions<TSettings> = TSettings extends {[key: string]: any
     never;
 
 export interface Provider<TState> {
-    run(previousState: TState, changedFiles: ChangedFiles): Promise<ExecaReturnValue<string>>;
+    executeTestProcess(previousState: TState, changedFiles: ChangedFiles): Promise<ExecaReturnValue<string>>;
     gatherState(): Promise<TState>;
     mergeState(previousState: TState, newState: TState): Promise<TState>;
 }

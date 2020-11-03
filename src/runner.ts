@@ -6,14 +6,15 @@ import * as parseGitDiff from 'git-diff-parser';
 import * as _ from "lodash";
 import * as chalk from "chalk";
 
-export async function run(Provider: ProviderClass<any, any>) {
+export async function runTests(Provider: ProviderClass<any, any>) {
     await useSpinner("Running tests", async () => {
-        const previousState = await readState(Provider);
-
         const providers = await createProviders(Provider);
         for(let provider of providers) {
             const changedLines = await getChangedLinesInGit();
-            const result = await provider.run(previousState, changedLines);
+
+            const previousState = await readState(Provider);
+
+            const result = await provider.executeTestProcess(previousState, changedLines);
             if(result.exitCode !== 0) {
                 console.error(chalk.red("Could not run tests.") + "\n" + chalk.yellow(result.stdout) + "\n" + chalk.red(result.stderr));
                 return;
@@ -52,7 +53,8 @@ async function getChangedLinesInGit() {
         .flatMap(x => x.files)
         .flatMap(x => ({
             lineNumbers: _.chain(x.lines)
-                .filter(line => line.type === "added" ||
+                .filter(line => 
+                    line.type === "added" ||
                     line.type === "deleted")
                 .flatMap(y => [y.ln1, y.ln2])
                 .filter(y => !!y)
