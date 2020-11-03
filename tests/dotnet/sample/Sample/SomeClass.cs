@@ -9,10 +9,10 @@ namespace Sample
         public static void DoSomething(int argument)
         {
             if(argument > 1337) { 
-                SomeOtherClass.DoSomethingElse();
+                SomeOtherClass.DoSomethingElse(); //i did something
             } else
             {
-                Console.WriteLine("Hello darkness");
+                Console.WriteLine("Hello lol darkness");
             }
         }
     }

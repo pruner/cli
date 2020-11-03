@@ -1,10 +1,10 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 
-namespace Sample.Tests
+namespace Sample.Tests.World
 {
     [TestClass]
-    public class SampleTests
+    public class SampleWorldTests
     {
 
         [TestMethod]
@@ -42,46 +42,6 @@ namespace Sample.Tests
         {
             RunScenario(1, 9001);
         }
-
-
-
-
-        [TestMethod]
-        public void Test_60s_HelloDarkness()
-        {
-            RunScenario(60, 123);
-        }
-
-        [TestMethod]
-        public void Test_30s_HelloDarkness()
-        {
-            RunScenario(30, 123);
-        }
-
-        [TestMethod]
-        public void Test_10s_HelloDarkness()
-        {
-            RunScenario(10, 123);
-        }
-
-        [TestMethod]
-        public void Test_5s_HelloDarkness()
-        {
-            RunScenario(5, 123);
-        }
-
-        [TestMethod]
-        public void Test_3s_HelloDarkness()
-        {
-            RunScenario(3, 123);
-        }
-
-        [TestMethod]
-        public void Test_1s_HelloDarkness()
-        {
-            RunScenario(1, 123);
-        }
-
 
 
         private static void RunScenario(int count, int argument)

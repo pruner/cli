@@ -11,6 +11,7 @@ export interface Provider<TState> {
 
     run(previousState: TState, changedFiles: ChangedFiles): Promise<ExecaReturnValue<string>>;
     gatherState(): Promise<TState>;
+    mergeState(previousState: TState, newState: TState): Promise<TState>;
 }
 
 export const allProviders: Array<Provider<any>> = [

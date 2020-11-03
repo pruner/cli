@@ -19,7 +19,9 @@ export default class DotNetProvider implements Provider<State> {
     }
     
     public async run(previousState: State, changedFiles: ChangedFiles): Promise<execa.ExecaReturnValue<string>> {
-        const testsToRun = await this.getTestsToRun(previousState, changedFiles);
+        const testsToRun = await this.getTestsToRun(
+            previousState, 
+            changedFiles);
 
         const attributes = [
             "TestMethod",
@@ -43,6 +45,7 @@ export default class DotNetProvider implements Provider<State> {
         });
 
         const filterArgument = [affectedFilter, unknownFilter]
+            .filter(x => !!x)
             .map(x => `(${x})`)
             .join('|');
             
@@ -156,6 +159,23 @@ export default class DotNetProvider implements Provider<State> {
         return result;
     }
 
+    public async mergeState(previousState: State, newState: State): Promise<State> {
+        return {
+            tests: _.chain([previousState?.tests || [], newState.tests || []])
+                .flatMap()
+                .uniqBy(x => x.name)
+                .value(),
+            files: _.chain([previousState?.files || [], newState.files || []])
+                .flatMap()
+                .uniqBy(x => x.path)
+                .value(),
+            coverage: _.chain([previousState?.coverage || [], newState.coverage])
+                .flatMap()
+                .uniqBy(x => x.fileId + "-" + x.lineNumber)
+                .value()
+        };
+    }
+
     private sanitizeMethodName(name: string) {
         const typeSplit = name.split(' ');
 
@@ -170,7 +190,7 @@ export default class DotNetProvider implements Provider<State> {
             return {
                 affected: [],
                 unaffected: []
-            }
+            };
         }
 
         const affectedTests = changedFiles
