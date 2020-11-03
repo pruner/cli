@@ -1,10 +1,10 @@
-import { dirname, join } from "path";
+import { join } from "path";
 import { readFile } from "fs/promises";
 import {ChangedFiles, Provider} from "../providers";
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
-import { getPrunerPath, glob, normalizePathSeparators, writeToPrunerFile } from "../io";
-import { ModuleModule, Root } from "./AltCoverTypes";
+import { glob, normalizePathSeparators } from "../io";
+import { Root } from "./AltCoverTypes";
 import _ from "lodash";
 import { getGitTopDirectory } from "../git";
 
@@ -20,7 +20,7 @@ export default class DotNetProvider implements Provider<State> {
     
     public async run(previousState: State, changedFiles: ChangedFiles): Promise<execa.ExecaReturnValue<string>> {
         if(previousState) {
-            const testsToRun = await this.getTestsToRun(previousState, changedFiles);
+            await this.getTestsToRun(previousState, changedFiles);
         }
 
         const attributes = [
@@ -82,6 +82,10 @@ export default class DotNetProvider implements Provider<State> {
             .flatMap(x => x.File)
             .map(x => x?.$)
             .filter(x => !!x)
+            .map(x => ({
+                id: +x.uid,
+                path: normalizePathSeparators(x.fullPath)
+            }))
             .value();
 
         const trackedMethods = _.chain(modules)
@@ -89,6 +93,10 @@ export default class DotNetProvider implements Provider<State> {
             .flatMap(x => x.TrackedMethod)
             .map(x => x?.$)
             .filter(x => !!x)
+            .map(x => ({
+                name: x.name,
+                id: +x.uid
+            }))
             .value();
 
         const coverageData = _.chain(modules)
@@ -99,43 +107,50 @@ export default class DotNetProvider implements Provider<State> {
             .flatMap(x => x.SequencePoints)
             .flatMap(x => x.SequencePoint)
             .filter(x => !!x)
-            .flatMap(x => ({
-                trackedMethods: _.chain(x.TrackedMethodRefs || [])
-                    .flatMap(m => m.TrackedMethodRef)
-                    .map(m => m.$)
-                    .map(m => trackedMethods.find(y => y?.uid === m?.uid))
-                    .map(m => m.name)
-                    .value(),
-                filePath: normalizePathSeparators(files
-                    .find(f => f.uid === x.$?.fileid)
-                    ?.fullPath),
-                lineNumbers: _.range(+x.$.sl, +x.$.el + 1)
-            }))
-            .groupBy(x => x.filePath)
-            .filter(x => x[0].filePath.startsWith(projectRootDirectory))
-            .map(x => ({
-                tests: _.chain(x)
-                    .flatMap(y => y.trackedMethods)
-                    .uniq()
-                    .value(),
-                filePath: x[0].filePath.substring(projectRootDirectory.length + 1),
-                lineNumbers: _.chain(x)
-                    .flatMap(y => y.lineNumbers)
-                    .uniq()
-                    .value()
-            }))
+            .flatMap(x => _
+                .range(+x.$.sl, +x.$.el + 1)
+                .map(l => ({
+                    testIds: _.chain(x.TrackedMethodRefs || [])
+                        .flatMap(m => m.TrackedMethodRef)
+                        .map(m => m.$)
+                        .map(m => trackedMethods.find(y => y?.id === +m.uid))
+                        .map(m => m.id)
+                        .value(),
+                    fileId: files
+                        .find(f => 
+                            f.id === +x.$?.fileid &&
+                            f.path.startsWith(projectRootDirectory))
+                        ?.id,
+                    lineNumber: l
+                })))
+            .filter(x => !!x.fileId)
             .value();
 
-        return coverageData;
+        const result = {
+            tests: trackedMethods,
+            files: files,
+            coverage: coverageData
+        };
+        return result;
     }
 
     private async getTestsToRun(previousState: State, changedFiles: ChangedFiles) {
-        
+        const relevantFiles = previousState.files;
     }
 }
 
-type State = Array<{
-    tests: string[],
-    filePath: string,
-    lineNumbers: number[]
-}>;
+type State = {
+    tests: {
+        name: string;
+        id: number;
+    }[];
+    files: {
+        id: number;
+        path: string;
+    }[];
+    coverage: {
+        testIds: number[];
+        fileId: number;
+        lineNumber: number;
+    }[];
+};

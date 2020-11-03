@@ -2,3 +2,5 @@
 **/bin/
 **/obj/
 **/__Instrumented
+**/coverage.xml
+**/TestResults
