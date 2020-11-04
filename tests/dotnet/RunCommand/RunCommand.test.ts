@@ -1,7 +1,7 @@
 jest.setTimeout(1000 * 60 * 5);
 
-jest.mock('../../../src/io/get-pruner-path', () => ({
-    ...(jest.requireActual('../../../src/io/get-pruner-path')),
+jest.mock('../../../src/io', () => ({
+    ...(jest.requireActual('../../../src/io')),
     getPrunerPath: async () => "tests/dotnet/RunCommand/temp/.pruner"
 }));
 
@@ -13,7 +13,7 @@ import _ from 'lodash';
 import { readFromFile, writeToFile } from '../../../src/io';
 import { State } from '../../../src/providers';
 
-const gitDiff = require('git-diff')
+const gitDiff: (a: string, b: string) => string = require('git-diff');
 
 describe("RunCommand", () => {
     const cleanup = async () => {
@@ -82,31 +82,31 @@ describe("RunCommand", () => {
             }));
     });
 
-    // test('run -> check coverage', async () => {
-    //     await overwriteCode("SomeClass.1.cs");
+    test('run -> check coverage', async () => {
+        await overwriteCode("SomeClass.1.cs");
 
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
-    // test('run -> run -> check coverage', async () => {
-    //     await overwriteCode("SomeClass.1.cs");
+    test('run -> run -> check coverage', async () => {
+        await overwriteCode("SomeClass.1.cs");
 
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
     test('run -> change condition -> run -> check coverage', async () => {
         await overwriteCode("SomeClass.1.cs");
