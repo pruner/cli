@@ -17,8 +17,14 @@ import _ from 'lodash';
 import { readFromFile, writeToFile } from '../../../src/io';
 import { State } from '../../../src/providers';
 import execa from 'execa';
+import rimraf from 'rimraf';
+import { copy } from 'fs-extra';
 
-describe("RunCommand", () => {
+describe("RunCommand", () => {    
+    const cleanup = async () => {
+        rimraf.sync(join(__dirname, "temp"));
+    }
+
     const lineRange = (from: number, to: number) => _.range(from, to + 1);
 
     const getState = async (): Promise<State> => {
@@ -72,21 +78,21 @@ describe("RunCommand", () => {
             templateFileContents.toString());
     }
 
-    // beforeEach(async () => {
-    //     await cleanup();
+    beforeEach(async () => {
+        await cleanup();
 
-    //     await copy(
-    //         join(__dirname, "..", "sample"),
-    //         join(__dirname, "temp"));
+        await copy(
+            join(__dirname, "..", "sample"),
+            join(__dirname, "temp"));
 
-    //     await writeToFile(
-    //         join(__dirname, "temp", ".pruner", "settings.json"),
-    //         JSON.stringify({
-    //             dotnet: [{
-    //                 "workingDirectory": "tests/dotnet/RunCommand/temp"
-    //             }]
-    //         }));
-    // });
+        await writeToFile(
+            join(__dirname, "temp", ".pruner", "settings.json"),
+            JSON.stringify({
+                dotnet: [{
+                    "workingDirectory": "tests/dotnet/RunCommand/temp"
+                }]
+            }));
+    });
 
     // test('run -> check coverage', async () => {
     //     await overwriteCode("SomeClass.1.cs");
