@@ -8,7 +8,7 @@ namespace Sample
     {
         public static void DoSomething(int argument)
         {
-            if(argument > 1337) { 
+            if(argument > 13370) { 
                 SomeOtherClass.DoSomethingElse();
             } else
             {

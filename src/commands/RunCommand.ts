@@ -1,13 +1,12 @@
-import yargs, { CommandModule } from "yargs";
-import { useSpinner } from "../console";
-import { getCurrentDiffText, getGitTopDirectory } from "../git";
-import { readFromPrunerFile, writeToPrunerFile } from "../io";
-import { allProviders, LineCoverage, Provider, ProviderClass, State } from "../providers";
 import parseGitDiff from 'git-diff-parser';
 import _ from "lodash";
 import chalk from "chalk";
 import { join } from "path";
 import { Command } from "./Command";
+import { useSpinner } from '../console';
+import { getGitTopDirectory, getCurrentDiffText } from '../git';
+import { writeToPrunerFile, readFromPrunerFile } from '../io';
+import { allProviders, Provider, State, ProviderClass, LineCoverage } from '../providers';
 
 type Args = {
     provider: string
@@ -98,6 +97,9 @@ async function generateLcovFile(state: State) {
 
 async function getChangedLinesInGit() {
     const gitDiff = parseGitDiff(await getCurrentDiffText());
+    console.log("git-diff", gitDiff
+        .commits
+        .flatMap(x => x.files));
 
     const changedLines = gitDiff
         .commits
@@ -119,36 +121,43 @@ async function getChangedLinesInGit() {
 
 async function createProviders(Provider: ProviderClass<any>) {
     const settings = JSON.parse(await readFromPrunerFile("settings.json"));
+    console.log("settings", settings);
+
     const providerSettings = settings[Provider.providerName] as any[];
 
     return providerSettings.map(x => new Provider(x));
 }
 
 async function mergeState(previousState: State, newState: State): Promise<State> {
+    console.log("previous", previousState?.coverage.filter(x => x.fileId === 2));
+    console.log("new", newState.coverage.filter(x => x.fileId === 2));
+
     const linesToRemove: LineCoverage[] = [];
     if(previousState) {
         for(let previousLine of previousState.coverage) {
             if(previousLine.testIds.length === 0)
                 continue;
                 
-            let remove = true;
-
             const newLine = newState.coverage.find(x => 
                 x.lineNumber === previousLine.lineNumber &&
                 x.fileId === previousLine.fileId);
-            if(newLine) {
-                const previousTestIds = previousLine.testIds;
-                const newTestIds = newLine.testIds;
-
-                for(let previousTestId of previousTestIds) {
-                    const existsInNewTests = !!newTestIds.find(newTestId => newTestId === previousTestId);
-                    if(existsInNewTests) 
-                        remove = false;
-                }
-            }
-
-            if(remove)
+            if(!newLine) {
                 linesToRemove.push(previousLine);
+                continue;
+            }
+            
+            // let remove = true;
+
+            // const previousTestIds = previousLine.testIds;
+            // const newTestIds = newLine.testIds;
+
+            // for(let previousTestId of previousTestIds) {
+            //     const existsInNewTests = !!newTestIds.find(newTestId => newTestId === previousTestId);
+            //     if(existsInNewTests) 
+            //         remove = false;
+            // }
+
+            // linesToRemove.push(previousLine);
         }
     }
 

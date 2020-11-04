@@ -1,17 +1,26 @@
+jest.setTimeout(1000 * 60 * 5);
+
+jest.mock('../../../src/io/get-pruner-path', () => ({
+    ...(jest.requireActual('../../../src/io/get-pruner-path')),
+    getPrunerPath: async () => "tests/dotnet/RunCommand/temp/.pruner"
+}));
+
 import { join } from 'path';
 import * as rimraf from 'rimraf';
 import {copy} from 'fs-extra';
-import { readFromFile, writeToFile, getPrunerPath } from '../../../src/io';
 import { handler } from '../../../src/commands/RunCommand';
-import { State } from '../../../src/providers';
 import _ from 'lodash';
+import { readFromFile, writeToFile } from '../../../src/io';
+import { State } from '../../../src/providers';
 
-jest.setTimeout(1000 * 60 * 5);
+const gitDiff = require('git-diff')
 
 describe("RunCommand", () => {
     const cleanup = async () => {
         rimraf.sync(join(__dirname, "temp"));
     }
+
+    const lineRange = (from: number, to: number) => _.range(from, to + 1);
 
     const getState = async (): Promise<State> => {
         const result = await readFromFile(join(__dirname, "temp", ".pruner", "state.json"));
@@ -37,8 +46,24 @@ describe("RunCommand", () => {
         return coverage.map(x => x.lineNumber);
     }
 
-    jest.mock('../../../src/io', () => ({
-        getPrunerPath: async () => "tests/dotnet/RunCommand/temp/.pruner"
+    let mockCurrentDiff: string;
+    const overwriteCode = async (fileName: string) => {
+        const templateFileContents = await readFromFile(join(__dirname, fileName));
+        const templateFileName = `${fileName.substr(0, fileName.indexOf("."))}.cs`;
+        
+        const existingFilePath = join(__dirname, "temp", "Sample", templateFileName);
+        const existingFileContents = await readFromFile(existingFilePath);
+
+        mockCurrentDiff = gitDiff(existingFileContents, templateFileContents);
+
+        await writeToFile(
+            existingFilePath,
+            templateFileContents.toString());
+    }
+
+    jest.mock('../../../src/git', () => ({
+        ...(jest.requireActual('../../../src/git')),
+        getCurrentDiffText: async () => mockCurrentDiff
     }));
 
     beforeEach(async () => {
@@ -51,33 +76,53 @@ describe("RunCommand", () => {
         await writeToFile(
             join(__dirname, "temp", ".pruner", "settings.json"),
             JSON.stringify({
-                dotnet: {
+                dotnet: [{
                     "workingDirectory": "tests/dotnet/RunCommand/temp"
-                }
+                }]
             }));
     });
 
-    // afterEach(cleanup);
+    // test('run -> check coverage', async () => {
+    //     await overwriteCode("SomeClass.1.cs");
 
-    const overwriteCode = async (fileName: string) => {
-        const fileContents = await readFromFile(
-            join(__dirname, fileName));
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
 
-        const templateFileName = `${fileName.substr(0, fileName.indexOf("."))}.cs`;
-        await writeToFile(
-            join(__dirname, "temp", "Sample", templateFileName),
-            fileContents.toString());
-    }
+    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 17));
+    // });
 
-    test('run -> check coverage', async () => {
-        expect(await getPrunerPath()).toBe("tests/dotnet/RunCommand/temp/.pruner")
+    // test('run -> run -> check coverage', async () => {
+    //     await overwriteCode("SomeClass.1.cs");
 
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
+
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
+
+    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 17));
+    // });
+
+    test('run -> change condition -> run -> check coverage', async () => {
         await overwriteCode("SomeClass.1.cs");
         await handler({
             provider: "dotnet"
         });
 
+        await overwriteCode("SomeClass.2.cs");
+        await handler({
+            provider: "dotnet"
+        });
+
         const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(_.range(10, 17));
+        expect(coverage).toEqual([
+            ...lineRange(10, 11),
+            ...lineRange(13, 17)
+        ]);
     });
 });

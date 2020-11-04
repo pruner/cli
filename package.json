@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The Pruner CLI that reduces the amount of time spent running tests.",
   "main": "dist/index.js",
-  "type": "commonjs",
+  "type": "module",
   "directories": {
     "test": "tests"
   },
@@ -17,7 +17,6 @@
     "type": "git",
     "url": "git+https://github.com/pruner/cli.git"
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -40,6 +39,7 @@
     "@types/yargs": "^15.0.9",
     "babel-jest": "^26.6.1",
     "fs-extra": "^9.0.1",
+    "git-diff": "^2.0.6",
     "jest": "^26.6.1",
     "rimraf": "^3.0.2",
     "ts-node": "^9.0.0",

@@ -48,7 +48,7 @@ namespace Sample.Tests.World
         {
             for (var i = 0; i < count; i++)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(0);
                 SomeClass.DoSomething(argument);
             }
         }
