@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
-        "target": "ES6",
+        "target": "ES2015",
         "lib": ["ESNext"],
-        "module": "CommonJS",
+        "module": "ES2015",
         "moduleResolution": "node",
-        "allowSyntheticDefaultImports": false
+        "allowSyntheticDefaultImports": true
     }
 }

@@ -13,23 +13,23 @@ LF:2
 end_of_record
 SF:C:\Users\Mathias Lorenzen\source\repos\cli\tests\dotnet\sample\Sample\SomeClass.cs
 FN:10,System.Void Sample.SomeClass::DoSomething(System.Int32)
-FNDA:218,System.Void Sample.SomeClass::DoSomething(System.Int32)
+FNDA:0,System.Void Sample.SomeClass::DoSomething(System.Int32)
 FNF:1
-FNH:1
-BRDA:11,0,0,109
-BRDA:11,0,1,109
+FNH:0
+BRDA:11,0,0,-
+BRDA:11,0,1,-
 BRF:2
-BRH:2
-DA:10,218
-DA:11,218
-DA:11,109
-DA:12,109
-DA:13,109
-DA:14,109
-DA:15,109
-DA:16,109
-DA:17,218
-LH:9
+BRH:0
+DA:10,0
+DA:11,0
+DA:11,0
+DA:12,0
+DA:13,0
+DA:14,0
+DA:15,0
+DA:16,0
+DA:17,0
+LH:0
 LF:9
 end_of_record
 SF:C:\Users\Mathias Lorenzen\source\repos\cli\tests\dotnet\sample\Sample\SomeNotUsedClass.cs
@@ -47,22 +47,22 @@ LF:3
 end_of_record
 SF:C:\Users\Mathias Lorenzen\source\repos\cli\tests\dotnet\sample\Sample\SomeOtherClass.cs
 FN:10,System.Void Sample.SomeOtherClass::DoSomethingElse()
-FNDA:109,System.Void Sample.SomeOtherClass::DoSomethingElse()
+FNDA:0,System.Void Sample.SomeOtherClass::DoSomethingElse()
 FNF:1
-FNH:1
-BRDA:11,2,0,109
-BRDA:11,2,1,1090
+FNH:0
+BRDA:11,2,0,-
+BRDA:11,2,1,-
 BRF:2
-BRH:2
-DA:10,109
-DA:11,109
-DA:12,1090
-DA:13,1090
-DA:14,1090
-DA:11,1090
-DA:11,1199
-DA:15,109
-LH:8
+BRH:0
+DA:10,0
+DA:11,0
+DA:12,0
+DA:13,0
+DA:14,0
+DA:11,0
+DA:11,0
+DA:15,0
+LH:0
 LF:8
 end_of_record
 SF:C:\Users\Mathias Lorenzen\source\repos\cli\tests\dotnet\sample\Sample\Program.cs
@@ -117,47 +117,47 @@ FN:30,System.Void Sample.Tests.World.SampleWorldTests::Test_5s_HelloWorld()
 FN:36,System.Void Sample.Tests.World.SampleWorldTests::Test_3s_HelloWorld()
 FN:42,System.Void Sample.Tests.World.SampleWorldTests::Test_1s_HelloWorld()
 FN:48,System.Void Sample.Tests.World.SampleWorldTests::RunScenario(System.Int32,System.Int32)
-FNDA:1,System.Void Sample.Tests.World.SampleWorldTests::Test_60s_HelloWorld()
-FNDA:1,System.Void Sample.Tests.World.SampleWorldTests::Test_30s_HelloWorld()
-FNDA:1,System.Void Sample.Tests.World.SampleWorldTests::Test_10s_HelloWorld()
-FNDA:1,System.Void Sample.Tests.World.SampleWorldTests::Test_5s_HelloWorld()
-FNDA:1,System.Void Sample.Tests.World.SampleWorldTests::Test_3s_HelloWorld()
-FNDA:1,System.Void Sample.Tests.World.SampleWorldTests::Test_1s_HelloWorld()
-FNDA:6,System.Void Sample.Tests.World.SampleWorldTests::RunScenario(System.Int32,System.Int32)
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::Test_60s_HelloWorld()
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::Test_30s_HelloWorld()
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::Test_10s_HelloWorld()
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::Test_5s_HelloWorld()
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::Test_3s_HelloWorld()
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::Test_1s_HelloWorld()
+FNDA:0,System.Void Sample.Tests.World.SampleWorldTests::RunScenario(System.Int32,System.Int32)
 FNF:7
-FNH:7
-BRDA:49,0,0,6
-BRDA:49,0,1,109
+FNH:0
+BRDA:49,0,0,-
+BRDA:49,0,1,-
 BRF:2
-BRH:2
-DA:12,1
-DA:13,1
-DA:14,1
-DA:18,1
-DA:19,1
-DA:20,1
-DA:24,1
-DA:25,1
-DA:26,1
-DA:30,1
-DA:31,1
-DA:32,1
-DA:36,1
-DA:37,1
-DA:38,1
-DA:42,1
-DA:43,1
-DA:44,1
-DA:48,6
-DA:49,6
-DA:50,109
-DA:51,109
-DA:52,109
-DA:53,109
-DA:49,109
-DA:49,115
-DA:54,6
-LH:27
+BRH:0
+DA:12,0
+DA:13,0
+DA:14,0
+DA:18,0
+DA:19,0
+DA:20,0
+DA:24,0
+DA:25,0
+DA:26,0
+DA:30,0
+DA:31,0
+DA:32,0
+DA:36,0
+DA:37,0
+DA:38,0
+DA:42,0
+DA:43,0
+DA:44,0
+DA:48,0
+DA:49,0
+DA:50,0
+DA:51,0
+DA:52,0
+DA:53,0
+DA:49,0
+DA:49,0
+DA:54,0
+LH:0
 LF:27
 end_of_record
 SF:C:\Users\Mathias Lorenzen\source\repos\cli\tests\dotnet\sample\Sample.Tests\SampleDarknessTests.cs
@@ -168,45 +168,55 @@ FN:29,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_5s_HelloDarkne
 FN:35,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_3s_HelloDarkness()
 FN:41,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_1s_HelloDarkness()
 FN:48,System.Void Sample.Tests.Darkness.SampleDarknessTests::RunScenario(System.Int32,System.Int32)
-FNDA:1,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_60s_HelloDarkness()
-FNDA:1,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_30s_HelloDarkness()
-FNDA:1,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_10s_HelloDarkness()
-FNDA:1,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_5s_HelloDarkness()
-FNDA:1,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_3s_HelloDarkness()
-FNDA:1,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_1s_HelloDarkness()
-FNDA:6,System.Void Sample.Tests.Darkness.SampleDarknessTests::RunScenario(System.Int32,System.Int32)
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_60s_HelloDarkness()
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_30s_HelloDarkness()
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_10s_HelloDarkness()
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_5s_HelloDarkness()
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_3s_HelloDarkness()
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::Test_1s_HelloDarkness()
+FNDA:0,System.Void Sample.Tests.Darkness.SampleDarknessTests::RunScenario(System.Int32,System.Int32)
 FNF:7
-FNH:7
-BRDA:49,2,0,6
-BRDA:49,2,1,109
+FNH:0
+BRDA:49,2,0,-
+BRDA:49,2,1,-
 BRF:2
-BRH:2
-DA:11,1
-DA:12,1
-DA:13,1
-DA:17,1
-DA:18,1
-DA:19,1
-DA:23,1
-DA:24,1
-DA:25,1
-DA:29,1
-DA:30,1
-DA:31,1
-DA:35,1
-DA:36,1
-DA:37,1
-DA:41,1
-DA:42,1
-DA:43,1
-DA:48,6
-DA:49,6
-DA:50,109
-DA:51,109
-DA:52,109
-DA:53,109
-DA:49,109
-DA:49,115
+BRH:0
+DA:11,0
+DA:12,0
+DA:13,0
+DA:17,0
+DA:18,0
+DA:19,0
+DA:23,0
+DA:24,0
+DA:25,0
+DA:29,0
+DA:30,0
+DA:31,0
+DA:35,0
+DA:36,0
+DA:37,0
+DA:41,0
+DA:42,0
+DA:43,0
+DA:48,0
+DA:49,0
+DA:50,0
+DA:51,0
+DA:52,0
+DA:53,0
+DA:49,0
+DA:49,0
+DA:54,0
+LH:0
+LF:27
+end_of_record
+115
+DA:54,6
+LH:27
+LF:27
+end_of_record
+
 DA:54,6
 LH:27
 LF:27

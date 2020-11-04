@@ -15,6 +15,10 @@ export default yargs(argv)
     ],
     demandOption: false
   })
+  .option("working-directory", {
+    alias: "w",
+    demandOption: false
+  })
   .command(InitCommand as any)
   .command(RunCommand as any)
   .demandCommand(1)

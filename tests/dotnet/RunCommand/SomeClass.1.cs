@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +9,7 @@ namespace Sample
         public static void DoSomething(int argument)
         {
             if(argument > 1337) { 
-                SomeOtherClass.DoSomethingElse(); //i qdw did something lol
+                SomeOtherClass.DoSomethingElse();
             } else
             {
                 Console.WriteLine("Hello lol darkness");

@@ -64,7 +64,7 @@ async function getProviderSettings(topDirectoryPath: string) {
     return JSON.parse(await readFromFile(settingsPath)) || {};
 }
 
-async function askForInitSettings(Provider: ProviderClass<any, any>) {
+async function askForInitSettings(Provider: ProviderClass<any>) {
     const initQuestions = Provider.getInitQuestions();
     
     const keys = _.keys(initQuestions);

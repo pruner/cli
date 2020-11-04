@@ -1,4 +1,4 @@
-import * as execa from "execa";
+import execa from "execa";
 import { normalizePathSeparators } from "./io";
 
 async function runGitCommand(...args: string[]) {
