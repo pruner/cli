@@ -24,6 +24,8 @@ export async function getGitTopDirectory() {
 }
 
 export async function getCurrentDiffText() {
+    throw new Error("NOPE!");
+
     const result = await runGitCommand("diff");
     return result;
 }

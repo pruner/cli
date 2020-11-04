@@ -96,10 +96,8 @@ async function generateLcovFile(state: State) {
 }
 
 async function getChangedLinesInGit() {
-    const gitDiff = parseGitDiff(await getCurrentDiffText());
-    console.log("git-diff", gitDiff
-        .commits
-        .flatMap(x => x.files));
+    const diffText = await getCurrentDiffText();
+    const gitDiff = parseGitDiff(diffText);
 
     const changedLines = gitDiff
         .commits
@@ -121,8 +119,6 @@ async function getChangedLinesInGit() {
 
 async function createProviders(Provider: ProviderClass<any>) {
     const settings = JSON.parse(await readFromPrunerFile("settings.json"));
-    console.log("settings", settings);
-
     const providerSettings = settings[Provider.providerName] as any[];
 
     return providerSettings.map(x => new Provider(x));
