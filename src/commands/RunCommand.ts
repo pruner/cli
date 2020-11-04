@@ -4,8 +4,8 @@ import chalk from "chalk";
 import { join } from "path";
 import { Command } from "./Command";
 import { useSpinner } from '../console';
-import { getGitTopDirectory, getCurrentDiffText } from '../git';
-import { writeToPrunerFile, readFromPrunerFile } from '../io';
+import git from '../git';
+import io from '../io';
 import { allProviders, Provider, State, ProviderClass, LineCoverage } from '../providers';
 
 type Args = {
@@ -32,10 +32,9 @@ export async function handler(args: Args) {
 }
 
 async function runTestsForProvider(provider: Provider) {
-    const changedLines = await getChangedLinesInGit();
     const previousState = await readState();
 
-    const testsToRun = await getTestsToRun(previousState, changedLines);
+    const testsToRun = await getTestsToRun(previousState);
 
     const result = await provider.executeTestProcess(testsToRun);
     if(result.exitCode !== 0) {
@@ -56,12 +55,12 @@ async function runTestsForProvider(provider: Provider) {
 
 async function persistState(state: any) {
     const stateFileName = getStateFileName();
-    await writeToPrunerFile(stateFileName, JSON.stringify(state, null, ' '));
+    await io.writeToPrunerFile(stateFileName, JSON.stringify(state, null, ' '));
 }
 
 async function readState() {
     const stateFileName = getStateFileName();
-    return JSON.parse(await readFromPrunerFile(stateFileName));
+    return JSON.parse(await io.readFromPrunerFile(stateFileName));
 }
 
 function getStateFileName() {
@@ -75,7 +74,7 @@ async function generateLcovFile(state: State) {
         lcovContents += `${line}\n`;
     }
 
-    const rootDirectory = await getGitTopDirectory();
+    const rootDirectory = await git.getGitTopDirectory();
 
     for(let file of state.files) {
         const fullPath = join(rootDirectory, file.path);
@@ -90,35 +89,44 @@ async function generateLcovFile(state: State) {
         appendLine("end_of_record");
     }
 
-    await writeToPrunerFile(
+    await io.writeToPrunerFile(
         join("temp", "lcov.info"), 
         lcovContents);
 }
 
 async function getChangedLinesInGit() {
-    const diffText = await getCurrentDiffText();
+    const diffText = await git.getCurrentDiffText();
     const gitDiff = parseGitDiff(diffText);
 
     const changedLines = gitDiff
         .commits
         .flatMap(x => x.files)
-        .flatMap(x => ({
-            lineNumbers: _.chain(x.lines)
+        .flatMap(x => {
+            const lineNumbers =  _.chain(x.lines)
                 .filter(line => 
                     line.type === "added" ||
                     line.type === "deleted")
                 .flatMap(y => [y.ln1, y.ln2])
                 .filter(y => !!y)
                 .uniq()
-                .value(),
-            name: x.name || x.oldName
-        }))
+                .value();
+            return [
+                {
+                    lineNumbers,
+                    name: x.oldName
+                },
+                {
+                    lineNumbers,
+                    name: x.name
+                }
+            ];
+        })
         .filter(x => !!x.name && x.lineNumbers.length > 0);
     return changedLines;
 }
 
 async function createProviders(Provider: ProviderClass<any>) {
-    const settings = JSON.parse(await readFromPrunerFile("settings.json"));
+    const settings = JSON.parse(await io.readFromPrunerFile("settings.json"));
     const providerSettings = settings[Provider.providerName] as any[];
 
     return providerSettings.map(x => new Provider(x));
@@ -127,6 +135,11 @@ async function createProviders(Provider: ProviderClass<any>) {
 async function mergeState(previousState: State, newState: State): Promise<State> {
     console.log("previous", previousState?.coverage.filter(x => x.fileId === 2));
     console.log("new", newState.coverage.filter(x => x.fileId === 2));
+
+    const allNewTestIds = _.chain(newState.coverage)
+        .flatMap(x => x.testIds)
+        .uniq()
+        .value();
 
     const linesToRemove: LineCoverage[] = [];
     if(previousState) {
@@ -137,23 +150,21 @@ async function mergeState(previousState: State, newState: State): Promise<State>
             const newLine = newState.coverage.find(x => 
                 x.lineNumber === previousLine.lineNumber &&
                 x.fileId === previousLine.fileId);
-            if(!newLine) {
-                linesToRemove.push(previousLine);
+            if(newLine)
                 continue;
+
+            let remove = false;
+
+            const previousTestIds = previousLine.testIds;
+
+            for(let previousTestId of previousTestIds) {
+                const existsInNewTests = !!allNewTestIds.find(newTestId => newTestId === previousTestId);
+                if(existsInNewTests) 
+                    remove = true;
             }
-            
-            // let remove = true;
 
-            // const previousTestIds = previousLine.testIds;
-            // const newTestIds = newLine.testIds;
-
-            // for(let previousTestId of previousTestIds) {
-            //     const existsInNewTests = !!newTestIds.find(newTestId => newTestId === previousTestId);
-            //     if(existsInNewTests) 
-            //         remove = false;
-            // }
-
-            // linesToRemove.push(previousLine);
+            if(remove)
+                linesToRemove.push(previousLine);
         }
     }
 
@@ -178,7 +189,7 @@ async function mergeState(previousState: State, newState: State): Promise<State>
     return mergedState;
 }
 
-async function getTestsToRun(previousState: State, changedFiles: ChangedFiles) {
+async function getTestsToRun(previousState: State) {
     if(!previousState) {
         return {
             affected: [],
@@ -186,7 +197,10 @@ async function getTestsToRun(previousState: State, changedFiles: ChangedFiles) {
         };
     }
 
-    const affectedTests = changedFiles
+    console.log("files", previousState.files);
+
+    const changedLines = await getChangedLinesInGit();
+    const affectedTests = changedLines
         .flatMap(changedFile => {
             const file = previousState.files.find(x => x.path === changedFile.name);
             if(!file)

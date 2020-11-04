@@ -1,5 +1,12 @@
 import execa from "execa";
-import { normalizePathSeparators } from "./io";
+import io from "./io";
+
+const declarations = {
+    isGitProject,
+    getGitVersion,
+    getGitTopDirectory,
+    getCurrentDiffText
+};
 
 async function runGitCommand(...args: string[]) {
     const result = await execa("git", args, {
@@ -11,21 +18,21 @@ async function runGitCommand(...args: string[]) {
     return result.stdout;
 }
 
-export async function isGitProject() {
+async function isGitProject() {
     return !!await getGitVersion();
 }
 
-export async function getGitVersion() {
+async function getGitVersion() {
     return await runGitCommand("--version");
 }
 
-export async function getGitTopDirectory() {
-    return normalizePathSeparators(await runGitCommand("rev-parse", "--show-toplevel"));
+async function getGitTopDirectory() {
+    return io.normalizePathSeparators(await runGitCommand("rev-parse", "--show-toplevel"));
 }
 
-export async function getCurrentDiffText() {
-    throw new Error("NOPE!");
-
+async function getCurrentDiffText() {
     const result = await runGitCommand("diff");
     return result;
 }
+
+export default declarations;

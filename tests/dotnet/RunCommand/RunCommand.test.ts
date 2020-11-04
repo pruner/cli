@@ -1,24 +1,20 @@
 jest.setTimeout(1000 * 60 * 5);
 
-jest.mock('../../../src/io', () => ({
-    ...(jest.requireActual('../../../src/io')),
-    getPrunerPath: async () => "tests/dotnet/RunCommand/temp/.pruner"
-}));
-
-let mockCurrentDiff: string;
-jest.mock('../../../src/git', () => ({
-    ...(jest.requireActual('../../../src/git')),
-    getCurrentDiffText: async () => mockCurrentDiff
-}));
-
 import { join } from 'path';
 import { handler } from '../../../src/commands/RunCommand';
 import _ from 'lodash';
-import { readFromFile, writeToFile } from '../../../src/io';
 import { State } from '../../../src/providers';
 import execa from 'execa';
 import rimraf from 'rimraf';
 import { copy } from 'fs-extra';
+
+import git from '../../../src/git';
+import io from '../../../src/io';
+
+io.getPrunerPath = async () => "tests/dotnet/RunCommand/temp/.pruner";
+
+let mockCurrentDiff = "";
+git.getCurrentDiffText = async () => mockCurrentDiff;
 
 describe("RunCommand", () => {    
     const cleanup = async () => {
@@ -28,7 +24,7 @@ describe("RunCommand", () => {
     const lineRange = (from: number, to: number) => _.range(from, to + 1);
 
     const getState = async (): Promise<State> => {
-        const result = await readFromFile(join(__dirname, "temp", ".pruner", "state.json"));
+        const result = await io.readFromFile(join(__dirname, "temp", ".pruner", "state.json"));
         if(!result) {
             return {
                 coverage: [],
@@ -64,16 +60,25 @@ describe("RunCommand", () => {
     }
 
     const overwriteCode = async (fileName: string) => {
+        const currentDirectory = join("tests", "dotnet", "RunCommand");
+
         const overwrittenFileName = `${fileName.substr(0, fileName.indexOf("."))}.cs`;
 
-        const existingFilePath = join(__dirname, "temp", "Sample", overwrittenFileName);
-        const templateFilePath = join(__dirname, fileName);
+        const relativeSampleFilePath = join("temp", "Sample", overwrittenFileName);
 
-        mockCurrentDiff = await gitDiff(existingFilePath, templateFilePath);
+        const existingFilePath = join(currentDirectory, relativeSampleFilePath);
+        const templateFilePath = join(currentDirectory, fileName);
 
-        const templateFileContents = await readFromFile(templateFilePath);
+        const overwrittenRelativePath = join(currentDirectory, relativeSampleFilePath);
+        mockCurrentDiff = await gitDiff(
+            overwrittenRelativePath, 
+            templateFilePath);
 
-        await writeToFile(
+        console.log("diff-set", mockCurrentDiff);
+
+        const templateFileContents = await io.readFromFile(templateFilePath);
+
+        await io.writeToFile(
             existingFilePath,
             templateFileContents.toString());
     }
@@ -85,7 +90,7 @@ describe("RunCommand", () => {
             join(__dirname, "..", "sample"),
             join(__dirname, "temp"));
 
-        await writeToFile(
+        await io.writeToFile(
             join(__dirname, "temp", ".pruner", "settings.json"),
             JSON.stringify({
                 dotnet: [{
@@ -95,8 +100,6 @@ describe("RunCommand", () => {
     });
 
     // test('run -> check coverage', async () => {
-    //     await overwriteCode("SomeClass.1.cs");
-
     //     await handler({
     //         provider: "dotnet"
     //     });
@@ -106,8 +109,6 @@ describe("RunCommand", () => {
     // });
 
     // test('run -> run -> check coverage', async () => {
-    //     await overwriteCode("SomeClass.1.cs");
-
     //     await handler({
     //         provider: "dotnet"
     //     });
@@ -121,12 +122,11 @@ describe("RunCommand", () => {
     // });
 
     test('run -> change condition -> run -> check coverage', async () => {
-        await overwriteCode("SomeClass.1.cs");
         await handler({
             provider: "dotnet"
         });
 
-        await overwriteCode("SomeClass.2.cs");
+        await overwriteCode("SomeClass.condition-change.cs");
         await handler({
             provider: "dotnet"
         });

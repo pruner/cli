@@ -3,7 +3,18 @@ import { glob as internalGlob } from 'glob';
 import { lstat, mkdir, readdir, readFile, writeFile } from "fs/promises";
 import { basename, dirname, join, sep } from 'path';
 
-export async function glob(workingDirectory: string, pattern: string): Promise<string[]> {
+const exported = {
+    glob,
+    safeStat,
+    writeToFile,
+    readFromFile,
+    getPrunerPath,
+    writeToPrunerFile,
+    readFromPrunerFile,
+    normalizePathSeparators
+};
+
+async function glob(workingDirectory: string, pattern: string): Promise<string[]> {
     return new Promise(resolve => 
         internalGlob(
             pattern, 
@@ -13,7 +24,7 @@ export async function glob(workingDirectory: string, pattern: string): Promise<s
             (_, matches) => resolve(matches)));
 }
 
-export async function safeStat(path: string) {
+async function safeStat(path: string) {
     try {
         const stat = await lstat(path);
         return stat;
@@ -22,12 +33,12 @@ export async function safeStat(path: string) {
     }
 }
 
-export async function writeToFile(path: string, contents: string) {
+async function writeToFile(path: string, contents: string) {
     await ensurePathExists(path);
     await writeFile(path, contents);
 }
 
-export async function readFromFile(path: string) {
+async function readFromFile(path: string) {
     await ensurePathExists(path);
 
     try {
@@ -51,7 +62,7 @@ async function ensurePathExists(path: string) {
     }
 }
 
-export async function getPrunerPath() {
+async function getPrunerPath() {
     let currentPath = process.cwd();
     while(currentPath.indexOf(sep) > -1) {
         const directories = await readdir(currentPath);
@@ -64,19 +75,21 @@ export async function getPrunerPath() {
     return "";
 }
 
-export async function writeToPrunerFile(path: string, contents: string) {
-    const prunerDirectory = await getPrunerPath();
+async function writeToPrunerFile(path: string, contents: string) {
+    const prunerDirectory = await exported.getPrunerPath();
     await writeToFile(join(prunerDirectory, path), contents);
 }
 
-export async function readFromPrunerFile(path: string) {
-    const prunerDirectory = await getPrunerPath();
+async function readFromPrunerFile(path: string) {
+    const prunerDirectory = await exported.getPrunerPath();
     return await readFromFile(join(prunerDirectory, path));
 }
 
-export function normalizePathSeparators(path: string) {
+function normalizePathSeparators(path: string) {
     if(!path)
         return "";
 
     return path.replace(/\\/g, "/");
 }
+
+export default exported;

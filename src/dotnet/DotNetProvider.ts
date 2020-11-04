@@ -3,10 +3,10 @@ import { readFile } from "fs/promises";
 import { Provider, SettingsQuestions, Tests } from "../providers";
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
-import { glob, normalizePathSeparators } from "../io";
+import io from "../io";
 import { Root } from "./altcover";
 import _ from "lodash";
-import { getGitTopDirectory } from "../git";
+import git from "../git";
 
 type Settings = {
     workingDirectory: string
@@ -56,6 +56,8 @@ export default class DotNetProvider implements Provider {
             .map(x => `(${x})`)
             .join('|');
 
+        console.log(filterArgument);
+
         const result = await execa(
             "dotnet",
             [
@@ -84,7 +86,7 @@ export default class DotNetProvider implements Provider {
     }
 
     public async gatherState() {
-        const projectRootDirectory = await getGitTopDirectory();
+        const projectRootDirectory = await git.getGitTopDirectory();
 
         const coverageFileContents = await this.getFileContents("**/coverage.xml.tmp.pruner");
 
@@ -107,7 +109,7 @@ export default class DotNetProvider implements Provider {
             .filter(x => !!x)
             .map(x => ({
                 id: +x.uid,
-                path: normalizePathSeparators(x.fullPath)
+                path: io.normalizePathSeparators(x.fullPath)
             }))
             .filter(x => x.path.startsWith(projectRootDirectory))
             .map(x => ({
@@ -167,7 +169,7 @@ export default class DotNetProvider implements Provider {
     }
 
     private async getFileContents(globPattern: string) {
-        const filePaths = await glob(
+        const filePaths = await io.glob(
             this.settings.workingDirectory,
             globPattern);
     
