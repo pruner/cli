@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import {ChangedFiles, Provider, SettingsQuestions} from "../providers";
 import { parseStringPromise } from "xml2js";
 import * as execa from "execa";
-import { glob, normalizePathSeparators } from "../io";
+import { glob, normalizePathSeparators, writeToPrunerFile } from "../io";
 import { Root } from "./AltCoverTypes";
 import * as _ from "lodash";
 import { getGitTopDirectory } from "../git";
@@ -25,8 +25,7 @@ type State = {
 };
 
 type Settings = {
-    workingDirectory: string,
-    projectDirectoryGlob: string
+    workingDirectory: string
 }
 
 export default class DotNetProvider implements Provider<State> {
@@ -42,12 +41,6 @@ export default class DotNetProvider implements Provider<State> {
                 type: "text",
                 message: "What working directory would you like to use?",
                 hint: "The directory where you would normally run 'dotnet test' from."
-            },
-            projectDirectoryGlob: {
-                type: "text",
-                initial: "**/*.Tests",
-                message: "What glob can be used to find your test project folders?",
-                hint: "The glob to use for finding individual test project folders."
             }
         }
     }
@@ -111,21 +104,13 @@ export default class DotNetProvider implements Provider<State> {
     }
 
     public async gatherState() {
+        await this.persistLcovFiles();
+
         const projectRootDirectory = await getGitTopDirectory();
 
-        const projectDirectoryPaths = await glob(
-            this.settings.workingDirectory,
-            this.settings.projectDirectoryGlob);
+        const coverageFileContents = await this.getFileBuffers("**/coverage.xml.pruner");
 
-        const coverageFileBuffers = await Promise.all(projectDirectoryPaths
-            .map(directoryPath => join(
-                this.settings.workingDirectory,
-                directoryPath,
-                "coverage.xml"))
-            .map(filePath => readFile(filePath)));
-
-        const state: Root[] = await Promise.all(coverageFileBuffers
-            .map(file => file.toString())
+        const state: Root[] = await Promise.all(coverageFileContents
             .map(file => parseStringPromise(file, {
                 async: true
             })));
@@ -194,6 +179,14 @@ export default class DotNetProvider implements Provider<State> {
         return result;
     }
 
+    private async persistLcovFiles() {
+        const lcovFileContents = await this.getFileBuffers("**/lcov.info.pruner");
+        await Promise.all(lcovFileContents
+            .map((contents, index) => writeToPrunerFile(
+                join("temp", index.toString(), "lcov.info"),
+                contents)));
+    }
+
     public async mergeState(previousState: State, newState: State): Promise<State> {
         return {
             tests: _.chain([previousState?.tests || [], newState.tests || []])
@@ -245,5 +238,16 @@ export default class DotNetProvider implements Provider<State> {
             affected: affectedTests,
             unaffected: allKnownUnaffectedTests
         };
+    }
+
+    private async getFileBuffers(globPattern: string) {
+        const filePaths = await glob(
+            this.settings.workingDirectory,
+            globPattern);
+    
+        const coverageFileBuffers = await Promise.all(filePaths
+            .map(filePath => readFile(filePath)));
+        return coverageFileBuffers
+            .map(file => file.toString());
     }
 }

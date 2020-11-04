@@ -1,6 +1,6 @@
 import yargs, { CommandModule } from "yargs";
 import { getGitTopDirectory } from "../git";
-import { readFromFile, writeToFile } from "../io";
+import { readFromFile, writeToFile, writeToPrunerFile } from "../io";
 import { join } from "path";
 import { allProviders, ProviderClass } from "../providers";
 import * as chalk from "chalk";
@@ -37,6 +37,12 @@ export default {
         existingSettings[args.provider] = providers;
 
         await persistProviderSettings(topDirectoryPath, existingSettings);
+
+        await writeToPrunerFile(
+            ".gitignore", 
+            [
+                "temp/"
+            ].join("\n"));
 
         console.log(chalk.green("Pruner has been initialized!"));
     }
