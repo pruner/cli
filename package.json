@@ -14,6 +14,7 @@
     "dist"
   ],
   "scripts": {
+    "pruner:install": "npm run build && npm unlink && npm link",
     "pruner:run": "npm run build && node ./",
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
@@ -32,8 +33,10 @@
   "bugs": {
     "url": "https://github.com/pruner/cli/issues"
   },
-  "engines" : { "node" : ">=10" },
-  "engineStrict" : true,
+  "engines": {
+    "node": ">=10"
+  },
+  "engineStrict": true,
   "homepage": "https://github.com/pruner/cli#readme",
   "devDependencies": {
     "@babel/cli": "^7.12.1",

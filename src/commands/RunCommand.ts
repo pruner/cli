@@ -199,7 +199,8 @@ async function getChangedLinesInGit() {
                 }
             ];
         })
-        .filter(x => !!x.name && x.lineNumbers.length > 0);
+        .filter(x => !!x.name && x.lineNumbers.length > 0)
+        .value();
 
     console.debug("git-diff-text", diffText);
     console.debug("git-diff-lines", changedLines);
