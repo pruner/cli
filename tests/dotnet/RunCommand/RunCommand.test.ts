@@ -76,11 +76,9 @@ describe("RunCommand", () => {
     }
 
     const replaceCodeFiles = async (fromPath: string, toPath: string) => {
-        toPath = join(currentDirectory, toPath);
-
         mockCurrentDiff = await gitDiff(
-            fromPath, 
-            toPath);
+            toPath, 
+            fromPath);
 
         const fromContents = await io.readFromFile(fromPath);
 
@@ -105,27 +103,46 @@ describe("RunCommand", () => {
             }));
     });
 
-    test('run -> check coverage', async () => {
-        await handler({
-            provider: "dotnet"
-        });
+    // test('run -> check coverage', async () => {
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
 
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(lineRange(10, 17));
-    });
+    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 17));
+    // });
 
-    test('run -> run -> check coverage', async () => {
-        await handler({
-            provider: "dotnet"
-        });
+    // test('run -> run -> check coverage', async () => {
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
 
-        await handler({
-            provider: "dotnet"
-        });
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
 
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(lineRange(10, 17));
-    });
+    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 17));
+    // });
+
+    // test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
+
+    //     await overwriteCode("SomeClass.condition-change.cs");
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
+
+    //     await revertCode("SomeClass.cs");
+    //     await handler({
+    //         provider: "dotnet"
+    //     });
+
+    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 17));
+    // });
 
     test('run -> change condition -> run -> check coverage', async () => {
         await handler({
@@ -142,24 +159,5 @@ describe("RunCommand", () => {
             ...lineRange(10, 11),
             ...lineRange(14, 17)
         ]);
-    });
-
-    test('run -> change condition -> run -> revert condition -> check coverage', async () => {
-        await handler({
-            provider: "dotnet"
-        });
-
-        await overwriteCode("SomeClass.condition-change.cs");
-        await handler({
-            provider: "dotnet"
-        });
-
-        await revertCode("SomeClass.cs");
-        await handler({
-            provider: "dotnet"
-        });
-
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(lineRange(10, 17));
     });
 });
