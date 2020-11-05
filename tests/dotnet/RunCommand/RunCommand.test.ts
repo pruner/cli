@@ -10,6 +10,7 @@ import { copy, pathExists, rmdir } from 'fs-extra';
 
 import git from '../../../src/git';
 import io from '../../../src/io';
+import { gitDiff } from '../../helpers/git';
 
 io.getPrunerPath = async () => "tests/dotnet/RunCommand/temp/.pruner";
 
@@ -50,18 +51,6 @@ describe("RunCommand", () => {
     const getCoveredLineNumbersForFile = async (fileName: string) => {
         const coverage = await getFileCoverage(fileName);
         return coverage.map(x => x.lineNumber);
-    }
-
-    const gitDiff = async (path1: string, path2: string) => {
-        const result = await execa("git", [
-            "diff",
-            "--no-index",
-            path1,
-            path2
-        ], {
-            reject: false
-        });
-        return result.stdout;
     }
 
     const revertCode = async (fileName: string) => {

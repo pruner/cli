@@ -1,4 +1,3 @@
-import parseGitDiff from 'git-diff-parser';
 import {chain, flatMap} from "lodash";
 import { green, red, white, yellow } from "chalk";
 import { join } from "path";
@@ -75,6 +74,8 @@ function watchProvider(provider: Provider, settings: Settings) {
             await runTestsForProvider(provider);
         }
 
+        console.log(white("Waiting for file changes..."));
+
         isRunning = false;
     };
 
@@ -88,11 +89,13 @@ function watchProvider(provider: Provider, settings: Settings) {
         useFsEvents: true,
         persistent: true
     });
-    watcher.on('change', runTests);
-    watcher.on('add', runTests);
-    watcher.on('unlink', runTests);
-    watcher.on('addDir', runTests);
-    watcher.on('unlinkDir', runTests);
+    watcher.on('ready', () => {
+        watcher.on('change', runTests);
+        watcher.on('add', runTests);
+        watcher.on('unlink', runTests);
+        watcher.on('addDir', runTests);
+        watcher.on('unlinkDir', runTests);
+    });
 }
 
 async function runTestsForProviders(providers: Provider[]) {
@@ -117,7 +120,7 @@ async function runTestsForProvider(provider: Provider) {
     });
     
     if(result.exitCode !== 0) {
-        console.error(red("Could not run tests.") + "\n" + yellow(result.stdout) + "\n" + red(result.stderr));
+        console.error(red(`Could not run tests. Exit code ${result.exitCode}.`) + "\n" + yellow(result.stdout) + "\n" + red(result.stderr));
         return;
     }
 
@@ -171,41 +174,6 @@ async function generateLcovFile(state: State) {
     await io.writeToPrunerFile(
         join("temp", "lcov.info"), 
         lcovContents);
-}
-
-async function getChangedLinesInGit() {
-    const diffText = await git.getCurrentDiffText();
-    const gitDiff = parseGitDiff(diffText);
-
-    const changedLines = chain(gitDiff.commits)
-        .flatMap(x => x.files)
-        .flatMap(x => {
-            const getLineNumbers = (accessor: (line: parseGitDiff.Line) => number) => chain(x.lines)
-                .filter(line => 
-                    line.type === "added" ||
-                    line.type === "deleted")
-                .map(accessor)
-                .filter(y => !!y)
-                .uniq()
-                .value();
-            return [
-                {
-                    lineNumbers: getLineNumbers(x => x.ln1),
-                    name: io.normalizePathSeparators(x.oldName)
-                },
-                {
-                    lineNumbers: getLineNumbers(x => x.ln2 || x.ln1),
-                    name: io.normalizePathSeparators(x.name)
-                }
-            ];
-        })
-        .filter(x => !!x.name && x.lineNumbers.length > 0)
-        .value();
-
-    console.debug("git-diff-text", diffText);
-    console.debug("git-diff-lines", changedLines);
-
-    return changedLines;
 }
 
 async function createProvidersFromClass(Provider: ProviderClass<Settings>) {
@@ -285,17 +253,17 @@ async function getTestsToRun(previousState: State) {
         };
     }
 
-    const changedLines = await getChangedLinesInGit();
+    const changedLines = await git.getChangedFileLines(previousState);
     const affectedTests = changedLines
         .flatMap(changedFile => {
-            const file = previousState.files.find(x => x.path === changedFile.name);
+            const file = previousState.files.find(x => x.path === changedFile.filePath);
             if(!file) {
                 console.debug("tests-to-run", "changed file not found in previous state", changedFile);
                 return [];
             }
 
             const linesInFile = previousState.coverage.filter(x => x.fileId === file.id);
-            const affectedLines = linesInFile.filter(x => changedFile.lineNumbers.indexOf(x.lineNumber) > -1);
+            const affectedLines = linesInFile.filter(x => changedFile.changedLines.indexOf(x.lineNumber) > -1);
             return flatMap(affectedLines, x => x.testIds);
         })
         .map(x => previousState.tests.find(y => y.id === x));
