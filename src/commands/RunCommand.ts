@@ -113,15 +113,16 @@ async function getChangedLinesInGit() {
             return [
                 {
                     lineNumbers,
-                    name: x.oldName
+                    name: io.normalizePathSeparators(x.oldName)
                 },
                 {
                     lineNumbers,
-                    name: x.name
+                    name: io.normalizePathSeparators(x.name)
                 }
             ];
         })
         .filter(x => !!x.name && x.lineNumbers.length > 0);
+
     return changedLines;
 }
 
@@ -133,9 +134,6 @@ async function createProviders(Provider: ProviderClass<any>) {
 }
 
 async function mergeState(previousState: State, newState: State): Promise<State> {
-    console.log("previous", previousState?.coverage.filter(x => x.fileId === 2));
-    console.log("new", newState.coverage.filter(x => x.fileId === 2));
-
     const allNewTestIds = _.chain(newState.coverage)
         .flatMap(x => x.testIds)
         .uniq()
@@ -196,8 +194,6 @@ async function getTestsToRun(previousState: State) {
             unaffected: []
         };
     }
-
-    console.log("files", previousState.files);
 
     const changedLines = await getChangedLinesInGit();
     const affectedTests = changedLines

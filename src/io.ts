@@ -89,7 +89,11 @@ function normalizePathSeparators(path: string) {
     if(!path)
         return "";
 
-    return path.replace(/\\/g, "/");
+    path = path.replace(/\\/g, "/");
+    while(path.indexOf("//") > -1)
+        path = path.replace("//", "/");
+
+    return path;
 }
 
 export default exported;

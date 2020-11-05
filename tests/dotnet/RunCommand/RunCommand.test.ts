@@ -74,8 +74,6 @@ describe("RunCommand", () => {
             overwrittenRelativePath, 
             templateFilePath);
 
-        console.log("diff-set", mockCurrentDiff);
-
         const templateFileContents = await io.readFromFile(templateFilePath);
 
         await io.writeToFile(
@@ -99,27 +97,27 @@ describe("RunCommand", () => {
             }));
     });
 
-    // test('run -> check coverage', async () => {
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+    test('run -> check coverage', async () => {
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
-    // test('run -> run -> check coverage', async () => {
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+    test('run -> run -> check coverage', async () => {
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
     test('run -> change condition -> run -> check coverage', async () => {
         await handler({
@@ -134,7 +132,7 @@ describe("RunCommand", () => {
         const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
         expect(coverage).toEqual([
             ...lineRange(10, 11),
-            ...lineRange(13, 17)
+            ...lineRange(14, 17)
         ]);
     });
 });

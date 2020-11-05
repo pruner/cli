@@ -56,8 +56,6 @@ export default class DotNetProvider implements Provider {
             .map(x => `(${x})`)
             .join('|');
 
-        console.log(filterArgument);
-
         const result = await execa(
             "dotnet",
             [
