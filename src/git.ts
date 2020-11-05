@@ -9,7 +9,8 @@ const declarations = {
     getGitVersion,
     getGitTopDirectory,
     getCurrentDiffText,
-    getChangedFiles: getChangedFiles
+    getChangedFiles,
+    createStashCommit
 };
 
 async function runGitCommand(...args: string[]) {
@@ -19,7 +20,7 @@ async function runGitCommand(...args: string[]) {
     if(result.exitCode !== 0)
         return "";
 
-    return result.stdout;
+    return result.stdout?.trim() ?? "";
 }
 
 async function isGitProject() {
@@ -38,13 +39,15 @@ async function getGitTopDirectory() {
     return io.normalizePathSeparators(path);
 }
 
-async function getCurrentDiffText() {
-    const result = await runGitCommand("diff");
-    return result;
+async function getCurrentDiffText(fromCommit: string, toCommit: string) {
+    if(fromCommit && toCommit)
+        return await runGitCommand("diff", fromCommit, toCommit);
+
+    return await runGitCommand("diff");
 }
 
-async function getChangedFiles() {
-    const diffText = await declarations.getCurrentDiffText();
+async function getChangedFiles(fromCommit: string, toCommit: string) {
+    const diffText = await declarations.getCurrentDiffText(fromCommit, toCommit);
     const gitDiff = parseGitDiff(diffText);
 
     const changedLines = chain(gitDiff.commits)
@@ -58,6 +61,10 @@ async function getChangedFiles() {
     console.debug("git-diff-lines", changedLines);
 
     return changedLines;
+}
+
+async function createStashCommit() {
+    return await runGitCommand("stash", "create");
 }
 
 function getLineChangesForFile(file: parseGitDiff.File) {

@@ -20,6 +20,7 @@ export type LineCoverage = {
 };
 
 export type State = {
+    commitId?: string;
     tests: Test[];
     files: {
         id: number;

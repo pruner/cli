@@ -7,6 +7,7 @@ import git from '../git';
 import io from '../io';
 import chokidar from 'chokidar';
 import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../providers';
+import { read } from "fs";
 
 type Args = DefaultArgs & {
     provider?: string,
@@ -55,6 +56,19 @@ export async function handler(args: Args) {
     }
 }
 
+async function wrapInGitTransaction(action: (previousState: State, newCommitId: string) => Promise<State>) {
+    const newCommitId = await git.createStashCommit();
+
+    let state = await readState();
+
+    state = await action(state, newCommitId);
+    
+    state.commitId = newCommitId;
+
+    await persistState(state);
+    await generateLcovFile(state);
+}
+
 function watchProvider(provider: Provider, settings: Settings) {
     let isRunning = false;
     let hasPending = false;
@@ -67,12 +81,16 @@ function watchProvider(provider: Provider, settings: Settings) {
 
         isRunning = true;
 
-        await runTestsForProvider(provider);
+        await wrapInGitTransaction(async (state, newCommitId) => {
+            state = await runTestsForProvider(provider, state, newCommitId);
 
-        if(hasPending) {
-            hasPending = false;
-            await runTestsForProvider(provider);
-        }
+            if(hasPending) {
+                hasPending = false;
+                state = await runTestsForProvider(provider, state, newCommitId);
+            }
+
+            return state;
+        });
 
         console.log(white("Waiting for file changes..."));
 
@@ -99,8 +117,12 @@ function watchProvider(provider: Provider, settings: Settings) {
 }
 
 async function runTestsForProviders(providers: Provider[]) {
-    for (let provider of providers)
-        await runTestsForProvider(provider);
+    await wrapInGitTransaction(async (state, newCommitId) => {
+        for (let provider of providers)
+            state = await runTestsForProvider(provider, state, newCommitId);
+        
+        return state;
+    });
 }
 
 async function createProvidersFromArguments(args: Args) {
@@ -111,11 +133,9 @@ async function createProvidersFromArguments(args: Args) {
     return flatMap(providerPairs, x => x);
 }
 
-async function runTestsForProvider(provider: Provider) {
-    const previousState = await readState();
-
+async function runTestsForProvider(provider: Provider, previousState: State, newCommitId: string): Promise<State> {
     const result = await useSpinner("Running tests", async () => {
-        const testsToRun = await getTestsToRun(previousState);
+        const testsToRun = await getTestsToRun(previousState, newCommitId);
         return await provider.executeTestProcess(testsToRun);
     });
     
@@ -129,18 +149,15 @@ async function runTestsForProvider(provider: Provider) {
 
     const state = await provider.gatherState();
 
-    const mergedState = await mergeState(previousState, state);
-    await persistState(mergedState);
-
-    await generateLcovFile(mergedState);
+    return await mergeState(previousState, state);
 }
 
-async function persistState(state: any) {
+async function persistState(state: State) {
     const stateFileName = getStateFileName();
     await io.writeToPrunerFile(stateFileName, JSON.stringify(state, null, ' '));
 }
 
-async function readState() {
+async function readState(): Promise<State> {
     const stateFileName = getStateFileName();
     return JSON.parse(await io.readFromPrunerFile(stateFileName));
 }
@@ -225,6 +242,7 @@ async function mergeState(previousState: State, newState: State): Promise<State>
     console.debug("merge-all-new-test-ids", allNewTestIds);
 
     const mergedState: State = {
+        commitId: newState?.commitId || previousState?.commitId,
         tests: chain([previousState?.tests || [], newState.tests || []])
             .flatMap()
             .uniqBy(x => x.name)
@@ -245,7 +263,7 @@ async function mergeState(previousState: State, newState: State): Promise<State>
     return mergedState;
 }
 
-async function getTestsToRun(previousState: State) {
+async function getTestsToRun(previousState: State, newCommitId: string) {
     if(!previousState) {
         return {
             affected: new Array<Test>(),
@@ -253,7 +271,9 @@ async function getTestsToRun(previousState: State) {
         };
     }
 
-    const changedFiles = await git.getChangedFiles();
+    const changedFiles = await git.getChangedFiles(
+        previousState.commitId, 
+        newCommitId);
     const affectedTests = chain(changedFiles)
         .flatMap(changedFile => {
             const previousStateFile = previousState.files.find(x => x.path === changedFile.filePath);
