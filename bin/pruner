@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+const command = require('../dist/src/index.js');
+const yargs = require('yargs');
+
+checkCommands(yargs, command.demandCommand().argv, 1);
+
+function checkCommands(yargs: any, argv: any, numRequired: any) {
+    if (argv._.length < numRequired) {
+        yargs.showHelp()
+    } else {
+        // check for unknown command
+    }
+}

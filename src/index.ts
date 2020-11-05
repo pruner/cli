@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import yargs from 'yargs';
 
 import InitCommand from './commands/InitCommand';
@@ -5,7 +7,7 @@ import RunCommand from './commands/RunCommand';
 
 console.debug = () => {};
 
-export default yargs(process.argv.slice(2))
+export = yargs(process.argv.slice(2))
   .scriptName("pruner")
   .option("verbosity", {
     alias: "v",
@@ -22,5 +24,4 @@ export default yargs(process.argv.slice(2))
   .command(InitCommand as any)
   .command(RunCommand as any)
   .demandCommand(1)
-  .help()
-  .argv
+  .help();

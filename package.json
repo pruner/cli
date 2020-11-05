@@ -7,6 +7,12 @@
   "directories": {
     "test": "tests"
   },
+  "bin": {
+    "pruner": "./bin/pruner"
+  },
+  "files": [
+    "dist/src"
+  ],
   "scripts": {
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
