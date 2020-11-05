@@ -2,14 +2,14 @@ import parseGitDiff from 'git-diff-parser';
 import {chain, flatMap} from "lodash";
 import { green, red, white, yellow } from "chalk";
 import { join } from "path";
-import { Command } from "./Command";
+import { Command, DefaultArgs } from "./Command";
 import { useSpinner } from '../console';
 import git from '../git';
 import io from '../io';
 import chokidar from 'chokidar';
 import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../providers';
 
-type Args = {
+type Args = DefaultArgs & {
     provider?: string,
     watch?: boolean
 }
@@ -34,6 +34,9 @@ export default {
 } as Command<Args>;
 
 export async function handler(args: Args) {
+    if(args.verbosity === "verbose")
+        console.debug = () => {};
+
     const prunerDirectory = await io.getPrunerPath();
     if(!prunerDirectory) {
         console.error(red("Pruner has not been initialized for this project."));

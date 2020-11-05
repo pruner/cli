@@ -5,9 +5,9 @@ import { allProviders, ProviderClass } from "../providers";
 import chalk from "chalk";
 import prompts from "prompts";
 import _ from "lodash";
-import { Command } from "./Command";
+import { Command, DefaultArgs } from "./Command";
 
-type Args = {
+type Args = DefaultArgs &{
     provider: string
 }
 
@@ -20,6 +20,9 @@ export default {
             demandOption: true
         }),
     handler: async (args) => {
+        if(args.verbosity === "verbose")
+            console.debug = () => {};
+            
         const topDirectoryPath = await git.getGitTopDirectory();
         if(!topDirectoryPath) {
             console.error("Pruner requires that the current directory is in GIT.");

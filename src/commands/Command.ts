@@ -1,7 +1,8 @@
 import { CommandModule } from "yargs";
 import yargs from "yargs";
 
-export type Command<TArgs> = CommandModule<typeof yargs, TArgs & {
+export type DefaultArgs = {
     verbosity?: "normal" | "verbose";
-    workingDirectory?: string;
-}>
+}
+
+export type Command<TArgs> = CommandModule<typeof yargs, TArgs>
