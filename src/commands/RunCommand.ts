@@ -174,8 +174,7 @@ async function getChangedLinesInGit() {
     const diffText = await git.getCurrentDiffText();
     const gitDiff = parseGitDiff(diffText);
 
-    const changedLines = gitDiff
-        .commits
+    const changedLines = chain(gitDiff.commits)
         .flatMap(x => x.files)
         .flatMap(x => {
             const getLineNumbers = (accessor: (line: parseGitDiff.Line) => number) => chain(x.lines)
