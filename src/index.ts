@@ -7,7 +7,7 @@ import RunCommand from './commands/RunCommand';
 
 console.debug = () => {};
 
-export = yargs(process.argv.slice(2))
+export default yargs(process.argv.slice(2))
   .scriptName("pruner")
   .option("verbosity", {
     alias: "v",
