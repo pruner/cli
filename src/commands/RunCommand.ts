@@ -298,8 +298,7 @@ async function getTestsToRun(previousState: State) {
             const affectedLines = linesInFile.filter(x => changedFile.lineNumbers.indexOf(x.lineNumber) > -1);
             return flatMap(affectedLines, x => x.testIds);
         })
-        .map(x => previousState.tests.find(y => y.id === x))
-        .value();
+        .map(x => previousState.tests.find(y => y.id === x));
 
     console.debug("tests-to-run", "previous-state", previousState.tests, previousState.files, previousState.coverage);
     console.debug("tests-to-run", "affected-tests", affectedTests);
