@@ -37,10 +37,12 @@ export async function handler(args: Args) {
     const providerPairs = await createProvidersFromArguments(args);
     await runTestsForProviders(providerPairs.map(x => x.provider));
 
-    for(let providerPair of providerPairs) {
-        watchProvider(
-            providerPair.provider, 
-            providerPair.settings);
+    if(args.watch) {
+        for(let providerPair of providerPairs) {
+            watchProvider(
+                providerPair.provider, 
+                providerPair.settings);
+        }
     }
 }
 
