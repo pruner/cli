@@ -31,6 +31,8 @@
   "bugs": {
     "url": "https://github.com/pruner/cli/issues"
   },
+  "engines" : { "node" : ">=14" },
+  "engineStrict" : true,
   "homepage": "https://github.com/pruner/cli#readme",
   "devDependencies": {
     "@babel/cli": "^7.12.1",
