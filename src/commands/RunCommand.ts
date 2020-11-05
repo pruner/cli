@@ -34,6 +34,13 @@ export default {
 } as Command<Args>;
 
 export async function handler(args: Args) {
+    const prunerDirectory = await io.getPrunerPath();
+    if(!prunerDirectory) {
+        console.error(red("Pruner has not been initialized for this project."));
+        console.log(`Run ${white("pruner init")}.`);
+        return;
+    }
+
     const providerPairs = await createProvidersFromArguments(args);
     await runTestsForProviders(providerPairs.map(x => x.provider));
 
