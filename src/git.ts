@@ -13,7 +13,7 @@ async function runGitCommand(...args: string[]) {
         reject: false
     });
     if(result.exitCode !== 0)
-        throw result;
+        return "";
 
     return result.stdout;
 }
@@ -27,7 +27,11 @@ async function getGitVersion() {
 }
 
 async function getGitTopDirectory() {
-    return io.normalizePathSeparators(await runGitCommand("rev-parse", "--show-toplevel"));
+    const path = await runGitCommand("rev-parse", "--show-toplevel");
+    if(!path)
+        return path;
+
+    return io.normalizePathSeparators(path);
 }
 
 async function getCurrentDiffText() {

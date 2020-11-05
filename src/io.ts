@@ -64,12 +64,14 @@ async function ensurePathExists(path: string) {
 
 async function getPrunerPath() {
     let currentPath = process.cwd();
-    while(currentPath.indexOf(sep) > -1) {
+    while(true) {
         const directories = await fs.promises.readdir(currentPath);
         if(!!directories.find(x => basename(x) === ".pruner"))
             return normalizePathSeparators(join(currentPath, ".pruner"));
 
         currentPath = dirname(currentPath);
+        if(currentPath.indexOf(sep) === -1 || currentPath.lastIndexOf(sep) === currentPath.length - 1)
+            break;
     }
 
     return "";
