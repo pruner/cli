@@ -2,9 +2,9 @@ import git from "../git";
 import io from "../io";
 import { join } from "path";
 import { allProviders, ProviderClass } from "../providers";
-import * as chalk from "chalk";
-import * as prompts from "prompts";
-import * as _ from "lodash";
+import chalk from "chalk";
+import prompts from "prompts";
+import _ from "lodash";
 import { Command } from "./Command";
 
 type Args = {

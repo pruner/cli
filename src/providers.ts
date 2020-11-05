@@ -1,5 +1,5 @@
-import { ExecaChildProcess, ExecaReturnValue } from "execa";
-import * as prompts from "prompts";
+import { ExecaReturnValue } from "execa";
+import prompts from "prompts";
 import DotNetProvider from "./dotnet/DotNetProvider";
 
 export type SettingsQuestions<TSettings> = TSettings extends {[key: string]: any} ? 
