@@ -1,6 +1,6 @@
 
 import { glob as internalGlob } from 'glob';
-import { lstat, mkdir, readdir, readFile, writeFile } from "fs/promises";
+import fs from "fs";
 import { basename, dirname, join, sep } from 'path';
 
 const exported = {
@@ -26,7 +26,7 @@ async function glob(workingDirectory: string, pattern: string): Promise<string[]
 
 async function safeStat(path: string) {
     try {
-        const stat = await lstat(path);
+        const stat = await fs.promises.lstat(path);
         return stat;
     } catch(ex) {
         return null;
@@ -35,14 +35,14 @@ async function safeStat(path: string) {
 
 async function writeToFile(path: string, contents: string) {
     await ensurePathExists(path);
-    await writeFile(path, contents);
+    await fs.promises.writeFile(path, contents);
 }
 
 async function readFromFile(path: string) {
     await ensurePathExists(path);
 
     try {
-        const result = await readFile(path);
+        const result = await fs.promises.readFile(path);
         return result.toString();
     } catch(ex) {
         return null;
@@ -55,7 +55,7 @@ async function ensurePathExists(path: string) {
         const folderPath = dirname(path);
         const folderStat = await safeStat(folderPath);
         if (!folderStat?.isDirectory()) {
-            await mkdir(folderPath, {
+            await fs.promises.mkdir(folderPath, {
                 recursive: true
             });
         }
@@ -65,7 +65,7 @@ async function ensurePathExists(path: string) {
 async function getPrunerPath() {
     let currentPath = process.cwd();
     while(currentPath.indexOf(sep) > -1) {
-        const directories = await readdir(currentPath);
+        const directories = await fs.promises.readdir(currentPath);
         if(!!directories.find(x => basename(x) === ".pruner"))
             return normalizePathSeparators(join(currentPath, ".pruner"));
 

@@ -1,5 +1,5 @@
 import { join } from "path";
-import { readFile } from "fs/promises";
+import fs from "fs";
 import { Provider, Settings, SettingsQuestions, State, Test, Tests } from "../providers";
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
@@ -71,7 +71,7 @@ export default class DotNetProvider implements Provider {
             cwd: this.settings.workingDirectory,
             reject: false
         };
-        
+
         const result = await execa(
             "dotnet",
             [
@@ -200,7 +200,7 @@ export default class DotNetProvider implements Provider {
         console.debug("file-glob-results", this.settings.workingDirectory, globPattern, filePaths);
     
         const coverageFileBuffers = await Promise.all(filePaths
-            .map(filePath => readFile(
+            .map(filePath => fs.promises.readFile(
                 join(this.settings.workingDirectory, filePath))));
         return coverageFileBuffers
             .map(file => file.toString());
