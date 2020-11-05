@@ -6,10 +6,12 @@ import { Command } from "./Command";
 import { useSpinner } from '../console';
 import git from '../git';
 import io from '../io';
-import { allProviders, Provider, State, ProviderClass, LineCoverage } from '../providers';
+import chokidar from 'chokidar';
+import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings } from '../providers';
 
 type Args = {
-    provider: string
+    provider?: string,
+    watch?: boolean
 }
 
 export default {
@@ -17,18 +19,86 @@ export default {
     describe: "Run tests in .NET.",
     builder: yargs => yargs
         .positional("provider", {
-            choices: allProviders.map(x => x.providerName)
+            choices: allProviders.map(x => x.providerName),
+            demandOption: false,
+            type: "string",
+            describe: "The provider to run tests for. If not specified, runs all tests."
+        })
+        .option("watch", {
+            alias: "w",
+            type: "boolean",
+            demandOption: false,
+            describe: "Launches in watch mode (run tests as files change)."
         }),
     handler
 } as Command<Args>;
 
 export async function handler(args: Args) {
+    const providerPairs = await createProvidersFromArguments(args);
+    await runTestsForProviders(providerPairs.map(x => x.provider));
+
+    for(let providerPair of providerPairs) {
+        watchProvider(
+            providerPair.provider, 
+            providerPair.settings);
+    }
+}
+
+function watchProvider(provider: Provider, settings: Settings) {
+    let isRunning = false;
+    let hasPending = false;
+
+    const runTests = async () => {
+        if(isRunning) {
+            hasPending = true;
+            return;
+        }
+
+        isRunning = true;
+        
+        await runTestsForProvider(provider);
+
+        if(hasPending) {
+            hasPending = false;
+            await runTestsForProvider(provider);
+        }
+
+        isRunning = false;
+    };
+
+    const paths = provider
+        .getGlobPatterns()
+        .map(x => join(settings.workingDirectory, x));
+
+    const watcher = chokidar.watch(paths, {
+        atomic: 1000,
+        ignorePermissionErrors: true,
+        useFsEvents: true,
+        persistent: true
+    });
+    watcher.on('change', runTests);
+    watcher.on('add', runTests);
+    watcher.on('unlink', runTests);
+    watcher.on('addDir', runTests);
+    watcher.on('unlinkDir', runTests);
+}
+
+async function runTestsForProviders(providers: Provider[]) {
     await useSpinner("Running tests", async () => {
-        const Provider = allProviders.find(x => x.providerName === args.provider);
-        const providers = await createProviders(Provider);
-        for(let provider of providers)
+        for (let provider of providers)
             await runTestsForProvider(provider);
     });
+}
+
+async function createProvidersFromArguments(args: Args) {
+    const classes = args.provider ?
+        [allProviders.find(x => x.providerName === args.provider)] :
+        allProviders;
+    const providerPairs = await Promise.all(_
+        .chain(classes)
+        .map(createProvidersFromClass)
+        .value());
+    return _.flatMap(providerPairs, x => x);
 }
 
 async function runTestsForProvider(provider: Provider) {
@@ -126,11 +196,14 @@ async function getChangedLinesInGit() {
     return changedLines;
 }
 
-async function createProviders(Provider: ProviderClass<any>) {
+async function createProvidersFromClass(Provider: ProviderClass<Settings>) {
     const settings = JSON.parse(await io.readFromPrunerFile("settings.json"));
-    const providerSettings = settings[Provider.providerName] as any[];
+    const providerSettings = settings[Provider.providerName] as Settings[];
 
-    return providerSettings.map(x => new Provider(x));
+    return providerSettings.map(x => ({
+        provider: new Provider(x),
+        settings: x
+    }));
 }
 
 async function mergeState(previousState: State, newState: State): Promise<State> {
@@ -214,8 +287,3 @@ async function getTestsToRun(previousState: State) {
         unaffected: allKnownUnaffectedTests
     };
 }
-
-type ChangedFiles = Array<{
-    lineNumbers: number[],
-    name: string
-}>;

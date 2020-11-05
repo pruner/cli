@@ -28,7 +28,12 @@ export type State = {
     coverage: LineCoverage[];
 };
 
+export type Settings = {
+    workingDirectory: string
+};
+
 export interface Provider {
+    getGlobPatterns(): string[];
     executeTestProcess(tests: Tests): Promise<ExecaReturnValue<string>>;
     gatherState(): Promise<State>;
 }

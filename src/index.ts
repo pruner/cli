@@ -16,7 +16,7 @@ export default yargs(argv)
     demandOption: false
   })
   .option("working-directory", {
-    alias: "w",
+    alias: "wd",
     demandOption: false
   })
   .command(InitCommand as any)

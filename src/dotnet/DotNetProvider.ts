@@ -1,6 +1,6 @@
 import { join } from "path";
 import { readFile } from "fs/promises";
-import { Provider, SettingsQuestions, Tests } from "../providers";
+import { Provider, Settings, SettingsQuestions, Tests } from "../providers";
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
 import io from "../io";
@@ -8,18 +8,16 @@ import { Root } from "./altcover";
 import _ from "lodash";
 import git from "../git";
 
-type Settings = {
-    workingDirectory: string
-}
+type DotNetSettings = Settings;
 
 export default class DotNetProvider implements Provider {
-    constructor(private readonly settings: Settings) {}
+    constructor(private readonly settings: DotNetSettings) {}
 
     public static get providerName() {
         return "dotnet";
     }
 
-    public static getInitQuestions(): SettingsQuestions<Settings> {
+    public static getInitQuestions(): SettingsQuestions<DotNetSettings> {
         return {
             workingDirectory: {
                 type: "text",
@@ -27,6 +25,12 @@ export default class DotNetProvider implements Provider {
                 hint: "The directory where you would normally run 'dotnet test' from."
             }
         }
+    }
+
+    public getGlobPatterns() {
+        return [
+            "**/*.cs"
+        ];
     }
     
     public async executeTestProcess(tests: Tests): Promise<execa.ExecaReturnValue<string>> {

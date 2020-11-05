@@ -17,7 +17,8 @@ export default {
     describe: "Set up Pruner for this project.",
     builder: yargs => yargs
         .positional("provider", {
-            choices: allProviders.map(x => x.providerName)
+            choices: allProviders.map(x => x.providerName),
+            demandOption: true
         }),
     handler: async (args) => {
         const topDirectoryPath = await getGitTopDirectory();
