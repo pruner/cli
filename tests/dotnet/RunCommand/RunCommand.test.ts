@@ -41,7 +41,10 @@ describe("RunCommand", () => {
     const getFileCoverage = async (fileName: string) => {
         const state = await getState();
         const file = state.files.find(x => x.path.endsWith(fileName));
-        return state.coverage.filter(x => x.fileId === file.id);
+        return _.chain(state.coverage)
+            .filter(x => x.fileId === file.id)
+            .orderBy(x => x.lineNumber)
+            .value();
     }
 
     const getCoveredLineNumbersForFile = async (fileName: string) => {
