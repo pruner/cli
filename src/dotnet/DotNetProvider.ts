@@ -26,8 +26,7 @@ export default class DotNetProvider implements Provider {
         return {
             workingDirectory: {
                 type: "text",
-                message: "What working directory would you like to use?",
-                hint: "The directory where you would normally run 'dotnet test' from."
+                message: "What relative directory would you like to run 'dotnet test' from?"
             }
         }
     }
