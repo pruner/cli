@@ -9,7 +9,7 @@ const declarations = {
     getGitVersion,
     getGitTopDirectory,
     getCurrentDiffText,
-    getChangedFileLines
+    getChangedFiles: getChangedFiles
 };
 
 async function runGitCommand(...args: string[]) {
@@ -43,17 +43,18 @@ async function getCurrentDiffText() {
     return result;
 }
 
-async function getChangedFileLines() {
+async function getChangedFiles() {
     const diffText = await declarations.getCurrentDiffText();
     const gitDiff = parseGitDiff(diffText);
 
     const changedLines = chain(gitDiff.commits)
         .flatMap(x => x.files)
         .map(getLineChangesForFile)
-        .filter(x => !!x.filePath && x.changedLines.length > 0)
+        .filter(x => !!x.filePath)
         .value();
 
     console.debug("git-diff-text", diffText);
+    console.debug("git-diff-original", chain(gitDiff.commits).flatMap(x => x.files).flatMap(x => x.lines).value());
     console.debug("git-diff-lines", changedLines);
 
     return changedLines;
@@ -62,17 +63,15 @@ async function getChangedFileLines() {
 function getLineChangesForFile(file: parseGitDiff.File) {
     const getLines = (type: (line: parseGitDiff.Line) => boolean) => chain(file.lines)
         .filter(type)
-        .map(x => x.ln2 || x.ln1)
-        .filter(y => !!y)
-        .uniq()
         .value();
 
-    const lines = getLines(line => 
-        line.type === "added" ||
-        line.type === "deleted");
-
     return {
-        changedLines: lines,
+        addedLines: getLines(line => line.type === "added").map(x => x.ln1),
+        deletedLines: getLines(line => line.type === "deleted").map(x => x.ln1),
+        unchangedLines: getLines(x => x.type === "normal").map(x => ({
+            oldLine: x.ln1,
+            newLine: x.ln2
+        })),
         filePath: io.normalizePathSeparators(file.name)
     };
 }

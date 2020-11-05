@@ -253,24 +253,44 @@ async function getTestsToRun(previousState: State) {
         };
     }
 
-    const changedLines = await git.getChangedFileLines(previousState);
-    const affectedTests = changedLines
+    const changedFiles = await git.getChangedFiles();
+    const affectedTests = chain(changedFiles)
         .flatMap(changedFile => {
-            const file = previousState.files.find(x => x.path === changedFile.filePath);
-            if(!file) {
+            const previousStateFile = previousState.files.find(x => x.path === changedFile.filePath);
+            if(!previousStateFile) {
                 console.debug("tests-to-run", "changed file not found in previous state", changedFile);
                 return [];
             }
 
-            const linesInFile = previousState.coverage.filter(x => x.fileId === file.id);
-            const affectedLines = linesInFile.filter(x => changedFile.changedLines.indexOf(x.lineNumber) > -1);
-            return flatMap(affectedLines, x => x.testIds);
+            return previousState.coverage
+                .filter(previousStateLine => previousStateLine.fileId === previousStateFile.id)
+                .map(previousStateLine => {
+                    const gitUnchangedLine = changedFile
+                        .unchangedLines
+                        .find(x => x.oldLine === previousStateLine.lineNumber);
+
+                    console.debug("tests-to-run", "find-unchanged-line", previousStateLine, gitUnchangedLine);
+                    return ({
+                        unchangedLine: gitUnchangedLine,
+                        previousStateLine: previousStateLine
+                    });
+                })
+                .filter(x => 
+                    x.unchangedLine &&
+                    (changedFile.addedLines.indexOf(x.unchangedLine.newLine - 1) > -1 ||
+                    changedFile.addedLines.indexOf(x.unchangedLine.newLine) > -1 ||
+                    changedFile.addedLines.indexOf(x.unchangedLine.newLine + 1) ||
+                    changedFile.deletedLines.indexOf(x.unchangedLine.newLine - 1) > -1 ||
+                    changedFile.deletedLines.indexOf(x.unchangedLine.newLine) > -1 ||
+                    changedFile.deletedLines.indexOf(x.unchangedLine.newLine + 1) > -1));
         })
-        .map(x => previousState.tests.find(y => y.id === x));
+        .flatMap(x => x.previousStateLine.testIds)
+        .map(x => previousState.tests.find(y => y.id === x))
+        .value();
 
     console.debug("tests-to-run", "previous-state", previousState.tests, previousState.files, previousState.coverage);
     console.debug("tests-to-run", "affected-tests", affectedTests);
-    console.debug("tests-to-run", "changed-lines", changedLines);
+    console.debug("tests-to-run", "changed-lines", changedFiles);
     
     const allKnownUnaffectedTests = previousState.tests.filter(x => !affectedTests.find(y => y.id === x.id));
     return {

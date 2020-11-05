@@ -1,6 +1,6 @@
 {
   "name": "@pruner/cli",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "The Pruner CLI that reduces the amount of time spent running tests.",
   "main": "dist/index.js",
   "type": "commonjs",
@@ -22,7 +22,8 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "test": "jest --verbose false",
-    "test:watch": "jest --watch --verbose false"
+    "test:watch": "jest --watch --verbose false",
+    "test:watch:git": "jest --watch --verbose false -t \"git\""
   },
   "repository": {
     "type": "git",

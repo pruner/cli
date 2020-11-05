@@ -135,7 +135,6 @@ export default class DotNetProvider implements Provider {
                 path: this.sanitizeStatePath(projectRootDirectory, x.path)
             }))
             .value();
-        console.debug("gather-state", "files", files);
 
         const tests = chain(modules)
             .flatMap(x => x.TrackedMethods)
@@ -168,6 +167,9 @@ export default class DotNetProvider implements Provider {
                 })))
             .filter(x => !!x.fileId && x.testIds.length > 0)
             .value();
+
+        console.debug("gather-state", "files", files);
+        console.debug("gather-state", "coverage", coverage);
 
         const result = {
             tests: tests,

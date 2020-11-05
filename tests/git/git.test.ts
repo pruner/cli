@@ -1,27 +1,37 @@
-import git from '../../src/git';
-import { gitDiff } from '../helpers/git';
+// import { join } from 'path';
+// import git from '../../src/git';
+// import { gitDiff } from '../helpers/git';
 
-let mockCurrentDiff = "";
-git.getCurrentDiffText = async () => mockCurrentDiff;
+// let mockCurrentDiff: string;
+// git.getCurrentDiffText = async () => mockCurrentDiff ?? "";
 
-describe("git", () => {
-    const setDiffBetweenFiles = async (fromPath: string, toPath: string) => {
-        mockCurrentDiff = await gitDiff(
-            toPath, 
-            fromPath);
-    };
+test("empty", () => {});
 
-    const getFile = async () => {
-        const files = await git.getChangedFileLines();
-        return files[0];
-    }
+// describe("git", () => {
+//     const setDiffBetweenFiles = async (fromPath: string, toPath: string) => {
+//         mockCurrentDiff = await gitDiff(
+//             join(__dirname, fromPath), 
+//             join(__dirname, toPath));
+//     };
 
-    describe("transpositions", () => {
-        test("added lines", async () => {
-            await setDiffBetweenFiles("SomeClass.cs", "SomeClass.added.cs");
+//     const getFile = async () => {
+//         const files = await git.getChangedFiles();
+//         return files[0];
+//     }
 
-            const changedLines = await getFile();
-            console.log(changedLines);
-        });
-    });
-});
+//     describe("transpositions", () => {
+//         test("added lines", async () => {
+//             await setDiffBetweenFiles("SomeClass.cs", "SomeClass.added.cs");
+
+//             const changedLines = await getFile();
+//             console.log(changedLines);
+//         });
+
+//         test("removed lines", async () => {
+//             await setDiffBetweenFiles("SomeClass.cs", "SomeClass.removed.cs");
+
+//             const changedLines = await getFile();
+//             console.log(changedLines);
+//         });
+//     });
+// });

@@ -1,3 +1,4 @@
 {
-    "autoHide.autoHidePanel": false
+    "autoHide.autoHidePanel": false,
+    "terminal.integrated.scrollback": 10000
 }
