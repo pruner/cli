@@ -17,6 +17,8 @@ let mockCurrentDiff = "";
 git.getCurrentDiffText = async () => mockCurrentDiff;
 
 describe("RunCommand", () => {    
+    const currentDirectory = join("tests", "dotnet", "RunCommand");
+
     const cleanup = async () => {
         rimraf.sync(join(__dirname, "temp"));
     }
@@ -59,26 +61,32 @@ describe("RunCommand", () => {
         return result.stdout;
     }
 
+    const revertCode = async (fileName: string) => {
+        const fromPath = join("tests", "dotnet", "sample", "Sample", fileName);
+        const toPath = join(currentDirectory, "temp", "Sample", fileName);
+
+        await replaceCodeFiles(fromPath, toPath);
+    }
+
     const overwriteCode = async (fileName: string) => {
-        const currentDirectory = join("tests", "dotnet", "RunCommand");
+        const fromPath = join(currentDirectory, fileName);
+        const toPath = join(currentDirectory, "temp", "Sample", `${fileName.substr(0, fileName.indexOf("."))}.cs`);
 
-        const overwrittenFileName = `${fileName.substr(0, fileName.indexOf("."))}.cs`;
+        await replaceCodeFiles(fromPath, toPath);
+    }
 
-        const relativeSampleFilePath = join("temp", "Sample", overwrittenFileName);
+    const replaceCodeFiles = async (fromPath: string, toPath: string) => {
+        toPath = join(currentDirectory, toPath);
 
-        const existingFilePath = join(currentDirectory, relativeSampleFilePath);
-        const templateFilePath = join(currentDirectory, fileName);
-
-        const overwrittenRelativePath = join(currentDirectory, relativeSampleFilePath);
         mockCurrentDiff = await gitDiff(
-            overwrittenRelativePath, 
-            templateFilePath);
+            fromPath, 
+            toPath);
 
-        const templateFileContents = await io.readFromFile(templateFilePath);
+        const fromContents = await io.readFromFile(fromPath);
 
         await io.writeToFile(
-            existingFilePath,
-            templateFileContents.toString());
+            toPath,
+            fromContents.toString());
     }
 
     beforeEach(async () => {
@@ -134,5 +142,24 @@ describe("RunCommand", () => {
             ...lineRange(10, 11),
             ...lineRange(14, 17)
         ]);
+    });
+
+    test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+        await handler({
+            provider: "dotnet"
+        });
+
+        await overwriteCode("SomeClass.condition-change.cs");
+        await handler({
+            provider: "dotnet"
+        });
+
+        await revertCode("SomeClass.cs");
+        await handler({
+            provider: "dotnet"
+        });
+
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
     });
 });

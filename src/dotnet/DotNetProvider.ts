@@ -2,7 +2,7 @@ import { join } from "path";
 import { readFile } from "fs/promises";
 import { Provider, Settings, SettingsQuestions, Test, Tests } from "../providers";
 import { parseStringPromise } from "xml2js";
-import execa = require("execa");
+import execa from "execa";
 import io from "../io";
 import { Root } from "./altcover";
 import { chain, range } from "lodash";

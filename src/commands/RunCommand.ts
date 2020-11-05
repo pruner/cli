@@ -1,4 +1,4 @@
-import parseGitDiff = require('git-diff-parser');
+import parseGitDiff from 'git-diff-parser';
 import {chain, flatMap} from "lodash";
 import { green, red, white, yellow } from "chalk";
 import { join } from "path";
@@ -6,7 +6,7 @@ import { Command } from "./Command";
 import { useSpinner } from '../console';
 import git from '../git';
 import io from '../io';
-import chokidar = require('chokidar');
+import chokidar from 'chokidar';
 import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings } from '../providers';
 
 type Args = {
