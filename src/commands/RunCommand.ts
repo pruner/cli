@@ -7,7 +7,7 @@ import { useSpinner } from '../console';
 import git from '../git';
 import io from '../io';
 import chokidar from 'chokidar';
-import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings } from '../providers';
+import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../providers';
 
 type Args = {
     provider?: string,
@@ -276,8 +276,8 @@ async function mergeState(previousState: State, newState: State): Promise<State>
 async function getTestsToRun(previousState: State) {
     if(!previousState) {
         return {
-            affected: [],
-            unaffected: []
+            affected: new Array<Test>(),
+            unaffected: new Array<Test>()
         };
     }
 
@@ -294,7 +294,8 @@ async function getTestsToRun(previousState: State) {
             const affectedLines = linesInFile.filter(x => changedFile.lineNumbers.indexOf(x.lineNumber) > -1);
             return flatMap(affectedLines, x => x.testIds);
         })
-        .map(x => previousState.tests.find(y => y.id === x));
+        .map(x => previousState.tests.find(y => y.id === x))
+        .value();
 
     console.debug("tests-to-run", "previous-state", previousState.tests, previousState.files, previousState.coverage);
     console.debug("tests-to-run", "affected-tests", affectedTests);
