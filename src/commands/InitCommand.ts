@@ -20,9 +20,9 @@ export default {
             demandOption: true
         }),
     handler: async (args) => {
-        if(args.verbosity === "verbose")
+        if(args.verbosity !== "verbose")
             console.debug = () => {};
-            
+
         const topDirectoryPath = await git.getGitTopDirectory();
         if(!topDirectoryPath) {
             console.error("Pruner requires that the current directory is in GIT.");

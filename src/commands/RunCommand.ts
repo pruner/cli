@@ -34,7 +34,7 @@ export default {
 } as Command<Args>;
 
 export async function handler(args: Args) {
-    if(args.verbosity === "verbose")
+    if(args.verbosity !== "verbose")
         console.debug = () => {};
 
     const prunerDirectory = await io.getPrunerPath();
