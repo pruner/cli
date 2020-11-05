@@ -3,9 +3,7 @@ import yargs from 'yargs';
 import InitCommand from './commands/InitCommand';
 import RunCommand from './commands/RunCommand';
 
-var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
-
-export default yargs(argv)
+export default yargs(process.argv.slice(2))
   .scriptName("pruner")
   .option("verbosity", {
     alias: "v",

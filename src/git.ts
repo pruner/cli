@@ -1,4 +1,4 @@
-import execa from "execa";
+import execa = require("execa");
 import io from "./io";
 
 const declarations = {

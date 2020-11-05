@@ -1,6 +1,5 @@
-import yargs, { CommandModule } from "yargs";
-import { getGitTopDirectory } from "../git";
-import { readFromFile, writeToFile, writeToPrunerFile } from "../io";
+import git from "../git";
+import io from "../io";
 import { join } from "path";
 import { allProviders, ProviderClass } from "../providers";
 import * as chalk from "chalk";
@@ -21,7 +20,7 @@ export default {
             demandOption: true
         }),
     handler: async (args) => {
-        const topDirectoryPath = await getGitTopDirectory();
+        const topDirectoryPath = await git.getGitTopDirectory();
         if(!topDirectoryPath) {
             console.error("Pruner requires that the current directory is in GIT.");
             return;
@@ -39,7 +38,7 @@ export default {
 
         await persistProviderSettings(topDirectoryPath, existingSettings);
 
-        await writeToPrunerFile(
+        await io.writeToPrunerFile(
             ".gitignore", 
             [
                 "temp/"
@@ -51,7 +50,7 @@ export default {
 
 async function persistProviderSettings(topDirectoryPath: string, existingSettings: any) {
     const settingsPath = getSettingsPath(topDirectoryPath);
-    await writeToFile(
+    await io.writeToFile(
         settingsPath,
         JSON.stringify(existingSettings, null, '\t'));
 }
@@ -62,7 +61,7 @@ function getSettingsPath(topDirectoryPath: string) {
 
 async function getProviderSettings(topDirectoryPath: string) {
     const settingsPath = getSettingsPath(topDirectoryPath);
-    return JSON.parse(await readFromFile(settingsPath)) || {};
+    return JSON.parse(await io.readFromFile(settingsPath)) || {};
 }
 
 async function askForInitSettings(Provider: ProviderClass<any>) {

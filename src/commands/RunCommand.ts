@@ -1,12 +1,12 @@
-import parseGitDiff from 'git-diff-parser';
-import _ from "lodash";
-import chalk from "chalk";
+import parseGitDiff = require('git-diff-parser');
+import {chain, flatMap} from "lodash";
+import { green, red, white, yellow } from "chalk";
 import { join } from "path";
 import { Command } from "./Command";
 import { useSpinner } from '../console';
 import git from '../git';
 import io from '../io';
-import chokidar from 'chokidar';
+import chokidar = require('chokidar');
 import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings } from '../providers';
 
 type Args = {
@@ -15,8 +15,8 @@ type Args = {
 }
 
 export default {
-    command: "run <provider>",
-    describe: "Run tests in .NET.",
+    command: "run [provider]",
+    describe: "Run tests.",
     builder: yargs => yargs
         .positional("provider", {
             choices: allProviders.map(x => x.providerName),
@@ -55,7 +55,7 @@ function watchProvider(provider: Provider, settings: Settings) {
         }
 
         isRunning = true;
-        
+
         await runTestsForProvider(provider);
 
         if(hasPending) {
@@ -84,37 +84,34 @@ function watchProvider(provider: Provider, settings: Settings) {
 }
 
 async function runTestsForProviders(providers: Provider[]) {
-    await useSpinner("Running tests", async () => {
-        for (let provider of providers)
-            await runTestsForProvider(provider);
-    });
+    for (let provider of providers)
+        await runTestsForProvider(provider);
 }
 
 async function createProvidersFromArguments(args: Args) {
     const classes = args.provider ?
         [allProviders.find(x => x.providerName === args.provider)] :
         allProviders;
-    const providerPairs = await Promise.all(_
-        .chain(classes)
-        .map(createProvidersFromClass)
-        .value());
-    return _.flatMap(providerPairs, x => x);
+    const providerPairs = await Promise.all(classes.map(createProvidersFromClass));
+    return flatMap(providerPairs, x => x);
 }
 
 async function runTestsForProvider(provider: Provider) {
     const previousState = await readState();
 
-    const testsToRun = await getTestsToRun(previousState);
-
-    const result = await provider.executeTestProcess(testsToRun);
+    const result = await useSpinner("Running tests", async () => {
+        const testsToRun = await getTestsToRun(previousState);
+        return await provider.executeTestProcess(testsToRun);
+    });
+    
     if(result.exitCode !== 0) {
-        console.error(chalk.red("Could not run tests.") + "\n" + chalk.yellow(result.stdout) + "\n" + chalk.red(result.stderr));
+        console.error(red("Could not run tests.") + "\n" + yellow(result.stdout) + "\n" + red(result.stderr));
         return;
     }
 
-    console.log(chalk.green("Tests ran successfully:"));
-    console.log(chalk.white(result.stdout));
-    
+    console.log(green("Tests ran successfully:"));
+    console.log(white(result.stdout));
+
     const state = await provider.gatherState();
 
     const mergedState = await mergeState(previousState, state);
@@ -172,7 +169,7 @@ async function getChangedLinesInGit() {
         .commits
         .flatMap(x => x.files)
         .flatMap(x => {
-            const lineNumbers =  _.chain(x.lines)
+            const lineNumbers =  chain(x.lines)
                 .filter(line => 
                     line.type === "added" ||
                     line.type === "deleted")
@@ -207,7 +204,7 @@ async function createProvidersFromClass(Provider: ProviderClass<Settings>) {
 }
 
 async function mergeState(previousState: State, newState: State): Promise<State> {
-    const allNewTestIds = _.chain(newState.coverage)
+    const allNewTestIds = chain(newState.coverage)
         .flatMap(x => x.testIds)
         .uniq()
         .value();
@@ -240,15 +237,15 @@ async function mergeState(previousState: State, newState: State): Promise<State>
     }
 
     const mergedState: State = {
-        tests: _.chain([previousState?.tests || [], newState.tests || []])
+        tests: chain([previousState?.tests || [], newState.tests || []])
             .flatMap()
             .uniqBy(x => x.name)
             .value(),
-        files: _.chain([previousState?.files || [], newState.files || []])
+        files: chain([previousState?.files || [], newState.files || []])
             .flatMap()
             .uniqBy(x => x.path)
             .value(),
-        coverage: _.chain([previousState?.coverage || [], newState.coverage])
+        coverage: chain([previousState?.coverage || [], newState.coverage])
             .flatMap()
             .filter(x => !linesToRemove.find(l => 
                 l.fileId === x.fileId && 
@@ -277,7 +274,7 @@ async function getTestsToRun(previousState: State) {
 
             const linesInFile = previousState.coverage.filter(x => x.fileId === file.id);
             const affectedLines = linesInFile.filter(x => changedFile.lineNumbers.indexOf(x.lineNumber) > -1);
-            return _.flatMap(affectedLines, x => x.testIds);
+            return flatMap(affectedLines, x => x.testIds);
         })
         .map(x => previousState.tests.find(y => y.id === x));
     

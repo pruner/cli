@@ -1,11 +1,11 @@
 import { join } from "path";
 import { readFile } from "fs/promises";
-import { Provider, Settings, SettingsQuestions, Tests } from "../providers";
+import { Provider, Settings, SettingsQuestions, Test, Tests } from "../providers";
 import { parseStringPromise } from "xml2js";
-import execa from "execa";
+import execa = require("execa");
 import io from "../io";
 import { Root } from "./altcover";
-import _ from "lodash";
+import { chain, range } from "lodash";
 import git from "../git";
 
 type DotNetSettings = Settings;
@@ -79,7 +79,7 @@ export default class DotNetProvider implements Provider {
     }
 
     private getFilterArgument(
-        tests: { name: string; id: number; }[], 
+        tests: Test[], 
         operandSettings: { join: string; compare: string; }) 
     {
         return tests
@@ -97,14 +97,14 @@ export default class DotNetProvider implements Provider {
                 async: true
             })));
 
-        const modules = _.chain(state)
+        const modules = chain(state)
             .map(x => x.CoverageSession)
             .flatMap(x => x.Modules)
             .flatMap(x => x.Module)
             .filter(x => !!x)
             .value();
 
-        const files = _.chain(modules)
+        const files = chain(modules)
             .flatMap(x => x.Files)
             .flatMap(x => x.File)
             .map(x => x?.$)
@@ -120,7 +120,7 @@ export default class DotNetProvider implements Provider {
             }))
             .value();
 
-        const tests = _.chain(modules)
+        const tests = chain(modules)
             .flatMap(x => x.TrackedMethods)
             .flatMap(x => x.TrackedMethod)
             .map(x => x?.$)
@@ -131,7 +131,7 @@ export default class DotNetProvider implements Provider {
             }))
             .value();
 
-        const coverage = _.chain(modules)
+        const coverage = chain(modules)
             .flatMap(x => x.Classes)
             .flatMap(x => x.Class)
             .flatMap(x => x.Methods)
@@ -139,10 +139,9 @@ export default class DotNetProvider implements Provider {
             .flatMap(x => x.SequencePoints)
             .flatMap(x => x.SequencePoint)
             .filter(x => !!x)
-            .flatMap(x => _
-                .range(+x.$.sl, +x.$.el + 1)
+            .flatMap(x => range(+x.$.sl, +x.$.el + 1)
                 .map(l => ({
-                    testIds: _.chain(x.TrackedMethodRefs || [])
+                    testIds: chain(x.TrackedMethodRefs || [])
                         .flatMap(m => m.TrackedMethodRef)
                         .map(m => m.$)
                         .map(m => +m.uid)
