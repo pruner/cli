@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { State } from '../../../src/providers';
 import execa from 'execa';
 import rimraf from 'rimraf';
-import { copy } from 'fs-extra';
+import { copy, pathExists, rmdir } from 'fs-extra';
 
 import git from '../../../src/git';
 import io from '../../../src/io';
@@ -20,13 +20,13 @@ describe("RunCommand", () => {
     const currentDirectory = join("tests", "dotnet", "RunCommand");
 
     const cleanup = async () => {
-        rimraf.sync(join(__dirname, "temp"));
+        rimraf.sync(join(currentDirectory, "temp"));
     }
 
     const lineRange = (from: number, to: number) => _.range(from, to + 1);
 
     const getState = async (): Promise<State> => {
-        const result = await io.readFromFile(join(__dirname, "temp", ".pruner", "state.json"));
+        const result = await io.readFromFile(join(currentDirectory, "temp", ".pruner", "state.json"));
         if(!result) {
             return {
                 coverage: [],
@@ -90,9 +90,30 @@ describe("RunCommand", () => {
     beforeEach(async () => {
         await cleanup();
 
+        const temporaryFolderPath = join(__dirname, "temp");
         await copy(
             join(__dirname, "..", "sample"),
-            join(__dirname, "temp"));
+            temporaryFolderPath);
+
+        const gitignoreContents = await io.readFromFile(join(temporaryFolderPath, ".gitignore"));
+        const directoriesToRemove = await Promise.all(_
+            .chain(gitignoreContents)
+            .split('\n')
+            .map(x => io.glob(temporaryFolderPath, x))
+            .value());
+        const directoriesToRemoveFlat = _.chain(directoriesToRemove)
+            .flatMap(x => x)
+            .map(x => join(temporaryFolderPath, x))
+            .value();
+        for(let directory of directoriesToRemoveFlat) {
+            if(!await pathExists(directory)) {
+                console.debug("not-present", directory);
+                continue;
+            }
+
+            console.debug("purging", directory);
+            rimraf.sync(directory);
+        }
 
         await io.writeToFile(
             join(__dirname, "temp", ".pruner", "settings.json"),
@@ -103,46 +124,46 @@ describe("RunCommand", () => {
             }));
     });
 
-    // test('run -> check coverage', async () => {
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+    test('run -> check coverage', async () => {
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
-    // test('run -> run -> check coverage', async () => {
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+    test('run -> run -> check coverage', async () => {
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
-    // test('run -> change condition -> run -> revert condition -> check coverage', async () => {
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+    test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     await overwriteCode("SomeClass.condition-change.cs");
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await overwriteCode("SomeClass.condition-change.cs");
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     await revertCode("SomeClass.cs");
-    //     await handler({
-    //         provider: "dotnet"
-    //     });
+        await revertCode("SomeClass.cs");
+        await handler({
+            provider: "dotnet"
+        });
 
-    //     const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 17));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 17));
+    });
 
     test('run -> change condition -> run -> check coverage', async () => {
         await handler({

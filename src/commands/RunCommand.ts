@@ -171,26 +171,29 @@ async function getChangedLinesInGit() {
         .commits
         .flatMap(x => x.files)
         .flatMap(x => {
-            const lineNumbers =  chain(x.lines)
+            const getLineNumbers = (accessor: (line: parseGitDiff.Line) => number) => chain(x.lines)
                 .filter(line => 
                     line.type === "added" ||
                     line.type === "deleted")
-                .flatMap(y => [y.ln1, y.ln2])
+                .map(accessor)
                 .filter(y => !!y)
                 .uniq()
                 .value();
             return [
                 {
-                    lineNumbers,
+                    lineNumbers: getLineNumbers(x => x.ln1),
                     name: io.normalizePathSeparators(x.oldName)
                 },
                 {
-                    lineNumbers,
+                    lineNumbers: getLineNumbers(x => x.ln2 || x.ln1),
                     name: io.normalizePathSeparators(x.name)
                 }
             ];
         })
         .filter(x => !!x.name && x.lineNumbers.length > 0);
+
+    console.debug("git-diff-text", diffText);
+    console.debug("git-diff-lines", changedLines);
 
     return changedLines;
 }
@@ -237,6 +240,11 @@ async function mergeState(previousState: State, newState: State): Promise<State>
                 linesToRemove.push(previousLine);
         }
     }
+    
+    console.debug("merge-previous", previousState);
+    console.debug("merge-new", newState);
+    console.debug("merge-remove", linesToRemove);
+    console.debug("merge-all-new-test-ids", allNewTestIds);
 
     const mergedState: State = {
         tests: chain([previousState?.tests || [], newState.tests || []])
@@ -271,14 +279,20 @@ async function getTestsToRun(previousState: State) {
     const affectedTests = changedLines
         .flatMap(changedFile => {
             const file = previousState.files.find(x => x.path === changedFile.name);
-            if(!file)
+            if(!file) {
+                console.debug("tests-to-run", "changed file not found in previous state", changedFile);
                 return [];
+            }
 
             const linesInFile = previousState.coverage.filter(x => x.fileId === file.id);
             const affectedLines = linesInFile.filter(x => changedFile.lineNumbers.indexOf(x.lineNumber) > -1);
             return flatMap(affectedLines, x => x.testIds);
         })
         .map(x => previousState.tests.find(y => y.id === x));
+
+    console.debug("tests-to-run", "previous-state", previousState.tests, previousState.files, previousState.coverage);
+    console.debug("tests-to-run", "affected-tests", affectedTests);
+    console.debug("tests-to-run", "changed-lines", changedLines);
     
     const allKnownUnaffectedTests = previousState.tests.filter(x => !affectedTests.find(y => y.id === x.id));
     return {

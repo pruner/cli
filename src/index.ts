@@ -3,6 +3,8 @@ import yargs from 'yargs';
 import InitCommand from './commands/InitCommand';
 import RunCommand from './commands/RunCommand';
 
+console.debug = () => {};
+
 export default yargs(process.argv.slice(2))
   .scriptName("pruner")
   .option("verbosity", {
