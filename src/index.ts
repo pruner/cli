@@ -23,5 +23,4 @@ export default yargs(process.argv.slice(2))
   })
   .command(InitCommand as any)
   .command(RunCommand as any)
-  .demandCommand(1)
   .help();
