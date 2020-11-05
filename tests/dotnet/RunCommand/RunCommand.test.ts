@@ -2,10 +2,10 @@ jest.setTimeout(1000 * 60 * 5);
 
 import { join } from 'path';
 import { handler } from '../../../src/commands/RunCommand';
-import _ = require('lodash');
+import _ from 'lodash';
 import { State } from '../../../src/providers';
-import execa = require('execa');
-import rimraf = require('rimraf');
+import execa from 'execa';
+import rimraf from 'rimraf';
 import { copy } from 'fs-extra';
 
 import git from '../../../src/git';
