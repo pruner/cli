@@ -51,18 +51,17 @@ export default class DotNetProvider implements Provider {
         ];
         console.debug("execute-settings", this.settings);
 
-        const processOptions = {
-            cwd: this.settings.workingDirectory,
-            reject: false
-        };
-
         const result = await execa(
             "dotnet",
             [
                 "test",
                 ...args
             ], 
-            processOptions);
+            {
+                cwd: this.settings.workingDirectory,
+                reject: false,
+                shell: true
+            });
         if(typeof result.exitCode === "undefined")
             console.warn(yellow("It could look like you don't have the .NET Core SDK installed, required for the .NET provider."));
 
