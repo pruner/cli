@@ -133,6 +133,9 @@ async function runTestsForProviders(providers: Provider[]) {
         const newStates = new Array<RunReport>();
         for (let provider of providers) {
             const stateChange = await runTestsForProvider(provider, state, newCommitId);
+            if(!stateChange)
+                continue;
+            
             state = stateChange.mergedState;
 
             newStates.push(stateChange);
