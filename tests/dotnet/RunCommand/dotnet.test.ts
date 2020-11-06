@@ -189,7 +189,7 @@ describe("RunCommand", () => {
         
         await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
         const testRun2 = await runHandler();
-        expect(testRun2.length).toBe(6);
+        expect(testRun2.length).toBe(0);
 
         const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
         expect(coverageForTest).toEqual([]);
@@ -199,5 +199,17 @@ describe("RunCommand", () => {
             ...lineRange(10, 20),
             ...lineRange(31, 31)
         ]);
+    });
+
+    test('run -> make change in first if-branch -> run -> check coverage', async () => {
+        const testRun1 = await runHandler();
+        expect(testRun1.length).toBe(12);
+        
+        await overwriteCode("Sample/SomeClass.first-branch-change.cs");
+        const testRun2 = await runHandler();
+        expect(testRun2.length).toBe(6);
+
+        const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 31));
     });
 });

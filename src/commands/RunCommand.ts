@@ -347,7 +347,7 @@ async function getTestsToRun(previousState: State, newCommitId: string) {
                     const line = x.unchangedLine?.newLine || x.previousStateLine.lineNumber;
                     return changedFile.addedLines.indexOf(line - 1) > -1 ||
                         changedFile.addedLines.indexOf(line) > -1 ||
-                        changedFile.addedLines.indexOf(line + 1) ||
+                        changedFile.addedLines.indexOf(line + 1) > -1 ||
                         changedFile.deletedLines.indexOf(line - 1) > -1 ||
                         changedFile.deletedLines.indexOf(line) > -1 ||
                         changedFile.deletedLines.indexOf(line + 1) > -1;
@@ -355,6 +355,7 @@ async function getTestsToRun(previousState: State, newCommitId: string) {
         })
         .flatMap(x => x.previousStateLine.testIds)
         .map(x => previousState.tests.find(y => y.id === x))
+        .uniqBy(x => x.name)
         .value();
 
     console.debug("tests-to-run", "previous-state", previousState.tests, previousState.files, previousState.coverage);
