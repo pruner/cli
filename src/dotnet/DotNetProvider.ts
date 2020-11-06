@@ -83,6 +83,9 @@ export default class DotNetProvider implements Provider {
                 `/p:AltCoverXmlReport=${reportName}`
             ], 
             processOptions);
+        if(typeof result.exitCode === "undefined")
+            console.warn(yellow("It could look like you don't have the .NET Core SDK installed, required for the .NET provider."));
+
         return result;
     }
 
