@@ -276,11 +276,14 @@ async function mergeState(
         if(newStateTestIndex === -1 && mergedStateTestIndex > -1) {
             mergedState.tests.splice(mergedStateTestIndex, 1);
 
-            remove(
-                mergedState.coverage, 
-                x => x.testIds.indexOf(testInFilter.id) > -1);
+            mergedState.coverage.forEach(lineCoverage => 
+                remove(lineCoverage.testIds, x => x === testInFilter.id));
         }
     }
+
+    remove(
+        mergedState.coverage, 
+        x => x.testIds.length === 0);
 
     return mergedState;
 }
@@ -317,14 +320,15 @@ async function getTestsToRun(previousState: State, newCommitId: string) {
                         previousStateLine: previousStateLine
                     });
                 })
-                .filter(x => 
-                    x.unchangedLine &&
-                    (changedFile.addedLines.indexOf(x.unchangedLine.newLine - 1) > -1 ||
-                    changedFile.addedLines.indexOf(x.unchangedLine.newLine) > -1 ||
-                    changedFile.addedLines.indexOf(x.unchangedLine.newLine + 1) ||
-                    changedFile.deletedLines.indexOf(x.unchangedLine.newLine - 1) > -1 ||
-                    changedFile.deletedLines.indexOf(x.unchangedLine.newLine) > -1 ||
-                    changedFile.deletedLines.indexOf(x.unchangedLine.newLine + 1) > -1));
+                .filter(x => {
+                    const line = x.unchangedLine?.newLine || x.previousStateLine.lineNumber;
+                    return changedFile.addedLines.indexOf(line - 1) > -1 ||
+                        changedFile.addedLines.indexOf(line) > -1 ||
+                        changedFile.addedLines.indexOf(line + 1) ||
+                        changedFile.deletedLines.indexOf(line - 1) > -1 ||
+                        changedFile.deletedLines.indexOf(line) > -1 ||
+                        changedFile.deletedLines.indexOf(line + 1) > -1;
+                });
         })
         .flatMap(x => x.previousStateLine.testIds)
         .map(x => previousState.tests.find(y => y.id === x))

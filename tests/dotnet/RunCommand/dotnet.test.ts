@@ -131,46 +131,46 @@ describe("RunCommand", () => {
             }));
     });
 
-    // test('run -> check coverage', async () => {
-    //     await runHandler();
+    test('run -> check coverage', async () => {
+        await runHandler();
 
-    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 31));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 31));
+    });
 
-    // test('run -> run -> check coverage', async () => {
-    //     await runHandler();
-    //     await runHandler();
+    test('run -> run -> check coverage', async () => {
+        await runHandler();
+        await runHandler();
 
-    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 31));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 31));
+    });
 
-    // test('run -> change condition -> run -> revert condition -> check coverage', async () => {
-    //     await runHandler();
+    test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+        await runHandler();
 
-    //     await overwriteCode("Sample/SomeClass.condition-change.cs");
-    //     await runHandler();
+        await overwriteCode("Sample/SomeClass.condition-change.cs");
+        await runHandler();
 
-    //     await revertCode("Sample/SomeClass.cs");
-    //     await runHandler();
+        await revertCode("Sample/SomeClass.cs");
+        await runHandler();
 
-    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-    //     expect(coverage).toEqual(lineRange(10, 31));
-    // });
+        const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 31));
+    });
 
-    // test('run -> change condition -> run -> check coverage', async () => {
-    //     await runHandler();
+    test('run -> change condition -> run -> check coverage', async () => {
+        await runHandler();
 
-    //     await overwriteCode("Sample/SomeClass.condition-change.cs");
-    //     await runHandler();
+        await overwriteCode("Sample/SomeClass.condition-change.cs");
+        await runHandler();
 
-    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-    //     expect(coverage).toEqual([
-    //         ...lineRange(10, 11),
-    //         ...lineRange(21, 31)
-    //     ]);
-    // });
+        const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverage).toEqual([
+            ...lineRange(10, 11),
+            ...lineRange(21, 31)
+        ]);
+    });
 
     test('run -> comment out test -> run -> check coverage', async () => {
         await runHandler();
@@ -178,15 +178,13 @@ describe("RunCommand", () => {
         await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
         await runHandler();
 
+        const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
+        expect(coverageForTest).toEqual([]);
+
         const coverageForClass = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
         expect(coverageForClass).toEqual([
-            ...lineRange(10, 19),
+            ...lineRange(10, 20),
             ...lineRange(31, 31)
-        ]);
-
-        const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
-        expect(coverageForTest).toEqual([
-            ...lineRange(10, 20)
         ]);
     });
 });

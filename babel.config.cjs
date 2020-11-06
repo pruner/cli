@@ -1,4 +1,6 @@
 module.exports = {
+    retainLines: true,
+    sourceMap: "inline",
     presets: [
         ['@babel/preset-env', { 
             targets: { 
