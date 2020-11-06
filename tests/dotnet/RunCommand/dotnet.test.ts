@@ -1,6 +1,6 @@
 jest.setTimeout(1000 * 60 * 5);
 
-import { join } from 'path';
+import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/RunCommand';
 import _ from 'lodash';
 import { State } from '../../../src/providers';
@@ -16,7 +16,7 @@ io.getPrunerPath = async () => "tests/dotnet/RunCommand/temp/.pruner";
 let mockCurrentDiff = "";
 git.getCurrentDiffText = async () => mockCurrentDiff;
 
-describe("RunCommand", () => {    
+describe("RunCommand", () => {
     const currentDirectory = join("tests", "dotnet", "RunCommand");
 
     const cleanup = async () => {
@@ -27,7 +27,7 @@ describe("RunCommand", () => {
 
     const getState = async (): Promise<State> => {
         const result = await io.readFromFile(join(currentDirectory, "temp", ".pruner", "state.json"));
-        if(!result) {
+        if (!result) {
             return {
                 coverage: [],
                 files: [],
@@ -53,31 +53,33 @@ describe("RunCommand", () => {
     }
 
     const revertCode = async (fileName: string) => {
-        const fromPath = join("tests", "dotnet", "sample", "Sample", fileName);
-        const toPath = join(currentDirectory, "temp", "Sample", fileName);
+        const fromPath = join("tests", "dotnet", "sample", fileName);
+        const toPath = join(currentDirectory, "temp", fileName);
 
         await replaceCodeFiles(fromPath, toPath);
     }
 
-    const overwriteCode = async (fileName: string) => {
-        const fromPath = join(currentDirectory, fileName);
-        const toPath = join(currentDirectory, "temp", "Sample", `${fileName.substr(0, fileName.indexOf("."))}.cs`);
+    const overwriteCode = async (filePath: string) => {
+        const fromPath = join(currentDirectory, filePath);
+
+        const fileName = basename(filePath);
+        const toPath = join(currentDirectory, "temp", dirname(filePath), `${fileName.substr(0, fileName.indexOf("."))}.cs`);
 
         await replaceCodeFiles(fromPath, toPath);
     }
 
     const replaceCodeFiles = async (fromPath: string, toPath: string) => {
         mockCurrentDiff = await gitDiff(
-            toPath, 
+            toPath,
             fromPath);
 
         const addExtraBackslashes = (text: string) => text.replace(/\\/g, "\\\\");
-        while(mockCurrentDiff.indexOf(addExtraBackslashes(fromPath)) > -1) {
+        while (mockCurrentDiff.indexOf(addExtraBackslashes(fromPath)) > -1) {
             mockCurrentDiff = mockCurrentDiff.replace(
-                addExtraBackslashes(fromPath), 
+                addExtraBackslashes(fromPath),
                 addExtraBackslashes(toPath));
         }
-            
+
         const fromContents = await io.readFromFile(fromPath);
 
         await io.writeToFile(
@@ -110,8 +112,8 @@ describe("RunCommand", () => {
             .flatMap(x => x)
             .map(x => join(temporaryFolderPath, x))
             .value();
-        for(let directory of directoriesToRemoveFlat) {
-            if(!await pathExists(directory)) {
+        for (let directory of directoriesToRemoveFlat) {
+            if (!await pathExists(directory)) {
                 console.debug("not-present", directory);
                 continue;
             }
@@ -129,44 +131,62 @@ describe("RunCommand", () => {
             }));
     });
 
-    test('run -> check coverage', async () => {
+    // test('run -> check coverage', async () => {
+    //     await runHandler();
+
+    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 31));
+    // });
+
+    // test('run -> run -> check coverage', async () => {
+    //     await runHandler();
+    //     await runHandler();
+
+    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 31));
+    // });
+
+    // test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+    //     await runHandler();
+
+    //     await overwriteCode("Sample/SomeClass.condition-change.cs");
+    //     await runHandler();
+
+    //     await revertCode("Sample/SomeClass.cs");
+    //     await runHandler();
+
+    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+    //     expect(coverage).toEqual(lineRange(10, 31));
+    // });
+
+    // test('run -> change condition -> run -> check coverage', async () => {
+    //     await runHandler();
+
+    //     await overwriteCode("Sample/SomeClass.condition-change.cs");
+    //     await runHandler();
+
+    //     const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+    //     expect(coverage).toEqual([
+    //         ...lineRange(10, 11),
+    //         ...lineRange(21, 31)
+    //     ]);
+    // });
+
+    test('run -> comment out test -> run -> check coverage', async () => {
+        await runHandler();
+        
+        await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
         await runHandler();
 
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(lineRange(10, 31));
-    });
+        const coverageForClass = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverageForClass).toEqual([
+            ...lineRange(10, 19),
+            ...lineRange(31, 31)
+        ]);
 
-    test('run -> run -> check coverage', async () => {
-        await runHandler();
-        await runHandler();
-
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(lineRange(10, 31));
-    });
-
-    test('run -> change condition -> run -> revert condition -> check coverage', async () => {
-        await runHandler();
-
-        await overwriteCode("SomeClass.condition-change.cs");
-        await runHandler();
-
-        await revertCode("SomeClass.cs");
-        await runHandler();
-
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual(lineRange(10, 31));
-    });
-
-    test('run -> change condition -> run -> check coverage', async () => {
-        await runHandler();
-
-        await overwriteCode("SomeClass.condition-change.cs");
-        await runHandler();
-
-        const coverage = await getCoveredLineNumbersForFile("SomeClass.cs");
-        expect(coverage).toEqual([
-            ...lineRange(10, 11),
-            ...lineRange(21, 31)
+        const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
+        expect(coverageForTest).toEqual([
+            ...lineRange(10, 20)
         ]);
     });
 });

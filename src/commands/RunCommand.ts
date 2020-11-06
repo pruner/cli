@@ -1,4 +1,4 @@
-import {chain, flatMap} from "lodash";
+import {chain, flatMap, remove} from "lodash";
 import { green, red, white, yellow } from "chalk";
 import { join } from "path";
 import { Command, DefaultArgs } from "./Command";
@@ -7,7 +7,7 @@ import git from '../git';
 import io from '../io';
 import chokidar from 'chokidar';
 import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../providers';
-import { read } from "fs";
+import { exists, read } from "fs";
 
 type Args = DefaultArgs & {
     provider?: string,
@@ -56,15 +56,14 @@ export async function handler(args: Args) {
     }
 }
 
-async function withStateDetection(action: (previousState: State, newCommitId: string) => Promise<State>) {
+async function withStateMiddleware(action: (previousState: State, newCommitId: string) => Promise<State>) {
     await io.removeDirectory(join(
         await io.getPrunerPath(),
         "temp"));
-        
+
     const newCommitId = await git.createStashCommit();
 
     let state = await readState();
-
     state = await action(state, newCommitId);
     
     state.commitId = newCommitId;
@@ -85,7 +84,7 @@ function watchProvider(provider: Provider, settings: Settings) {
 
         isRunning = true;
 
-        await withStateDetection(async (state, newCommitId) => {
+        await withStateMiddleware(async (state, newCommitId) => {
             state = await runTestsForProvider(provider, state, newCommitId);
 
             if(hasPending) {
@@ -121,7 +120,7 @@ function watchProvider(provider: Provider, settings: Settings) {
 }
 
 async function runTestsForProviders(providers: Provider[]) {
-    await withStateDetection(async (state, newCommitId) => {
+    await withStateMiddleware(async (state, newCommitId) => {
         for (let provider of providers)
             state = await runTestsForProvider(provider, state, newCommitId);
         
@@ -138,10 +137,10 @@ async function createProvidersFromArguments(args: Args) {
 }
 
 async function runTestsForProvider(provider: Provider, previousState: State, newCommitId: string): Promise<State> {
-    const result = await useSpinner("Running tests", async () => {
-        const testsToRun = await getTestsToRun(previousState, newCommitId);
-        return await provider.executeTestProcess(testsToRun);
-    });
+    const testsToRun = await getTestsToRun(previousState, newCommitId);
+
+    const result = await useSpinner("Running tests", async () => 
+        await provider.executeTestProcess(testsToRun));
     
     if(result.exitCode !== 0) {
         console.error(red(`Could not run tests. Exit code ${result.exitCode}.`) + "\n" + yellow(result.stdout) + "\n" + red(result.stderr));
@@ -153,7 +152,10 @@ async function runTestsForProvider(provider: Provider, previousState: State, new
 
     const state = await provider.gatherState();
 
-    return await mergeState(previousState, state);
+    return await mergeState(
+        testsToRun.affected,
+        previousState, 
+        state);
 }
 
 async function persistState(state: State) {
@@ -207,7 +209,11 @@ async function createProvidersFromClass(Provider: ProviderClass<Settings>) {
     }));
 }
 
-async function mergeState(previousState: State, newState: State): Promise<State> {
+async function mergeState(
+    testsInFilter: Test[],
+    previousState: State, 
+    newState: State
+): Promise<State> {
     const allNewTestIds = chain(newState.coverage)
         .flatMap(x => x.testIds)
         .uniq()
@@ -263,6 +269,18 @@ async function mergeState(previousState: State, newState: State): Promise<State>
             .uniqBy(x => x.fileId + "-" + x.lineNumber)
             .value()
     };
+
+    for(let testInFilter of testsInFilter) {
+        const newStateTestIndex = newState.tests.findIndex(x => x.name === testInFilter.name);
+        const mergedStateTestIndex = mergedState.tests.findIndex(x => x.name === testInFilter.name);
+        if(newStateTestIndex === -1 && mergedStateTestIndex > -1) {
+            mergedState.tests.splice(mergedStateTestIndex, 1);
+
+            remove(
+                mergedState.coverage, 
+                x => x.testIds.indexOf(testInFilter.id) > -1);
+        }
+    }
 
     return mergedState;
 }
