@@ -1,6 +1,6 @@
 
 import { glob as internalGlob } from 'glob';
-import fs from "fs";
+import fs, { rm } from "fs";
 import { basename, dirname, join, sep } from 'path';
 import rimraf from 'rimraf';
 
@@ -27,18 +27,28 @@ async function glob(workingDirectory: string, pattern: string): Promise<string[]
             (_, matches) => resolve(matches)));
 }
 
-async function globContents(workingDirectory: string, globPattern: string) {
+async function globContents(globPattern: string, options?: {
+    workingDirectory?: string,
+    deleteAfterRead?: boolean
+}) {
     const filePaths = await exported.glob(
-        workingDirectory,
+        options?.workingDirectory,
         globPattern);
 
-    console.debug("file-glob-results", workingDirectory, globPattern, filePaths);
+    console.debug("file-glob-results", options?.workingDirectory, globPattern, filePaths);
 
     const coverageFileBuffers = await Promise.all(filePaths
         .map(filePath => fs.promises.readFile(
-            join(workingDirectory, filePath))));
-    return coverageFileBuffers
+            join(options?.workingDirectory, filePath))));
+            
+    if(options?.deleteAfterRead) {
+        await Promise.all(filePaths
+            .map(filePath => fs.promises.unlink(filePath)));
+    }
+
+    const fileContents = coverageFileBuffers
         .map(file => file.toString());
+    return fileContents;
 }
 
 async function safeStat(path: string) {

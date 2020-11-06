@@ -73,8 +73,10 @@ export default class DotNetProvider implements Provider {
         const projectRootDirectory = await git.getGitTopDirectory();
 
         const coverageFileContents = await io.globContents(
-            this.settings.workingDirectory, 
-            `**/${reportName}`);
+            `**/${reportName}`, {
+                workingDirectory: this.settings.workingDirectory,
+                deleteAfterRead: true
+            });
         if(coverageFileContents.length === 0) {
             console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}. Make sure AltCover is installed in your test projects.`));
             return {
