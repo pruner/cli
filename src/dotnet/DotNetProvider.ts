@@ -8,8 +8,13 @@ import { Root } from "./altcover";
 import { chain, range } from "lodash";
 import git from "../git";
 import { yellow, yellowBright } from "chalk";
+import { getAltCoverArguments, getFilterArguments } from "./arguments";
 
-type DotNetSettings = Settings;
+export type DotNetSettings = Settings & {
+    msTest: {
+        categories: string[]
+    }
+};
 
 const reportName = "coverage.xml.tmp.pruner";
 
@@ -27,7 +32,9 @@ export default class DotNetProvider implements Provider {
             workingDirectory: {
                 type: "text",
                 message: "What relative directory would you like to run 'dotnet test' from?"
-            }
+            },
+            msTest: null,
+            excludeFromWatch: null
         }
     }
 
@@ -38,32 +45,10 @@ export default class DotNetProvider implements Provider {
     }
     
     public async executeTestProcess(tests: Tests): Promise<execa.ExecaReturnValue<string>> {
-        const attributes = [
-            "TestMethod",
-            "Test",
-            "Fact",
-            "Theory"
+        const args = [
+            ...getFilterArguments(tests, this.settings),
+            ...getAltCoverArguments(reportName)
         ];
-
-        const callContextArgument = attributes
-            .map(attribute => `[${attribute}]`)
-            .join('|');
-
-        const unknownFilter = this.getFilterArgument(tests.unaffected, {
-            compare: "!=",
-            join: "&"
-        });
-
-        const affectedFilter = this.getFilterArgument(tests.affected, {
-            compare: "=",
-            join: "|"
-        });
-
-        const filterArgument = [affectedFilter, unknownFilter]
-            .filter(x => !!x)
-            .map(x => `(${x})`)
-            .join('|');
-        console.debug("execute-filter", filterArgument);
         console.debug("execute-settings", this.settings);
 
         const processOptions = {
@@ -75,12 +60,7 @@ export default class DotNetProvider implements Provider {
             "dotnet",
             [
                 "test",
-                "--filter",
-                filterArgument,
-                "/p:AltCover=true",
-                `/p:AltCoverCallContext=${callContextArgument}`,
-                "/p:AltCoverForce=true",
-                `/p:AltCoverXmlReport=${reportName}`
+                ...args
             ], 
             processOptions);
         if(typeof result.exitCode === "undefined")
@@ -89,19 +69,12 @@ export default class DotNetProvider implements Provider {
         return result;
     }
 
-    private getFilterArgument(
-        tests: Test[], 
-        operandSettings: { join: string; compare: string; }) 
-    {
-        return tests
-            .map(x => `FullyQualifiedName${operandSettings.compare}${x.name}`)
-            .join(operandSettings.join);
-    }
-
     public async gatherState(): Promise<State> {
         const projectRootDirectory = await git.getGitTopDirectory();
 
-        const coverageFileContents = await this.getFileContents(`**/${reportName}`);
+        const coverageFileContents = await io.globContents(
+            this.settings.workingDirectory, 
+            `**/${reportName}`);
         if(coverageFileContents.length === 0) {
             console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}. Make sure AltCover is installed in your test projects.`));
             return {
@@ -194,19 +167,5 @@ export default class DotNetProvider implements Provider {
             .replace(/::/g, ".");
         
         return namespaceAndName.substr(0, namespaceAndName.indexOf('('));
-    }
-
-    private async getFileContents(globPattern: string) {
-        const filePaths = await io.glob(
-            this.settings.workingDirectory,
-            globPattern);
-
-        console.debug("file-glob-results", this.settings.workingDirectory, globPattern, filePaths);
-    
-        const coverageFileBuffers = await Promise.all(filePaths
-            .map(filePath => fs.promises.readFile(
-                join(this.settings.workingDirectory, filePath))));
-        return coverageFileBuffers
-            .map(file => file.toString());
     }
 }

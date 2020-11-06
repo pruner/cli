@@ -30,7 +30,8 @@ export type State = {
 };
 
 export type Settings = {
-    workingDirectory: string
+    workingDirectory: string,
+    excludeFromWatch: boolean
 };
 
 export interface Provider {

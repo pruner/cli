@@ -69,13 +69,11 @@ async function getProviderSettings(topDirectoryPath: string) {
 
 async function askForInitSettings(Provider: ProviderClass<any>) {
     const initQuestions = Provider.getInitQuestions();
-    
     const keys = _.keys(initQuestions);
     for (let key of keys) {
         initQuestions[key]["name"] = key;
     }
 
-    const initSettings = await prompts(
-        _.values(initQuestions) as prompts.PromptObject<any>[]);
-    return initSettings;
+    const values = _.values(initQuestions) as prompts.PromptObject<any>[];
+    return await prompts(values);
 }

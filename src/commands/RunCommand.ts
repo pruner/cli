@@ -84,6 +84,11 @@ async function withStateMiddleware(action: (previousState: State, newCommitId: s
 }
 
 function watchProvider(provider: Provider, settings: Settings) {
+    if(settings.excludeFromWatch) {
+        console.log(yellow("A provider was excluded from watch due to the 'excludeFromWatch' setting."));
+        return;
+    }
+
     let isRunning = false;
     let hasPending = false;
 

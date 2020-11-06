@@ -6,6 +6,7 @@ import rimraf from 'rimraf';
 
 const exported = {
     glob,
+    globContents,
     safeStat,
     writeToFile,
     readFromFile,
@@ -24,6 +25,20 @@ async function glob(workingDirectory: string, pattern: string): Promise<string[]
                 cwd: workingDirectory
             }, 
             (_, matches) => resolve(matches)));
+}
+
+async function globContents(workingDirectory: string, globPattern: string) {
+    const filePaths = await exported.glob(
+        workingDirectory,
+        globPattern);
+
+    console.debug("file-glob-results", workingDirectory, globPattern, filePaths);
+
+    const coverageFileBuffers = await Promise.all(filePaths
+        .map(filePath => fs.promises.readFile(
+            join(workingDirectory, filePath))));
+    return coverageFileBuffers
+        .map(file => file.toString());
 }
 
 async function safeStat(path: string) {
