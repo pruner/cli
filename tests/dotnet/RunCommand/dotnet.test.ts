@@ -2,7 +2,7 @@ jest.setTimeout(1000 * 60 * 5);
 
 import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/RunCommand';
-import _ from 'lodash';
+import _, { last } from 'lodash';
 import { State } from '../../../src/providers';
 import rimraf from 'rimraf';
 import { copy, pathExists } from 'fs-extra';
@@ -88,10 +88,12 @@ describe("RunCommand", () => {
     }
 
     const runHandler = async () => {
-        await handler({
+        const stateChanges = await handler({
             provider: "dotnet",
             verbosity: "verbose"
         });
+        const stateChange = last(stateChanges);
+        return stateChange.testsRun;
     }
 
     beforeEach(async () => {
@@ -132,38 +134,47 @@ describe("RunCommand", () => {
     });
 
     test('run -> check coverage', async () => {
-        await runHandler();
+        const testRun = await runHandler();
+        expect(testRun.length).toBe(12);
 
         const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
         expect(coverage).toEqual(lineRange(10, 31));
     });
 
     test('run -> run -> check coverage', async () => {
-        await runHandler();
-        await runHandler();
+        const testRun1 = await runHandler();
+        expect(testRun1.length).toBe(12);
+
+        const testRun2 = await runHandler();
+        expect(testRun2.length).toBe(0);
 
         const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
         expect(coverage).toEqual(lineRange(10, 31));
     });
 
     test('run -> change condition -> run -> revert condition -> check coverage', async () => {
-        await runHandler();
+        const testRun1 = await runHandler();
+        expect(testRun1.length).toBe(12);
 
         await overwriteCode("Sample/SomeClass.condition-change.cs");
-        await runHandler();
+        const testRun2 = await runHandler();
+        expect(testRun2.length).toBe(12);
 
         await revertCode("Sample/SomeClass.cs");
-        await runHandler();
+        const testRun3 = await runHandler();
+        expect(testRun3.length).toBe(12);
 
         const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
         expect(coverage).toEqual(lineRange(10, 31));
     });
 
     test('run -> change condition -> run -> check coverage', async () => {
-        await runHandler();
+        const testRun1 = await runHandler();
+        expect(testRun1.length).toBe(12);
 
         await overwriteCode("Sample/SomeClass.condition-change.cs");
-        await runHandler();
+        const testRun2 = await runHandler();
+        expect(testRun2.length).toBe(12);
 
         const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
         expect(coverage).toEqual([
@@ -173,10 +184,12 @@ describe("RunCommand", () => {
     });
 
     test('run -> comment out test -> run -> check coverage', async () => {
-        await runHandler();
+        const testRun1 = await runHandler();
+        expect(testRun1.length).toBe(12);
         
         await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
-        await runHandler();
+        const testRun2 = await runHandler();
+        expect(testRun2.length).toBe(0);
 
         const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
         expect(coverageForTest).toEqual([]);
@@ -186,5 +199,17 @@ describe("RunCommand", () => {
             ...lineRange(10, 20),
             ...lineRange(31, 31)
         ]);
+    });
+
+    test('run -> make change in first if-branch -> run -> check coverage', async () => {
+        const testRun1 = await runHandler();
+        expect(testRun1.length).toBe(12);
+        
+        await overwriteCode("Sample/SomeClass.first-branch-change.cs");
+        const testRun2 = await runHandler();
+        expect(testRun2.length).toBe(6);
+
+        const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+        expect(coverage).toEqual(lineRange(10, 31));
     });
 });

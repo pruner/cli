@@ -1,4 +1,4 @@
-import {chain, flatMap, remove} from "lodash";
+import {chain, flatMap, last, remove} from "lodash";
 import { green, red, white, yellow } from "chalk";
 import { join } from "path";
 import { Command, DefaultArgs } from "./Command";
@@ -12,6 +12,11 @@ import { exists, read } from "fs";
 type Args = DefaultArgs & {
     provider?: string,
     watch?: boolean
+}
+
+type RunReport = {
+    testsRun: Test[],
+    mergedState: State
 }
 
 export default {
@@ -45,7 +50,7 @@ export async function handler(args: Args) {
     }
 
     const providerPairs = await createProvidersFromArguments(args);
-    await runTestsForProviders(providerPairs.map(x => x.provider));
+    const stateChanges = await runTestsForProviders(providerPairs.map(x => x.provider));
 
     if(args.watch) {
         for(let providerPair of providerPairs) {
@@ -54,20 +59,26 @@ export async function handler(args: Args) {
                 providerPair.settings);
         }
     }
+
+    return stateChanges;
 }
 
-async function withStateMiddleware(action: (previousState: State, newCommitId: string) => Promise<State>) {
+async function withStateMiddleware(action: (previousState: State, newCommitId: string) => Promise<RunReport[]>) {
     await generateLcovFile();
 
     const newCommitId = await git.createStashCommit();
 
     let state = await readState();
-    state = await action(state, newCommitId);
+
+    const stateChanges = await action(state, newCommitId);
+    state = last(stateChanges).mergedState;
     
     state.commitId = newCommitId;
 
     await persistState(state);
     await generateLcovFile(state);
+
+    return stateChanges;
 }
 
 function watchProvider(provider: Provider, settings: Settings) {
@@ -83,14 +94,14 @@ function watchProvider(provider: Provider, settings: Settings) {
         isRunning = true;
 
         await withStateMiddleware(async (state, newCommitId) => {
-            state = await runTestsForProvider(provider, state, newCommitId);
+            let stateChange = await runTestsForProvider(provider, state, newCommitId);
 
             if(hasPending) {
                 hasPending = false;
-                state = await runTestsForProvider(provider, state, newCommitId);
+                stateChange = await runTestsForProvider(provider, state, newCommitId);
             }
 
-            return state;
+            return [stateChange];
         });
 
         console.log(white("Waiting for file changes..."));
@@ -118,11 +129,16 @@ function watchProvider(provider: Provider, settings: Settings) {
 }
 
 async function runTestsForProviders(providers: Provider[]) {
-    await withStateMiddleware(async (state, newCommitId) => {
-        for (let provider of providers)
-            state = await runTestsForProvider(provider, state, newCommitId);
+    return await withStateMiddleware(async (state, newCommitId) => {
+        const newStates = new Array<RunReport>();
+        for (let provider of providers) {
+            const stateChange = await runTestsForProvider(provider, state, newCommitId);
+            state = stateChange.mergedState;
+
+            newStates.push(stateChange);
+        }
         
-        return state;
+        return newStates;
     });
 }
 
@@ -134,7 +150,7 @@ async function createProvidersFromArguments(args: Args) {
     return flatMap(providerPairs, x => x);
 }
 
-async function runTestsForProvider(provider: Provider, previousState: State, newCommitId: string): Promise<State> {
+async function runTestsForProvider(provider: Provider, previousState: State, newCommitId: string): Promise<RunReport> {
     const testsToRun = await getTestsToRun(previousState, newCommitId);
 
     const result = await useSpinner("Running tests", async () => 
@@ -150,10 +166,17 @@ async function runTestsForProvider(provider: Provider, previousState: State, new
 
     const state = await provider.gatherState();
 
-    return await mergeState(
-        testsToRun.affected,
-        previousState, 
-        state);
+    return {
+        mergedState: await mergeState(
+            testsToRun.affected,
+            previousState, 
+            state),
+        testsRun: chain(state.coverage)
+            .flatMap(x => x.testIds)
+            .uniq()
+            .map(x => state.tests.find(y => y.id === x))
+            .value()
+    }
 }
 
 async function persistState(state: State) {
@@ -324,7 +347,7 @@ async function getTestsToRun(previousState: State, newCommitId: string) {
                     const line = x.unchangedLine?.newLine || x.previousStateLine.lineNumber;
                     return changedFile.addedLines.indexOf(line - 1) > -1 ||
                         changedFile.addedLines.indexOf(line) > -1 ||
-                        changedFile.addedLines.indexOf(line + 1) ||
+                        changedFile.addedLines.indexOf(line + 1) > -1 ||
                         changedFile.deletedLines.indexOf(line - 1) > -1 ||
                         changedFile.deletedLines.indexOf(line) > -1 ||
                         changedFile.deletedLines.indexOf(line + 1) > -1;
@@ -332,6 +355,7 @@ async function getTestsToRun(previousState: State, newCommitId: string) {
         })
         .flatMap(x => x.previousStateLine.testIds)
         .map(x => previousState.tests.find(y => y.id === x))
+        .uniqBy(x => x.name)
         .value();
 
     console.debug("tests-to-run", "previous-state", previousState.tests, previousState.files, previousState.coverage);
