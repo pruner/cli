@@ -56,7 +56,11 @@ export async function handler(args: Args) {
     }
 }
 
-async function wrapInGitTransaction(action: (previousState: State, newCommitId: string) => Promise<State>) {
+async function withStateDetection(action: (previousState: State, newCommitId: string) => Promise<State>) {
+    await io.removeDirectory(join(
+        await io.getPrunerPath(),
+        "temp"));
+        
     const newCommitId = await git.createStashCommit();
 
     let state = await readState();
@@ -81,7 +85,7 @@ function watchProvider(provider: Provider, settings: Settings) {
 
         isRunning = true;
 
-        await wrapInGitTransaction(async (state, newCommitId) => {
+        await withStateDetection(async (state, newCommitId) => {
             state = await runTestsForProvider(provider, state, newCommitId);
 
             if(hasPending) {
@@ -117,7 +121,7 @@ function watchProvider(provider: Provider, settings: Settings) {
 }
 
 async function runTestsForProviders(providers: Provider[]) {
-    await wrapInGitTransaction(async (state, newCommitId) => {
+    await withStateDetection(async (state, newCommitId) => {
         for (let provider of providers)
             state = await runTestsForProvider(provider, state, newCommitId);
         

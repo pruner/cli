@@ -2,6 +2,7 @@
 import { glob as internalGlob } from 'glob';
 import fs from "fs";
 import { basename, dirname, join, sep } from 'path';
+import rimraf from 'rimraf';
 
 const exported = {
     glob,
@@ -11,7 +12,8 @@ const exported = {
     getPrunerPath,
     writeToPrunerFile,
     readFromPrunerFile,
-    normalizePathSeparators
+    normalizePathSeparators,
+    removeDirectory
 };
 
 async function glob(workingDirectory: string, pattern: string): Promise<string[]> {
@@ -85,6 +87,10 @@ async function writeToPrunerFile(path: string, contents: string) {
 async function readFromPrunerFile(path: string) {
     const prunerDirectory = await exported.getPrunerPath();
     return await readFromFile(join(prunerDirectory, path));
+}
+
+async function removeDirectory(path: string) {
+    return new Promise(resolve => rimraf(path, null, resolve));
 }
 
 function normalizePathSeparators(path: string) {
