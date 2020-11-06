@@ -71,12 +71,14 @@ async function withStateMiddleware(action: (previousState: State, newCommitId: s
     let state = await readState();
 
     const stateChanges = await action(state, newCommitId);
-    state = last(stateChanges).mergedState;
-    
-    state.commitId = newCommitId;
+    if(stateChanges?.length > 0) {
+        state = last(stateChanges).mergedState;
+        
+        state.commitId = newCommitId;
 
-    await persistState(state);
-    await generateLcovFile(state);
+        await persistState(state);
+        await generateLcovFile(state);
+    }
 
     return stateChanges;
 }
