@@ -41,13 +41,15 @@ async function globContents(globPattern: string, options?: {
         .map(filePath => fs.promises.readFile(
             join(options?.workingDirectory, filePath))));
             
-    if(options?.deleteAfterRead) {
-        await Promise.all(filePaths
-            .map(filePath => fs.promises.unlink(filePath)));
-    }
-
     const fileContents = coverageFileBuffers
         .map(file => file.toString());
+
+    if(options?.deleteAfterRead) {
+        await Promise.all(filePaths
+            .map(filePath => fs.promises.unlink(
+                join(options?.workingDirectory, filePath))));
+    }
+
     return fileContents;
 }
 

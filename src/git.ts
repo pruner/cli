@@ -15,8 +15,7 @@ const declarations = {
 
 async function runGitCommand(...args: string[]) {
     const result = await execa("git", args, {
-        reject: false,
-        shell: true
+        reject: false
     });
     if(result.exitCode !== 0)
         return "";

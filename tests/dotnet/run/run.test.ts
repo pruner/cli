@@ -81,6 +81,8 @@ describe("run", () => {
         }
 
         const fromContents = await io.readFromFile(fromPath);
+        if(!fromContents)
+            throw new Error("Could not find: " + fromPath);
 
         await io.writeToFile(
             toPath,

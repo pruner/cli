@@ -59,8 +59,7 @@ export default class DotNetProvider implements Provider {
             ], 
             {
                 cwd: this.settings.workingDirectory,
-                reject: false,
-                shell: true
+                reject: false
             });
         if(typeof result.exitCode === "undefined")
             console.warn(yellow("It could look like you don't have the .NET Core SDK installed, required for the .NET provider."));
