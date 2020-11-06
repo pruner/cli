@@ -2,7 +2,7 @@ import {chain, flatMap, last, remove} from "lodash";
 import { green, red, white, yellow } from "chalk";
 import { join } from "path";
 import { Command, DefaultArgs } from "./Command";
-import { useSpinner } from '../console';
+import con from '../console';
 import git from '../git';
 import io from '../io';
 import chokidar from 'chokidar';
@@ -163,7 +163,7 @@ async function createProvidersFromArguments(args: Args) {
 async function runTestsForProvider(provider: Provider, previousState: State, newCommitId: string): Promise<RunReport> {
     const testsToRun = await getTestsToRun(previousState, newCommitId);
 
-    const result = await useSpinner("Running tests", async () => 
+    const result = await con.useSpinner("Running tests", async () => 
         await provider.executeTestProcess(testsToRun));
     
     if(result.exitCode !== 0) {

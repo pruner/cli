@@ -11,13 +11,13 @@ import git from '../../../src/git';
 import io from '../../../src/io';
 import { gitDiff } from '../../helpers/git';
 
-io.getPrunerPath = async () => "tests/dotnet/RunCommand/temp/.pruner";
+io.getPrunerPath = async () => "tests/dotnet/run/temp/.pruner";
 
 let mockCurrentDiff = "";
 git.getCurrentDiffText = async () => mockCurrentDiff;
 
-describe("RunCommand", () => {
-    const currentDirectory = join("tests", "dotnet", "RunCommand");
+describe("run", () => {
+    const currentDirectory = join("tests", "dotnet", "run");
 
     const cleanup = async () => {
         rimraf.sync(join(currentDirectory, "temp"));
@@ -128,7 +128,7 @@ describe("RunCommand", () => {
             join(__dirname, "temp", ".pruner", "settings.json"),
             JSON.stringify({
                 dotnet: [{
-                    "workingDirectory": "tests/dotnet/RunCommand/temp"
+                    "workingDirectory": "tests/dotnet/run/temp"
                 }]
             }));
     });
