@@ -57,9 +57,7 @@ export async function handler(args: Args) {
 }
 
 async function withStateMiddleware(action: (previousState: State, newCommitId: string) => Promise<State>) {
-    await io.removeDirectory(join(
-        await io.getPrunerPath(),
-        "temp"));
+    await generateLcovFile();
 
     const newCommitId = await git.createStashCommit();
 
@@ -172,7 +170,7 @@ function getStateFileName() {
     return `state.json`;
 }
 
-async function generateLcovFile(state: State) {
+async function generateLcovFile(state?: State) {
     let lcovContents = "";
 
     function appendLine(line: string) {
@@ -181,17 +179,19 @@ async function generateLcovFile(state: State) {
 
     const rootDirectory = await git.getGitTopDirectory();
 
-    for(let file of state.files) {
-        const fullPath = join(rootDirectory, file.path);
-        appendLine(`SF:${fullPath}`);
-        
-        const lines = state.coverage.filter(x => x.fileId === file.id);
-        for(let line of lines) {
-            const isCovered = line.testIds.length > 0;
-            appendLine(`DA:${line.lineNumber},${isCovered ? 1 : 0}`);
-        }
+    if(state) {
+        for(let file of state.files) {
+            const fullPath = join(rootDirectory, file.path);
+            appendLine(`SF:${fullPath}`);
+            
+            const lines = state.coverage.filter(x => x.fileId === file.id);
+            for(let line of lines) {
+                const isCovered = line.testIds.length > 0;
+                appendLine(`DA:${line.lineNumber},${isCovered ? 1 : 0}`);
+            }
 
-        appendLine("end_of_record");
+            appendLine("end_of_record");
+        }
     }
 
     await io.writeToPrunerFile(
