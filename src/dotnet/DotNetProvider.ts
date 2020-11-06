@@ -126,8 +126,10 @@ export default class DotNetProvider implements Provider {
         const coverage = chain(modules)
             .flatMap(x => x.Classes)
             .flatMap(x => x.Class)
+            .filter(x => !!x)
             .flatMap(x => x.Methods)
             .flatMap(x => x.Method)
+            .filter(x => !!x)
             .flatMap(x => x.SequencePoints)
             .flatMap(x => x.SequencePoint)
             .filter(x => !!x)
@@ -135,7 +137,8 @@ export default class DotNetProvider implements Provider {
                 .map(l => ({
                     testIds: chain(x.TrackedMethodRefs || [])
                         .flatMap(m => m.TrackedMethodRef)
-                        .map(m => m.$)
+                        .map(m => m?.$)
+                        .filter(m => !!m)
                         .map(m => +m.uid)
                         .value(),
                     fileId: +x?.$.fileid,
