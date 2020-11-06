@@ -90,7 +90,9 @@ async function readFromPrunerFile(path: string) {
 }
 
 async function removeDirectory(path: string) {
-    return new Promise(resolve => rimraf(path, null, resolve));
+    return new Promise(resolve => {
+        rimraf(path, resolve);
+    });
 }
 
 function normalizePathSeparators(path: string) {
