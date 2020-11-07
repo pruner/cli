@@ -7,6 +7,7 @@ import con from '../console';
 import git, { FileChanges } from '../git';
 import io from '../io';
 import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../providers';
+import _ from 'lodash';
 
 type Args = DefaultArgs & {
 	provider?: string;
@@ -315,152 +316,85 @@ async function mergeState(
 	testsInFilter: Test[],
 	previousState: State,
 	newState: State,
-): Promise<
-	State
-> {
+): Promise<State> {
 	const allNewTestIds = chain(newState.coverage)
 		.flatMap(x => x.testIds)
 		.uniq()
 		.value();
 
 	const linesToRemove: LineCoverage[] = [];
-	if (
-		previousState
-	) {
-		for (const previousLine of previousState.coverage) {
-			if (
-				previousLine
-					.testIds
-					.length
-				=== 0
-			)
+	if (previousState) {
+		for (const previousLineCoverage of previousState.coverage) {
+			if (previousLineCoverage.testIds.length === 0)
 				continue;
 
-			const newLine = newState.coverage.find(
-				x => x.lineNumber
-					=== previousLine.lineNumber
-					&& x.fileId
-					=== previousLine.fileId,
-			);
-			if (
-				newLine
-			)
+			const newLineCoverage = newState.coverage.find(x =>
+				x.lineNumber === previousLineCoverage.lineNumber &&
+				x.fileId === previousLineCoverage.fileId);
+			if (newLineCoverage)
 				continue;
 
 			let remove = false;
 
-			const previousTestIds = previousLine.testIds;
+			const previousTestIds = previousLineCoverage.testIds;
 
 			for (const previousTestId of previousTestIds) {
-				const existsInNewTests = !!allNewTestIds.find(
-					newTestId => newTestId
-						=== previousTestId,
-				);
-				if (
-					existsInNewTests
-				)
+				const existsInNewTests = !!allNewTestIds.find(newTestId => newTestId === previousTestId);
+				if (existsInNewTests)
 					remove = true;
 			}
 
-			if (
-				remove
-			) {
-				linesToRemove.push(
-					previousLine,
-				);
-			}
+			if (remove)
+				linesToRemove.push(previousLineCoverage);
 		}
 	}
 
 	const mergedState: State = {
-		commitId:
-			newState?.commitId
-			|| previousState?.commitId,
-		tests: chain(
-			[
-				previousState?.tests
-				|| [],
-				newState.tests
-				|| [],
-			],
-		)
+		commitId: newState.commitId,
+		tests: _
+			.chain([
+				previousState?.tests || [],
+				newState.tests || []
+			])
 			.flatMap()
-			.uniqBy(
-				x => x.name,
-			)
+			.uniqBy(x => x.name)
 			.value(),
-		files: chain(
-			[
-				previousState?.files
-				|| [],
-				newState.files
-				|| [],
-			],
-		)
+		files: _
+			.chain([
+				previousState?.files || [],
+				newState.files || [],
+			])
 			.flatMap()
-			.uniqBy(
-				x => x.path,
-			)
+			.uniqBy(x => x.path)
 			.value(),
-		coverage: chain(
-			[
-				previousState?.coverage
-				|| [],
-				newState.coverage,
-			],
-		)
+		coverage: _
+			.chain([
+				previousState?.coverage || [],
+				newState.coverage
+			])
 			.flatMap()
-			.filter(
-				x => !linesToRemove.find(
-					l => l.fileId
-						=== x.fileId
-						&& l.lineNumber
-						=== x.lineNumber,
-				),
-			)
-			.uniqBy(
-				x => `${x.fileId}-${x.lineNumber}`,
-			)
+			.filter(x => !linesToRemove.find(l =>
+				l.fileId === x.fileId &&
+				l.lineNumber === x.lineNumber))
+			.uniqBy(x => `${x.fileId}-${x.lineNumber}`)
 			.value()
 	};
 
+	//this is to remove outdated coverage.
 	for (const testInFilter of testsInFilter) {
-		const newStateTestIndex = newState.tests.findIndex(
-			x => x.name
-				=== testInFilter.name,
-		);
-		const mergedStateTestIndex = mergedState.tests.findIndex(
-			x => x.name
-				=== testInFilter.name,
-		);
-		if (
-			newStateTestIndex
-			=== -1
-			&& mergedStateTestIndex
-			> -1
-		) {
-			mergedState.tests.splice(
-				mergedStateTestIndex,
-				1,
-			);
+		const newStateTestIndex = newState.tests.findIndex(x => x.name === testInFilter.name);
+		const mergedStateTestIndex = mergedState.tests.findIndex(x => x.name === testInFilter.name);
+		if (newStateTestIndex === -1 && mergedStateTestIndex > -1) {
+			mergedState.tests.splice(mergedStateTestIndex, 1);
 
-			mergedState.coverage.forEach(
-				lineCoverage => remove(
-					lineCoverage.testIds,
-					x => x
-						=== testInFilter.id,
-				),
-			);
+			mergedState.coverage.forEach(lineCoverage => _
+				.remove(lineCoverage.testIds, x => x === testInFilter.id));
 		}
 	}
 
 	remove(
 		mergedState.coverage,
-		x => x
-			.testIds
-			.length
-			=== 0,
-	);
+		x => x.testIds.length === 0);
 
 	return mergedState;
 }
@@ -533,9 +467,9 @@ function getTestFromStateById(state: State, id: number): Test {
 }
 
 /**
- * This function exists in case we have removed a line,
- * and therefore don't have coverage data on that line anymore,
- * so we check nearby surrounding instead.
+ * This function exists in case we have added a new line,
+ * and therefore don't have coverage data on that line,
+ * so we check nearby surrounding lines instead.
  */
 function hasCoverageOfLineInSurroundingLines(
 	line: number,
@@ -543,8 +477,7 @@ function hasCoverageOfLineInSurroundingLines(
 ) {
 	return (
 		allLines.indexOf(line - 1) > -1 ||
-		allLines.indexOf(line) > -1 ||
-		allLines.indexOf(line + 1) > -1
+		allLines.indexOf(line) > -1
 	);
 }
 
@@ -574,9 +507,7 @@ function getFileIdFromStateForPath(
 		x => x.path
 			=== path,
 	);
-	if (
-		!file
-	)
+	if (!file)
 		return null;
 
 	return file.id;
