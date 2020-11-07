@@ -81,7 +81,7 @@ describe("run", () => {
         }
 
         const fromContents = await io.readFromFile(fromPath);
-        if(!fromContents)
+        if (!fromContents)
             throw new Error("Could not find: " + fromPath);
 
         await io.writeToFile(
@@ -188,7 +188,7 @@ describe("run", () => {
     test('run -> comment out test -> run -> check coverage', async () => {
         const testRun1 = await runHandler();
         expect(testRun1.length).toBe(12);
-        
+
         await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
         const testRun2 = await runHandler();
         expect(testRun2.length).toBe(0);
@@ -206,7 +206,7 @@ describe("run", () => {
     test('run -> make change in first if-branch -> run -> check coverage', async () => {
         const testRun1 = await runHandler();
         expect(testRun1.length).toBe(12);
-        
+
         await overwriteCode("Sample/SomeClass.first-branch-change.cs");
         const testRun2 = await runHandler();
         expect(testRun2.length).toBe(6);

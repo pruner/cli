@@ -54,10 +54,7 @@ export type FileChanges = {
   filePath: string;
 };
 
-async function getChangedFiles(
-  fromCommit?: string,
-  toCommit?: string
-): Promise<FileChanges[]> {
+async function getChangedFiles(fromCommit?: string, toCommit?: string): Promise<FileChanges[]> {
   const diffText = await declarations.getCurrentDiffText(fromCommit, toCommit);
   const gitDiff = parseGitDiff(diffText);
 
