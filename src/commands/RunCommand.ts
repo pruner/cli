@@ -37,13 +37,9 @@ export default {
 			describe: 'Launches in watch mode (run tests as files change).'
 		}),
 	handler
-} as Command<
-	Args
->;
+} as Command<Args>;
 
-export async function handler(
-	args: Args,
-) {
+export async function handler(args: Args) {
 	if (args.verbosity !== 'verbose')
 		console.debug = () => { };
 
@@ -58,11 +54,8 @@ export async function handler(
 	const stateChanges = await runTestsForProviders(providers);
 
 	if (args.watch) {
-		for (const provider of providers) {
-			watchProvider(
-				provider,
-			);
-		}
+		for (const provider of providers)
+			watchProvider(provider);
 	}
 
 	return stateChanges;
@@ -114,8 +107,7 @@ function watchProvider(provider: Provider) {
 				let stateChange = await runTestsForProvider(
 					provider,
 					state,
-					newCommitId,
-				);
+					newCommitId);
 
 				while (hasPending) {
 					hasPending = false;
@@ -137,143 +129,73 @@ function watchProvider(provider: Provider) {
 		.getGlobPatterns()
 		.map(x => join(provider.settings.workingDirectory, x));
 
-	const watcher = chokidar.watch(
-		paths,
-		{
-			atomic: 1000,
-			ignorePermissionErrors: true,
-			useFsEvents: true,
-			persistent: true
-		},
-	);
+	const watcher = chokidar.watch(paths, {
+		atomic: 1000,
+		ignorePermissionErrors: true,
+		useFsEvents: true,
+		persistent: true
+	});
 	watcher.on('ready', () => {
-		watcher.on(
-			'change',
-			runTests,
-		);
-		watcher.on(
-			'add',
-			runTests,
-		);
-		watcher.on(
-			'unlink',
-			runTests,
-		);
-		watcher.on(
-			'addDir',
-			runTests,
-		);
-		watcher.on(
-			'unlinkDir',
-			runTests,
-		);
-	},
-	);
+		watcher.on('change', runTests);
+		watcher.on('add', runTests);
+		watcher.on('unlink', runTests);
+		watcher.on('addDir', runTests);
+		watcher.on('unlinkDir', runTests);
+	});
 }
 
-async function runTestsForProviders(
-	providers: Provider[],
-) {
-	return await withStateMiddleware(
-		async (
-			state,
-			newCommitId,
-		) => {
-			const newStates = new Array<
-				RunReport
-			>();
-			for (const provider of providers) {
-				const stateChange = await runTestsForProvider(
-					provider,
-					state,
-					newCommitId,
-				);
-				if (
-					!stateChange
-				)
-					continue;
+async function runTestsForProviders(providers: Provider[]) {
+	return await withStateMiddleware(async (state, newCommitId) => {
+		const newStates = new Array<RunReport>();
+		for (const provider of providers) {
+			const stateChange = await runTestsForProvider(
+				provider,
+				state,
+				newCommitId);
+			if (!stateChange)
+				continue;
 
-				state = stateChange.mergedState;
+			state = stateChange.mergedState;
 
-				newStates.push(
-					stateChange,
-				);
-			}
+			newStates.push(stateChange);
+		}
 
-			return newStates;
-		},
-	);
+		return newStates;
+	});
 }
 
-async function createProvidersFromArguments(
-	args: Args,
-) {
-	const classes = args.provider
-		? [
-			allProviders.find(
-				x => x.providerName
-					=== args.provider,
-			),
-		]
-		: allProviders;
-	const providerPairs = await Promise.all(
-		classes.map(
-			createProvidersFromClass,
-		),
-	);
+async function createProvidersFromArguments(args: Args) {
+	const classes = args.provider ?
+		[allProviders.find(x => x.providerName === args.provider)] :
+		allProviders;
+
+	const providers = await Promise.all(classes.map(createProvidersFromClass));
 	return flatMap(
-		providerPairs,
-		x => x,
+		providers,
+		providers => providers,
 	);
 }
 
 async function runTestsForProvider(
 	provider: Provider,
 	previousState: State,
-	newCommitId: string,
-): Promise<
-	RunReport
-> {
+	newCommitId: string
+): Promise<RunReport> {
 	const testsToRun = await getTestsToRun(
 		previousState,
-		newCommitId,
-	);
+		newCommitId);
 
 	const result = await con.useSpinner(
 		'Running tests',
-		async () => await provider.executeTestProcess(
-			testsToRun,
-		),
-	);
+		async () => await provider.executeTestProcess(testsToRun));
 
-	if (
-		result.exitCode
-		!== 0
-	) {
-		console.error(
-			`${red(
-				`Could not run tests. Exit code ${result.exitCode}.`,
-			)
-			}\n${yellow(
-				result.stdout,
-			)
-			}\n${red(
-				result.stderr,
-			)}`,
-		);
+	if (result.exitCode !== 0) {
+		console.error(`${red(`Could not run tests. Exit code ${result.exitCode}.`)}\n${yellow(result.stdout)}\n${red(result.stderr)}`);
 		return;
 	}
 
-	console.log(
-		green(
-			'Tests ran successfully:',
-		),
-	);
-	console.log(
-		white(
-			result.stdout,
-		),
-	);
+	console.log(green('Tests ran successfully:'));
+	console.log(white(result.stdout));
 
 	const state = await provider.gatherState();
 
@@ -283,55 +205,37 @@ async function runTestsForProvider(
 			previousState,
 			state,
 		),
-		testsRun: chain(
-			state.coverage,
-		)
-			.flatMap(
-				x => x.testIds,
-			)
+		testsRun: chain(state.coverage)
+			.flatMap(x => x.testIds)
 			.uniq()
-			.map(
-				x => state.tests.find(
-					y => y.id
-						=== x,
-				),
-			)
+			.map(x => state
+				.tests
+				.find(y => y.id === x))
 			.value()
 	};
 }
 
-async function persistState(
-	state: State,
-) {
+async function persistState(state: State) {
 	const stateFileName = getStateFileName();
 	await io.writeToPrunerFile(
 		stateFileName,
 		JSON.stringify(
 			state,
 			null,
-			' ',
-		),
-	);
+			' '));
 }
 
-async function readState(): Promise<
-	State
-> {
+async function readState(): Promise<State> {
 	const stateFileName = getStateFileName();
 	return JSON.parse(
-		await io.readFromPrunerFile(
-			stateFileName,
-		),
-	);
+		await io.readFromPrunerFile(stateFileName));
 }
 
 function getStateFileName() {
 	return `state.json`;
 }
 
-async function generateLcovFile(
-	state?: State,
-) {
+async function generateLcovFile(state?: State) {
 	let lcovContents = '';
 
 	function appendLine(
@@ -342,9 +246,7 @@ async function generateLcovFile(
 
 	const rootDirectory = await git.getGitTopDirectory();
 
-	if (
-		state
-	) {
+	if (state) {
 		for (const file of state.files) {
 			const fullPath = join(
 				rootDirectory,
@@ -416,12 +318,8 @@ async function mergeState(
 ): Promise<
 	State
 > {
-	const allNewTestIds = chain(
-		newState.coverage,
-	)
-		.flatMap(
-			x => x.testIds,
-		)
+	const allNewTestIds = chain(newState.coverage)
+		.flatMap(x => x.testIds)
 		.uniq()
 		.value();
 
@@ -571,16 +469,10 @@ async function getTestsToRun(
 	previousState: State,
 	newCommitId: string,
 ) {
-	if (
-		!previousState
-	) {
+	if (!previousState) {
 		return {
-			affected: new Array<
-				Test
-			>(),
-			unaffected: new Array<
-				Test
-			>()
+			affected: new Array<Test>(),
+			unaffected: new Array<Test>()
 		};
 	}
 
@@ -593,12 +485,8 @@ async function getTestsToRun(
 		previousState,
 	);
 
-	const allKnownUnaffectedTests = previousState.tests.filter(
-		x => !affectedTests.find(
-			y => y.id
-				=== x.id,
-		),
-	);
+	const allKnownUnaffectedTests = previousState.tests
+		.filter(x => !affectedTests.find(y => y.id === x.id));
 
 	return {
 		affected: affectedTests,
@@ -612,56 +500,36 @@ function getAffectedTests(
 ) {
 	const correctedLineCoverage = flatMap(
 		gitFileChanges,
-		gitChangedFile => getLineCoverageForGitFile(
-			previousState,
-			gitChangedFile,
-		).filter(
-			gitLineCoverage => {
-				const gitUnchangedLine = gitChangedFile.unchanged.find(
-					x => x.oldLineNumber
-						=== gitLineCoverage.lineNumber,
-				);
-				const newLineNumber = gitUnchangedLine?.newLineNumber
-					|| gitLineCoverage.lineNumber;
+		gitChangedFile => getLineCoverageForGitChangedFile(previousState, gitChangedFile)
+			.filter(gitLineCoverage => {
+				const newLineNumber = getNewLineNumberForLineCoverage(
+					gitChangedFile,
+					gitLineCoverage);
+
 				return (
-					hasCoverageOfLineInSurroundingLines(
-						newLineNumber,
-						gitChangedFile.added,
-					)
-					|| hasCoverageOfLineInSurroundingLines(
-						newLineNumber,
-						gitChangedFile.deleted,
-					)
+					hasCoverageOfLineInSurroundingLines(newLineNumber, gitChangedFile.added) ||
+					hasCoverageOfLineInSurroundingLines(newLineNumber, gitChangedFile.deleted)
 				);
-			},
-		),
-	);
-	return chain(
-		correctedLineCoverage,
-	)
-		.flatMap(
-			x => x.testIds,
-		)
-		.map(
-			x => getTestFromStateById(
-				previousState,
-				x,
-			),
-		)
-		.uniqBy(
-			x => x.name,
-		)
+			}));
+
+	return chain(correctedLineCoverage)
+		.flatMap(lineCoverage => lineCoverage.testIds)
+		.map(testId => getTestFromStateById(previousState, testId))
+		.uniqBy(test => test.name)
 		.value();
 }
 
-function getTestFromStateById(
-	state: State,
-	id: number,
-): Test {
-	return state.tests.find(
-		y => y.id
-			=== id,
-	);
+function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, gitLineCoverage: LineCoverage) {
+	const gitUnchangedLine = gitChangedFile.unchanged
+		.find(x => x.oldLineNumber === gitLineCoverage.lineNumber);
+
+	const newLineNumber = gitUnchangedLine?.newLineNumber ||
+		gitLineCoverage.lineNumber;
+	return newLineNumber;
+}
+
+function getTestFromStateById(state: State, id: number): Test {
+	return state.tests.find(y => y.id === id);
 }
 
 /**
@@ -674,47 +542,28 @@ function hasCoverageOfLineInSurroundingLines(
 	allLines: number[],
 ) {
 	return (
-		allLines.indexOf(
-			line
-			- 1,
-		)
-		> -1
-		|| allLines.indexOf(
-			line,
-		)
-		> -1
-		|| allLines.indexOf(
-			line
-			+ 1,
-		)
-		> -1
+		allLines.indexOf(line - 1) > -1 ||
+		allLines.indexOf(line) > -1 ||
+		allLines.indexOf(line + 1) > -1
 	);
 }
 
-function getLineCoverageForGitFile(
+function getLineCoverageForGitChangedFile(
 	previousState: State,
 	gitChangedFile: FileChanges,
 ) {
 	const fileIdForGitChange = getFileIdFromStateForPath(
 		previousState,
-		gitChangedFile.filePath,
-	);
+		gitChangedFile.filePath);
 
-	const lineCoverageForFile = getLineCoverageForFileFromState(
+	return getLineCoverageForFileFromState(
 		previousState,
-		fileIdForGitChange,
-	);
-	return lineCoverageForFile;
+		fileIdForGitChange);
 }
 
-function getLineCoverageForFileFromState(
-	state: State,
-	fileId: number,
-) {
+function getLineCoverageForFileFromState(state: State, fileId: number) {
 	return state.coverage.filter(
-		previousStateLine => previousStateLine.fileId
-			=== fileId,
-	);
+		previousStateLine => previousStateLine.fileId === fileId);
 }
 
 function getFileIdFromStateForPath(
