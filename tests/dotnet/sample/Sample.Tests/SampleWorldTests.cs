@@ -32,6 +32,12 @@ namespace Sample.Tests.World
         }
 
         [TestMethod]
+        public void Test_30s_HelloDarkness()
+        {
+            RunScenario(30, 123);
+        }
+
+        [TestMethod]
         public void Test_3s_HelloWorld()
         {
             RunScenario(3, 9001);
