@@ -85,13 +85,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
       deleteAfterRead: true,
     });
     if (coverageFileContents.length === 0) {
-      console.warn(
-        yellow(
-          `Could not find any coverage data from AltCover recursively within ${yellowBright(
-            this.settings.workingDirectory
-          )}. Make sure AltCover is installed in your test projects.`
-        )
-      );
+      console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}. Make sure AltCover is installed in your test projects.`));
       return {
         coverage: [],
         files: [],
