@@ -1,12 +1,13 @@
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
 import io from "../../io";
-import { Root } from "./altcover";
+import { ModuleModule, AltCoverRoot } from "./altcover";
 import { chain, range } from "lodash";
 import git from "../../git";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getFilterArguments } from "./arguments";
+import { getAltCoverArguments, getFilterArguments, getLoggerArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
+import { TrxRoot } from "./trx";
 
 export type DotNetSettings = ProviderSettings & {
 	msTest: {
@@ -14,7 +15,8 @@ export type DotNetSettings = ProviderSettings & {
 	};
 };
 
-const reportName = "coverage.xml.tmp.pruner";
+const coverageXmlFileName = "coverage.xml.tmp.pruner";
+const summaryFileName = "summary.trx.tmp.pruner";
 
 export default class DotNetProvider implements Provider<DotNetSettings> {
 	public get settings() {
@@ -48,7 +50,8 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	): Promise<execa.ExecaReturnValue<string>> {
 		const args = [
 			...getFilterArguments(tests, this.settings),
-			...getAltCoverArguments(reportName),
+			...getAltCoverArguments(coverageXmlFileName),
+			...getLoggerArguments(summaryFileName)
 		];
 		console.debug("execute-settings", this.settings);
 
@@ -65,29 +68,49 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async gatherState(): Promise<ProviderState> {
 		const projectRootDirectory = await git.getGitTopDirectory();
 
-		const coverageFileContents = await io.globContents(`**/${reportName}`, {
-			workingDirectory: this.settings.workingDirectory,
-			deleteAfterRead: true
-		});
-		if (coverageFileContents.length === 0) {
+		const altCoverXmlAsJson: AltCoverRoot[] = await this.globContentsFromXmlToJson(`**/${coverageXmlFileName}`);
+		if (altCoverXmlAsJson.length === 0) {
 			console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}. Make sure AltCover is installed in your test projects.`));
 			return null;
 		}
 
-		const altCoverXmlAsJson: Root[] = await Promise.all(
-			coverageFileContents.map((file) =>
-				parseStringPromise(file, {
-					async: true,
-				})));
+		const summaryFileContents: TrxRoot[] = await this.globContentsFromXmlToJson(`**/${summaryFileName}`);
 
-		const modules = chain(altCoverXmlAsJson)
+		const modules = this.parseModules(altCoverXmlAsJson);
+
+		const files = this.parseFiles(modules, projectRootDirectory);
+		const tests = this.parseTests(modules, summaryFileContents);
+		const coverage = this.parseLineCoverage(modules);
+
+		return {
+			tests: tests,
+			files: files,
+			coverage: coverage,
+		};
+	}
+
+	private async globContentsFromXmlToJson(glob: string) {
+		const coverageFileContents = await io.globContents(glob, {
+			workingDirectory: this.settings.workingDirectory,
+			deleteAfterRead: true
+		});
+		return await Promise.all(
+			coverageFileContents.map((file) => parseStringPromise(file, {
+				async: true,
+			})));
+	}
+
+	private parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
+		return chain(altCoverXmlAsJson)
 			.map((x) => x.CoverageSession)
 			.flatMap((x) => x.Modules)
 			.flatMap((x) => x.Module)
 			.filter((x) => !!x)
 			.value();
+	}
 
-		const files = chain(modules)
+	private parseFiles(modules: ModuleModule[], projectRootDirectory: string) {
+		return chain(modules)
 			.flatMap((x) => x.Files)
 			.flatMap((x) => x.File)
 			.map((x) => x?.$)
@@ -102,19 +125,51 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 				path: this.sanitizeStatePath(projectRootDirectory, x.path),
 			}))
 			.value();
+	}
 
-		const tests = chain(modules)
-			.flatMap((x) => x.TrackedMethods)
-			.flatMap((x) => x.TrackedMethod)
-			.map((x) => x?.$)
-			.filter((x) => !!x)
-			.map((x) => ({
-				name: this.sanitizeMethodName(x.name),
-				id: +x.uid,
+	private parseTests(
+		altCoverModules: ModuleModule[],
+		trxSummary: TrxRoot[]
+	) {
+		const testRuns = trxSummary.map(x => x.TestRun);
+		const testDefinitions = chain(testRuns)
+			.flatMap(x => x.TestDefinitions)
+			.flatMap(x => x?.UnitTest)
+			.filter(x => !!x)
+			.flatMap(x => x
+				.TestMethod
+				.map(t => ({
+					id: x.$.id,
+					name: `${t.$.className}.${t.$.name}`
+				})))
+			.value();
+		const testResults = chain(testRuns)
+			.flatMap(x => x.Results)
+			.flatMap(x => x?.UnitTestResult)
+			.filter(x => !!x)
+			.map(x => x.$)
+			.map(x => ({
+				...testDefinitions.find(t => t.id === x.testId),
+				passed: x.outcome === "Passed",
+				duration: x.duration
 			}))
 			.value();
 
-		const coverage = chain(modules)
+		return chain(altCoverModules)
+			.flatMap(x => x.TrackedMethods)
+			.flatMap(x => x.TrackedMethod)
+			.map(x => x?.$)
+			.filter(x => !!x)
+			.map(x => ({
+				...testResults.find(t => t.name === x.name),
+				name: this.sanitizeMethodName(x.name),
+				id: +x.uid
+			}))
+			.value();
+	}
+
+	private parseLineCoverage(modules: ModuleModule[]) {
+		return chain(modules)
 			.flatMap((x) => x.Classes)
 			.flatMap((x) => x.Class)
 			.filter((x) => !!x)
@@ -124,26 +179,20 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			.flatMap((x) => x.SequencePoints)
 			.flatMap((x) => x.SequencePoint)
 			.filter((x) => !!x)
-			.flatMap((x) =>
-				range(+x.$.sl, +x.$.el + 1).map((l) => ({
-					testIds: chain(x.TrackedMethodRefs || [])
-						.flatMap((m) => m.TrackedMethodRef)
-						.map((m) => m?.$)
-						.filter((m) => !!m)
-						.map((m) => +m.uid)
-						.value(),
-					fileId: +x?.$.fileid,
-					lineNumber: l,
-				}))
-			)
-			.filter((x) => !!x.fileId && x.testIds.length > 0)
+			.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => ({
+				testIds: chain(x.TrackedMethodRefs || [])
+					.flatMap((m) => m.TrackedMethodRef)
+					.map((m) => m?.$)
+					.filter((m) => !!m)
+					.map((m) => +m.uid)
+					.value(),
+				fileId: +x?.$.fileid,
+				lineNumber: l,
+			})))
+			.filter((x) =>
+				!!x.fileId &&
+				x.testIds.length > 0)
 			.value();
-
-		return {
-			tests: tests,
-			files: files,
-			coverage: coverage,
-		};
 	}
 
 	private sanitizeStatePath(projectRootDirectory: string, path: string): string {

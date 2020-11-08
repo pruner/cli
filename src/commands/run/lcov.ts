@@ -5,30 +5,37 @@ import { join } from "path";
 import { ProviderState } from '../../providers/types';
 
 export async function generateLcovFile(providerId: string, state?: ProviderState) {
-    let lcovContents = '';
+	let lcovContents = '';
 
-    function appendLine(line: string) {
-        lcovContents += `${line}\n`;
-    }
+	function appendLine(line: string) {
+		lcovContents += `${line}\n`;
+	}
 
-    const rootDirectory = await git.getGitTopDirectory();
+	const rootDirectory = await git.getGitTopDirectory();
 
-    if (state) {
-        for (const file of state.files) {
-            const fullPath = join(rootDirectory, file.path);
-            appendLine(`SF:${fullPath}`);
+	if (state) {
+		for (const file of state.files) {
+			const fullPath = join(rootDirectory, file.path);
+			appendLine(`SF:${fullPath}`);
 
-            const lines = state.coverage.filter(x => x.fileId === file.id);
-            for (const line of lines) {
-                const isCovered = line.testIds.length > 0;
-                appendLine(`DA:${line.lineNumber},${isCovered ? 1 : 0}`);
-            }
+			const lines = state.coverage.filter(x => x.fileId === file.id);
+			for (const line of lines) {
+				const testsRunningThroughLine = line.testIds.map(id =>
+					state.tests.find(t => t.id === id));
 
-            appendLine('end_of_record');
-        }
-    }
+				const isCovered = testsRunningThroughLine.length > 0;
+				if (!isCovered)
+					continue;
 
-    await pruner.writeToTempFile(
-        join(providerId, 'lcov.info'),
-        lcovContents);
+				const isFailing = !!testsRunningThroughLine.find(x => !x.passed);
+				appendLine(`DA:${line.lineNumber},${isFailing ? 0 : 1}`);
+			}
+
+			appendLine('end_of_record');
+		}
+	}
+
+	await pruner.writeToTempFile(
+		join(providerId, 'lcov.info'),
+		lcovContents);
 }

@@ -11,6 +11,8 @@ export type SettingsQuestions<TSettings> = TSettings extends ProviderSettings & 
 export type StateTest = {
 	name: string;
 	id: number;
+	passed: boolean;
+	duration: string;
 };
 
 export type StateLineCoverage = {

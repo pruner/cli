@@ -35,9 +35,7 @@ export async function handler(args: Args) {
 		return;
 	}
 
-	await io.writeToFile(
-		join(topDirectoryPath, ".pruner", '.gitignore'),
-		['temp/'].join('\n'));
+	await createPrunerDirectory(topDirectoryPath);
 
 	const Provider = allProviderClasses.find(x => x.providerType === args.provider);
 
@@ -49,8 +47,29 @@ export async function handler(args: Args) {
 	settingsFile.providers.push(provider);
 
 	await pruner.persistSettings(settingsFile);
+	await patchTopDirectoryGitIgnoreFile(topDirectoryPath);
 
 	console.log(chalk.green('Pruner has been initialized!'));
+}
+
+async function patchTopDirectoryGitIgnoreFile(topDirectoryPath: string) {
+	const topDirectoryGitIgnorePath = join(topDirectoryPath, '.gitignore');
+	const gitignoreContents = await io.readFromFile(topDirectoryGitIgnorePath) || "";
+
+	const ignoreLine = "**/*.tmp.pruner";
+
+	await io.writeToFile(topDirectoryGitIgnorePath, [
+		...gitignoreContents
+			.split('\n')
+			.filter(x => x !== ignoreLine),
+		ignoreLine
+	].join('\n'));
+}
+
+async function createPrunerDirectory(topDirectoryPath: string) {
+	await io.writeToFile(
+		join(topDirectoryPath, ".pruner", '.gitignore'),
+		['temp/'].join('\n'));
 }
 
 async function createProviderFromClass(Provider: ProviderClass<any>) {
