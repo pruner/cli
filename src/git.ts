@@ -10,7 +10,23 @@ const declarations = {
   getCurrentDiffText,
   getChangedFiles,
   createStashCommit,
+  getBranchName
 };
+
+export type FileChanges = {
+  added: number[];
+  deleted: number[];
+  unchanged: Array<{
+    oldLineNumber: number;
+    newLineNumber: number;
+  }>;
+  filePath: string;
+};
+
+export type CommitRange = {
+  from: string,
+  to: string
+}
 
 async function runGitCommand(...args: string[]) {
   const result = await execa("git", args, {
@@ -29,32 +45,28 @@ async function getGitVersion() {
   return await runGitCommand("--version");
 }
 
+async function getBranchName() {
+  return await runGitCommand("rev-parse", "--abbrev-ref", "HEAD");
+}
+
 async function getGitTopDirectory() {
   const path = await runGitCommand("rev-parse", "--show-toplevel");
-  if (!path) return path;
+  if (!path)
+    return path;
 
   return io.normalizePathSeparators(path);
 }
 
-async function getCurrentDiffText(fromCommit: string, toCommit: string) {
-  if (fromCommit && toCommit)
-    return await runGitCommand("diff", fromCommit, toCommit);
+async function getCurrentDiffText(commitRange?: CommitRange) {
+  const { from, to } = commitRange || {};
+  if (from && to)
+    return await runGitCommand("diff", from, to);
 
   return await runGitCommand("diff");
 }
 
-export type FileChanges = {
-  added: number[];
-  deleted: number[];
-  unchanged: Array<{
-    oldLineNumber: number;
-    newLineNumber: number;
-  }>;
-  filePath: string;
-};
-
-async function getChangedFiles(fromCommit?: string, toCommit?: string): Promise<FileChanges[]> {
-  const diffText = await declarations.getCurrentDiffText(fromCommit, toCommit);
+async function getChangedFiles(commitRange?: CommitRange): Promise<FileChanges[]> {
+  const diffText = await declarations.getCurrentDiffText(commitRange);
   const gitDiff = parseGitDiff(diffText);
 
   const changedLines = chain(gitDiff.commits)

@@ -1,16 +1,16 @@
-import { chain, flatMap, last, remove } from 'lodash';
+import { chain, flatMap, uniqBy } from 'lodash';
 import { green, red, white, yellow } from 'chalk';
-import { join } from 'path';
-import chokidar from 'chokidar';
 import { Command, DefaultArgs } from '../Command';
 import con from '../../console';
-import git, { FileChanges } from '../../git';
-import io from '../../io';
+import git, { CommitRange, FileChanges } from '../../git';
+import chokidar from 'chokidar';
+import pruner from '../../pruner';
 import _ from 'lodash';
-import { allProviders, createProvidersFromArguments } from '../../providers/factories';
-import { StateTest, State, Provider, ProviderClass, ProviderSettings, StateLineCoverage } from '../../providers/types';
-import { mergeState as mergeStates, persistState, readState } from './state';
+import { allProviderClasses, createProvidersFromProvider as createProvidersFromIdOrNameOrType } from '../../providers/factories';
+import { StateTest, ProviderState, Provider, StateLineCoverage } from '../../providers/types';
+import { mergeStates } from './state';
 import { generateLcovFile } from './lcov';
+import { join } from 'path';
 
 type Args = DefaultArgs & {
 	provider?: string;
@@ -19,7 +19,7 @@ type Args = DefaultArgs & {
 
 type RunReport = {
 	testsRun: StateTest[];
-	mergedState: State;
+	mergedState: ProviderState;
 };
 
 export default {
@@ -27,7 +27,7 @@ export default {
 	describe: 'Run tests.',
 	builder: yargs => yargs
 		.positional('provider', {
-			choices: allProviders.map(x => x.providerName),
+			choices: allProviderClasses.map(x => x.providerType),
 			demandOption: false,
 			type: 'string',
 			describe: 'The provider to run tests for. If not specified, runs all tests.'
@@ -45,43 +45,19 @@ export async function handler(args: Args) {
 	if (args.verbosity !== 'verbose')
 		console.debug = () => { };
 
-	const prunerDirectory = await io.getPrunerPath();
+	const prunerDirectory = await pruner.getPrunerPath();
 	if (!prunerDirectory) {
 		console.error(red('Pruner has not been initialized for this project.'));
 		console.log(`Run ${white('pruner init')}.`);
 		return;
 	}
 
-	const providers = await createProvidersFromArguments(args.provider);
+	const providers = await createProvidersFromIdOrNameOrType(args.provider);
 	const stateChanges = await runTestsForProviders(providers);
 
 	if (args.watch) {
 		for (const provider of providers)
 			watchProvider(provider);
-	}
-
-	return stateChanges;
-}
-
-async function withStateMiddleware(
-	action: (previousState: State, newCommitId: string) => Promise<RunReport[]>
-) {
-	await generateLcovFile();
-
-	const newCommitId = await git.createStashCommit();
-
-	let state = await readState();
-
-	const stateChanges = await action(
-		state,
-		newCommitId);
-	if (stateChanges?.length > 0) {
-		state = last(stateChanges).mergedState;
-
-		state.commitId = newCommitId;
-
-		await persistState(state);
-		await generateLcovFile(state);
 	}
 
 	return stateChanges;
@@ -97,6 +73,13 @@ function watchProvider(provider: Provider) {
 	let hasPending = false;
 
 	const runTests = async () => {
+		return await runInGitStateTransaction(async commitRange =>
+			await runTestsForProvider(
+				provider,
+				commitRange));
+	};
+
+	const onFilesChanged = async () => {
 		if (isRunning) {
 			hasPending = true;
 			return;
@@ -105,24 +88,18 @@ function watchProvider(provider: Provider) {
 		isRunning = true;
 
 		try {
-			await withStateMiddleware(async (state, newCommitId) => {
-				let stateChange = await runTestsForProvider(
-					provider,
-					state,
-					newCommitId);
+			const results = new Array<StateTest>();
+			results.push(...await runTests());
 
-				while (hasPending) {
-					hasPending = false;
-					stateChange = await runTestsForProvider(
-						provider,
-						state,
-						newCommitId);
-				}
+			while (hasPending) {
+				hasPending = false;
+				results.push(...await runTests());
+			}
 
-				return [stateChange];
-			});
-		} finally {
 			console.log(white('Waiting for file changes...'));
+
+			return uniqBy(results, x => x.id);
+		} finally {
 			isRunning = false;
 		}
 	};
@@ -138,76 +115,89 @@ function watchProvider(provider: Provider) {
 		persistent: true
 	});
 	watcher.on('ready', () => {
-		watcher.on('change', runTests);
-		watcher.on('add', runTests);
-		watcher.on('unlink', runTests);
-		watcher.on('addDir', runTests);
-		watcher.on('unlinkDir', runTests);
+		watcher.on('change', onFilesChanged);
+		watcher.on('add', onFilesChanged);
+		watcher.on('unlink', onFilesChanged);
+		watcher.on('addDir', onFilesChanged);
+		watcher.on('unlinkDir', onFilesChanged);
 	});
 }
 
+async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) => Promise<T>) {
+	const gitState = await pruner.readGitState();
+
+	const commitRange: CommitRange = {
+		from: gitState.commit,
+		to: await git.createStashCommit()
+	};
+
+	const results = await action(commitRange);
+	await pruner.persistGitState(commitRange.to);
+
+	return results;
+}
+
 async function runTestsForProviders(providers: Provider[]) {
-	return await withStateMiddleware(async (state, newCommitId) => {
-		const newStates = new Array<RunReport>();
-		for (const provider of providers) {
-			const stateChange = await runTestsForProvider(
-				provider,
-				state,
-				newCommitId);
-			if (!stateChange)
-				continue;
-
-			state = stateChange.mergedState;
-
-			newStates.push(stateChange);
-		}
-
-		return newStates;
-	});
+	const results = await runInGitStateTransaction(async commitRange =>
+		await Promise.all(providers
+			.map(async provider =>
+				await runTestsForProvider(
+					provider,
+					commitRange))));
+	return flatMap(results);
 }
 
 async function runTestsForProvider(
 	provider: Provider,
-	previousState: State,
-	newCommitId: string
-): Promise<RunReport> {
+	commitRange: CommitRange
+) {
+	const providerId = provider.settings.id;
+	await generateLcovFile(providerId);
+
+	const previousState = await pruner.readState(providerId);
+
 	const testsToRun = await getTestsToRun(
 		previousState,
-		newCommitId);
+		commitRange);
 
-	const result = await con.useSpinner(
+	const processResult = await con.useSpinner(
 		'Running tests',
 		async () => await provider.executeTestProcess(testsToRun));
 
-	if (result.exitCode !== 0) {
-		console.error(`${red(`Could not run tests. Exit code ${result.exitCode}.`)}\n${yellow(result.stdout)}\n${red(result.stderr)}`);
-		return;
+	if (processResult.exitCode !== 0) {
+		console.error(`${red(`Could not run tests. Exit code ${processResult.exitCode}.`)}\n${yellow(processResult.stdout)}\n${red(processResult.stderr)}`);
+	} else {
+		console.log(green('Tests ran successfully:'));
+		console.log(white(processResult.stdout));
 	}
 
-	console.log(green('Tests ran successfully:'));
-	console.log(white(result.stdout));
-
-	const state = await provider.gatherState();
-
-	return {
-		mergedState: await mergeStates(
-			testsToRun.affected,
-			previousState,
-			state,
-		),
-		testsRun: chain(state.coverage)
-			.flatMap(x => x.testIds)
-			.uniq()
-			.map(x => state
-				.tests
-				.find(y => y.id === x))
-			.value()
+	const state = await provider.gatherState() || {
+		coverage: [],
+		files: [],
+		tests: []
 	};
+
+	const mergedState = await mergeStates(
+		testsToRun.affected,
+		previousState,
+		state
+	);
+	await pruner.persistState(providerId, mergedState);
+	await generateLcovFile(providerId, mergedState);
+
+	const actualTestRuns = chain(state.coverage)
+		.flatMap(x => x.testIds)
+		.uniq()
+		.map(x => state
+			.tests
+			.find(y => y.id === x))
+		.value();
+	return actualTestRuns;
 }
 
 async function getTestsToRun(
-	previousState: State,
-	newCommitId: string,
+	previousState: ProviderState,
+	commitRange: CommitRange
 ) {
 	if (!previousState) {
 		return {
@@ -216,9 +206,7 @@ async function getTestsToRun(
 		};
 	}
 
-	const gitChangedFiles = await git.getChangedFiles(
-		previousState.commitId,
-		newCommitId);
+	const gitChangedFiles = await git.getChangedFiles(commitRange);
 	const affectedTests = getAffectedTests(
 		gitChangedFiles,
 		previousState);
@@ -234,7 +222,7 @@ async function getTestsToRun(
 
 function getAffectedTests(
 	gitFileChanges: FileChanges[],
-	previousState: State,
+	previousState: ProviderState,
 ) {
 	const correctedLineCoverage = flatMap(
 		gitFileChanges,
@@ -266,7 +254,7 @@ function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, gitLineCov
 	return newLineNumber;
 }
 
-function getTestFromStateById(state: State, id: number): StateTest {
+function getTestFromStateById(state: ProviderState, id: number): StateTest {
 	return state.tests.find(y => y.id === id);
 }
 
@@ -286,7 +274,7 @@ function hasCoverageOfLineInSurroundingLines(
 }
 
 function getLineCoverageForGitChangedFile(
-	previousState: State,
+	previousState: ProviderState,
 	gitChangedFile: FileChanges,
 ) {
 	const fileIdForGitChange = getFileIdFromStateForPath(
@@ -298,13 +286,13 @@ function getLineCoverageForGitChangedFile(
 		fileIdForGitChange);
 }
 
-function getLineCoverageForFileFromState(state: State, fileId: number) {
+function getLineCoverageForFileFromState(state: ProviderState, fileId: number) {
 	return state.coverage.filter(
 		previousStateLine => previousStateLine.fileId === fileId);
 }
 
 function getFileIdFromStateForPath(
-	state: State,
+	state: ProviderState,
 	path: string,
 ) {
 	const file = state.files.find(x => x.path === path);

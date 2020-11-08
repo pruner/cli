@@ -1,6 +1,8 @@
 {
-	"dotnet": [
+	"providers": [
 		{
+			"id": "63148e55-2c92-42b2-81df-4cfd52b2b238",
+			"type": "dotnet",
 			"workingDirectory": "tests/dotnet/sample"
 		}
 	]

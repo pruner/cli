@@ -1,60 +1,60 @@
 import { ExecaReturnValue } from "execa";
 import prompts from "prompts";
+import { allProviderClasses } from "./factories";
 
-export type SettingsQuestions<TSettings> = TSettings extends {
-    [key: string]: any;
-}
-    ? {
-        [TKey in keyof TSettings]: Omit<
-            prompts.PromptObject<TSettings[TKey]>,
-            "name"
-        >;
-    }
-    : never;
+export type SettingsQuestions<TSettings> = TSettings extends ProviderSettings & { [key: string]: any; } ?
+	{
+		[TKey in keyof Omit<TSettings, "excludeFromWatch" | "id" | "name" | "type">]: Omit<prompts.PromptObject<TSettings[TKey]>, "name">;
+	}
+	: never;
 
 export type StateTest = {
-    name: string;
-    id: number;
+	name: string;
+	id: number;
 };
 
 export type StateLineCoverage = {
-    lineNumber: number;
-    fileId: number;
-    testIds: number[];
+	lineNumber: number;
+	fileId: number;
+	testIds: number[];
 };
 
-export type State = {
-    commitId?: string;
-    tests: StateTest[];
-    files: {
-        id: number;
-        path: string;
-    }[];
-    coverage: StateLineCoverage[];
+export type ProviderState = {
+	tests: StateTest[];
+	files: {
+		id: number;
+		path: string;
+	}[];
+	coverage: StateLineCoverage[];
 };
 
 export type ProviderSettings = {
-    workingDirectory: string;
-    excludeFromWatch: boolean;
+	id: string;
+	type: ProviderType;
+	name: string;
+	workingDirectory: string;
+	excludeFromWatch: boolean;
 };
 
 export interface Provider<TSettings extends ProviderSettings = ProviderSettings> {
-    settings: TSettings;
+	settings: TSettings;
 
-    getGlobPatterns(): string[];
-    executeTestProcess(tests: TestsByAffectedState): Promise<ExecaReturnValue<string>>;
-    gatherState(): Promise<State>;
+	getGlobPatterns(): string[];
+	executeTestProcess(tests: TestsByAffectedState): Promise<ExecaReturnValue<string>>;
+	gatherState(): Promise<ProviderState>;
 }
 
+export type ProviderType = "dotnet";
+
 export type ProviderClass<TSettings extends ProviderSettings = ProviderSettings> = {
-    providerName: string;
+	providerType: ProviderType;
 
-    new(settings: TSettings): Provider<TSettings>;
+	new(settings: TSettings): Provider<TSettings>;
 
-    getInitQuestions(): SettingsQuestions<TSettings>;
+	getInitQuestions(): SettingsQuestions<TSettings>;
 };
 
 export type TestsByAffectedState = {
-    affected: StateTest[];
-    unaffected: StateTest[];
+	affected: StateTest[];
+	unaffected: StateTest[];
 };

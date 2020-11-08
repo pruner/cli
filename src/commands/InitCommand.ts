@@ -2,85 +2,75 @@ import { join } from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
 import _ from 'lodash';
-import { allProviders } from '../providers/factories';
+import { allProviderClasses } from '../providers/factories';
 import io from '../io';
+import pruner from '../pruner';
 import git from '../git';
 import con from '../console';
+import { v4 as guid } from 'uuid';
 import { Command, DefaultArgs } from './Command';
-import { ProviderClass } from '../providers/types';
+import { ProviderClass, ProviderSettings } from '../providers/types';
 
 type Args = DefaultArgs & {
-  provider: string;
+	provider: string;
 };
 
 export default {
-  command: 'init <provider>',
-  describe: 'Set up Pruner for this project.',
-  builder: yargs => yargs.positional('provider', {
-    choices: allProviders.map(x => x.providerName),
-    demandOption: true,
-  }),
-  handler,
+	command: 'init <provider>',
+	describe: 'Set up Pruner for this project.',
+	builder: yargs => yargs.positional('provider', {
+		choices: allProviderClasses.map(x => x.providerType),
+		demandOption: true,
+	}),
+	handler,
 } as Command<Args>;
 
 export async function handler(args: Args) {
-  if (args.verbosity !== 'verbose')
-    console.debug = () => { };
+	if (args.verbosity !== 'verbose')
+		console.debug = () => { };
 
-  const topDirectoryPath = await git.getGitTopDirectory();
-  if (!topDirectoryPath) {
-    console.error('Pruner requires that the current directory is in GIT.');
-    return;
-  }
+	const topDirectoryPath = await git.getGitTopDirectory();
+	if (!topDirectoryPath) {
+		console.error('Pruner requires that the current directory is in GIT.');
+		return;
+	}
 
-  const Provider = allProviders.find(x => x.providerName === args.provider);
+	await io.writeToFile(
+		join(topDirectoryPath, ".pruner", '.gitignore'),
+		['temp/'].join('\n'));
 
-  const initSettings = await askForInitSettings(Provider);
-  const existingSettings = await getProviderSettings(topDirectoryPath);
+	const Provider = allProviderClasses.find(x => x.providerType === args.provider);
 
-  const providers = existingSettings[args.provider] || [];
-  providers.push(initSettings);
+	const settingsFile = await pruner.readSettings() || {
+		providers: []
+	};
 
-  existingSettings[args.provider] = providers;
+	const provider = await createProviderFromClass(Provider);
+	settingsFile.providers.push(provider);
 
-  await persistProviderSettings(topDirectoryPath, existingSettings);
+	await pruner.persistSettings(settingsFile);
 
-  await io.writeToPrunerFile('.gitignore', ['temp/'].join('\n'));
-
-  console.log(chalk.green('Pruner has been initialized!'));
+	console.log(chalk.green('Pruner has been initialized!'));
 }
 
-async function persistProviderSettings(
-  topDirectoryPath: string,
-  existingSettings: any,
-) {
-  const settingsPath = getSettingsPath(topDirectoryPath);
-  await io.writeToFile(
-    settingsPath,
-    JSON.stringify(existingSettings, null, '\t'),
-  );
+async function createProviderFromClass(Provider: ProviderClass<any>) {
+	const provider = await constructProviderSettingsFromInitQuestions(Provider);
+	provider.id = guid();
+	provider.type = Provider.providerType;
+
+	return provider;
 }
 
-function getSettingsPath(topDirectoryPath: string) {
-  return join(topDirectoryPath, '.pruner', 'settings.json');
-}
+async function constructProviderSettingsFromInitQuestions(Provider: ProviderClass) {
+	const initQuestions = Provider.getInitQuestions();
+	const keys = _.keys(initQuestions);
+	for (const key of keys) {
+		const section = initQuestions[key];
+		if (section)
+			section['name'] = key;
+	}
 
-async function getProviderSettings(topDirectoryPath: string) {
-  const settingsPath = getSettingsPath(topDirectoryPath);
-  return JSON.parse(await io.readFromFile(settingsPath)) || {
-  };
-}
-
-async function askForInitSettings(Provider: ProviderClass) {
-  const initQuestions = Provider.getInitQuestions();
-  const keys = _.keys(initQuestions);
-  for (const key of keys) {
-    const section = initQuestions[key];
-    if (section)
-      section['name'] = key;
-  }
-
-  const questions = _.values(initQuestions)
-    .filter(x => !!x) as prompts.PromptObject<any>[];
-  return con.ask(questions);
+	const questions = _.values(initQuestions)
+		.filter(x => !!x) as prompts.PromptObject<any>[];
+	return con.ask(questions) as any as ProviderSettings;
 }

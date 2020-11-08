@@ -1,11 +1,10 @@
-import { State } from "../../providers/types";
-
 import git from '../../git';
-import io from '../../io';
+import pruner from '../../pruner';
 
 import { join } from "path";
+import { ProviderState } from '../../providers/types';
 
-export async function generateLcovFile(state?: State) {
+export async function generateLcovFile(providerId: string, state?: ProviderState) {
     let lcovContents = '';
 
     function appendLine(line: string) {
@@ -29,7 +28,7 @@ export async function generateLcovFile(state?: State) {
         }
     }
 
-    await io.writeToPrunerFile(
-        join('temp', 'lcov.info'),
+    await pruner.writeToTempFile(
+        join(providerId, 'lcov.info'),
         lcovContents);
 }

@@ -1,12 +1,12 @@
 import _, { chain, remove } from "lodash";
-import { State, StateLineCoverage, StateTest } from "../../providers/types";
+import { ProviderState, StateLineCoverage, StateTest } from "../../providers/types";
 import io from '../../io';
 
-export async function mergeState(
+export async function mergeStates(
     affectedTests: StateTest[],
-    previousState: State,
-    newState: State,
-): Promise<State> {
+    previousState: ProviderState,
+    newState: ProviderState,
+): Promise<ProviderState> {
     const allNewTestIds = chain(newState.coverage)
         .flatMap(x => x.testIds)
         .uniq()
@@ -39,8 +39,7 @@ export async function mergeState(
         }
     }
 
-    const mergedState: State = {
-        commitId: newState.commitId,
+    const mergedState: ProviderState = {
         tests: _
             .chain([
                 previousState?.tests || [],
@@ -76,7 +75,7 @@ export async function mergeState(
         if (newStateTestIndex === -1 && mergedStateTestIndex > -1) {
             mergedState.tests.splice(mergedStateTestIndex, 1);
 
-            mergedState.coverage.forEach(lineCoverage => 
+            mergedState.coverage.forEach(lineCoverage =>
                 remove(lineCoverage.testIds, x => x === testInFilter.id));
         }
     }
@@ -86,24 +85,4 @@ export async function mergeState(
         x => x.testIds.length === 0);
 
     return mergedState;
-}
-
-export async function persistState(state: State) {
-    const stateFileName = getStateFileName();
-    await io.writeToPrunerFile(
-        stateFileName,
-        JSON.stringify(
-            state,
-            null,
-            ' '));
-}
-
-export async function readState(): Promise<State> {
-    const stateFileName = getStateFileName();
-    return JSON.parse(
-        await io.readFromPrunerFile(stateFileName));
-}
-
-function getStateFileName() {
-    return `state.json`;
 }
