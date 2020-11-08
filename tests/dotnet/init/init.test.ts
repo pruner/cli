@@ -3,8 +3,6 @@ jest.setTimeout(1000 * 60 * 5);
 import { join } from 'path';
 import { handler } from '../../../src/commands/InitCommand';
 import _ from 'lodash';
-import { ProviderSettings } from '../../../src/providers/providers';
-import { DotNetSettings } from '../../../src/providers/dotnet/DotNetProvider';
 
 import rimraf from 'rimraf';
 import { copy } from 'fs-extra';
@@ -12,6 +10,8 @@ import { copy } from 'fs-extra';
 import io from '../../../src/io';
 import con from '../../../src/console';
 import git from '../../../src/git';
+import { ProviderSettings } from '../../../src/providers/types';
+import { DotNetSettings } from '../../../src/providers/dotnet/DotNetProvider';
 
 con.ask = async () => ({});
 git.getGitTopDirectory = async () => "tests/dotnet/init/temp";

@@ -7,8 +7,10 @@ import con from '../../console';
 import git, { FileChanges } from '../../git';
 import io from '../../io';
 import _ from 'lodash';
-import { allProviders } from '../../providers/providers';
+import { allProviders, createProvidersFromArguments } from '../../providers/factories';
 import { StateTest, State, Provider, ProviderClass, ProviderSettings, StateLineCoverage } from '../../providers/types';
+import { mergeState as mergeStates, persistState, readState } from './state';
+import { generateLcovFile } from './lcov';
 
 type Args = DefaultArgs & {
 	provider?: string;
@@ -50,7 +52,7 @@ export async function handler(args: Args) {
 		return;
 	}
 
-	const providers = await createProvidersFromArguments(args);
+	const providers = await createProvidersFromArguments(args.provider);
 	const stateChanges = await runTestsForProviders(providers);
 
 	if (args.watch) {
@@ -164,18 +166,6 @@ async function runTestsForProviders(providers: Provider[]) {
 	});
 }
 
-async function createProvidersFromArguments(args: Args) {
-	const classes = args.provider ?
-		[allProviders.find(x => x.providerName === args.provider)] :
-		allProviders;
-
-	const providers = await Promise.all(classes.map(createProvidersFromClass));
-	return flatMap(
-		providers,
-		providers => providers,
-	);
-}
-
 async function runTestsForProvider(
 	provider: Provider,
 	previousState: State,
@@ -200,7 +190,7 @@ async function runTestsForProvider(
 	const state = await provider.gatherState();
 
 	return {
-		mergedState: await mergeState(
+		mergedState: await mergeStates(
 			testsToRun.affected,
 			previousState,
 			state,
@@ -213,189 +203,6 @@ async function runTestsForProvider(
 				.find(y => y.id === x))
 			.value()
 	};
-}
-
-async function persistState(state: State) {
-	const stateFileName = getStateFileName();
-	await io.writeToPrunerFile(
-		stateFileName,
-		JSON.stringify(
-			state,
-			null,
-			' '));
-}
-
-async function readState(): Promise<State> {
-	const stateFileName = getStateFileName();
-	return JSON.parse(
-		await io.readFromPrunerFile(stateFileName));
-}
-
-function getStateFileName() {
-	return `state.json`;
-}
-
-async function generateLcovFile(state?: State) {
-	let lcovContents = '';
-
-	function appendLine(
-		line: string,
-	) {
-		lcovContents += `${line}\n`;
-	}
-
-	const rootDirectory = await git.getGitTopDirectory();
-
-	if (state) {
-		for (const file of state.files) {
-			const fullPath = join(
-				rootDirectory,
-				file.path,
-			);
-			appendLine(
-				`SF:${fullPath}`,
-			);
-
-			const lines = state.coverage.filter(
-				x => x.fileId
-					=== file.id,
-			);
-			for (const line of lines) {
-				const isCovered = line
-					.testIds
-					.length
-					> 0;
-				appendLine(
-					`DA:${line.lineNumber
-					},${isCovered
-						? 1
-						: 0
-					}`,
-				);
-			}
-
-			appendLine(
-				'end_of_record',
-			);
-		}
-	}
-
-	await io.writeToPrunerFile(
-		join(
-			'temp',
-			'lcov.info',
-		),
-		lcovContents,
-	);
-}
-
-async function createProvidersFromClass(
-	Provider: ProviderClass<
-		ProviderSettings
-	>,
-) {
-	const settings = JSON.parse(
-		await io.readFromPrunerFile(
-			'settings.json',
-		),
-	);
-	const providerSettings = settings[
-		Provider
-			.providerName
-	] as ProviderSettings[];
-
-	return providerSettings.map(
-		settings => new Provider(
-			settings,
-		),
-	);
-}
-
-async function mergeState(
-	testsInFilter: StateTest[],
-	previousState: State,
-	newState: State,
-): Promise<State> {
-	const allNewTestIds = chain(newState.coverage)
-		.flatMap(x => x.testIds)
-		.uniq()
-		.value();
-
-	const linesToRemove: StateLineCoverage[] = [];
-	if (previousState) {
-		for (const previousLineCoverage of previousState.coverage) {
-			if (previousLineCoverage.testIds.length === 0)
-				continue;
-
-			const newLineCoverage = newState.coverage.find(x =>
-				x.lineNumber === previousLineCoverage.lineNumber &&
-				x.fileId === previousLineCoverage.fileId);
-			if (newLineCoverage)
-				continue;
-
-			let remove = false;
-
-			const previousTestIds = previousLineCoverage.testIds;
-
-			for (const previousTestId of previousTestIds) {
-				const existsInNewTests = !!allNewTestIds.find(newTestId => newTestId === previousTestId);
-				if (existsInNewTests)
-					remove = true;
-			}
-
-			if (remove)
-				linesToRemove.push(previousLineCoverage);
-		}
-	}
-
-	const mergedState: State = {
-		commitId: newState.commitId,
-		tests: _
-			.chain([
-				previousState?.tests || [],
-				newState.tests || []
-			])
-			.flatMap()
-			.uniqBy(x => x.name)
-			.value(),
-		files: _
-			.chain([
-				previousState?.files || [],
-				newState.files || [],
-			])
-			.flatMap()
-			.uniqBy(x => x.path)
-			.value(),
-		coverage: _
-			.chain([
-				previousState?.coverage || [],
-				newState.coverage
-			])
-			.flatMap()
-			.filter(x => !linesToRemove.find(l =>
-				l.fileId === x.fileId &&
-				l.lineNumber === x.lineNumber))
-			.uniqBy(x => `${x.fileId}-${x.lineNumber}`)
-			.value()
-	};
-
-	//this is to remove outdated coverage.
-	for (const testInFilter of testsInFilter) {
-		const newStateTestIndex = newState.tests.findIndex(x => x.name === testInFilter.name);
-		const mergedStateTestIndex = mergedState.tests.findIndex(x => x.name === testInFilter.name);
-		if (newStateTestIndex === -1 && mergedStateTestIndex > -1) {
-			mergedState.tests.splice(mergedStateTestIndex, 1);
-
-			mergedState.coverage.forEach(lineCoverage => _
-				.remove(lineCoverage.testIds, x => x === testInFilter.id));
-		}
-	}
-
-	remove(
-		mergedState.coverage,
-		x => x.testIds.length === 0);
-
-	return mergedState;
 }
 
 async function getTestsToRun(
@@ -411,12 +218,10 @@ async function getTestsToRun(
 
 	const gitChangedFiles = await git.getChangedFiles(
 		previousState.commitId,
-		newCommitId,
-	);
+		newCommitId);
 	const affectedTests = getAffectedTests(
 		gitChangedFiles,
-		previousState,
-	);
+		previousState);
 
 	const allKnownUnaffectedTests = previousState.tests
 		.filter(x => !affectedTests.find(y => y.id === x.id));
@@ -502,10 +307,7 @@ function getFileIdFromStateForPath(
 	state: State,
 	path: string,
 ) {
-	const file = state.files.find(
-		x => x.path
-			=== path,
-	);
+	const file = state.files.find(x => x.path === path);
 	if (!file)
 		return null;
 

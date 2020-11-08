@@ -25,6 +25,6 @@ jobs:
     - run: npm test
     - run: npm run build
     
-    - run: npm publish --access public
+    - run: npm publish --access public || echo "Not published to NPM - possibly due to version conflict."
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

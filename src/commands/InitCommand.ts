@@ -2,11 +2,12 @@ import { join } from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
 import _ from 'lodash';
-import { allProviders, ProviderClass } from '../providers/providers';
+import { allProviders } from '../providers/factories';
 import io from '../io';
 import git from '../git';
 import con from '../console';
 import { Command, DefaultArgs } from './Command';
+import { ProviderClass } from '../providers/types';
 
 type Args = DefaultArgs & {
   provider: string;
@@ -70,7 +71,7 @@ async function getProviderSettings(topDirectoryPath: string) {
   };
 }
 
-async function askForInitSettings(Provider: ProviderClass<any>) {
+async function askForInitSettings(Provider: ProviderClass) {
   const initQuestions = Provider.getInitQuestions();
   const keys = _.keys(initQuestions);
   for (const key of keys) {

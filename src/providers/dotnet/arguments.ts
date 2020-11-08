@@ -1,4 +1,4 @@
-import { StateTest, TestsByAffectedState } from "../providers";
+import { StateTest, TestsByAffectedState } from "../types";
 import { DotNetSettings } from "./DotNetProvider";
 
 export function getCallContextArgument() {
