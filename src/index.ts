@@ -3,7 +3,7 @@
 import yargs from 'yargs';
 
 import InitCommand from './commands/InitCommand';
-import RunCommand from './commands/RunCommand';
+import RunCommand from './commands/run/RunCommand';
 
 export default yargs(process.argv.slice(2))
   .scriptName("pruner")

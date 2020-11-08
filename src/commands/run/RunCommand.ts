@@ -2,11 +2,11 @@ import { chain, flatMap, last, remove } from 'lodash';
 import { green, red, white, yellow } from 'chalk';
 import { join } from 'path';
 import chokidar from 'chokidar';
-import { Command, DefaultArgs } from './Command';
-import con from '../console';
-import git, { FileChanges } from '../git';
-import io from '../io';
-import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../providers';
+import { Command, DefaultArgs } from '../Command';
+import con from '../../console';
+import git, { FileChanges } from '../../git';
+import io from '../../io';
+import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../../providers';
 import _ from 'lodash';
 
 type Args = DefaultArgs & {

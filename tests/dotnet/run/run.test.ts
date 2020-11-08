@@ -1,7 +1,7 @@
 jest.setTimeout(1000 * 60 * 5);
 
 import { basename, dirname, join } from 'path';
-import { handler } from '../../../src/commands/RunCommand';
+import { handler } from '../../../src/commands/run/RunCommand';
 import _, { last } from 'lodash';
 import { State } from '../../../src/providers';
 import rimraf from 'rimraf';
