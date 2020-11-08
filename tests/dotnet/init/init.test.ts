@@ -7,15 +7,14 @@ import _ from 'lodash';
 import rimraf from 'rimraf';
 import { copy } from 'fs-extra';
 
-import io from '../../../src/io';
+import pruner from '../../../src/pruner';
 import con from '../../../src/console';
 import git from '../../../src/git';
-import { ProviderSettings } from '../../../src/providers/types';
 import { DotNetSettings } from '../../../src/providers/dotnet/DotNetProvider';
 
 con.ask = async () => ({});
 git.getGitTopDirectory = async () => "tests/dotnet/init/temp";
-io.getPrunerPath = async () => "tests/dotnet/init/temp/.pruner";
+pruner.getPrunerPath = async () => "tests/dotnet/init/temp/.pruner";
 
 describe("init", () => {
     const currentDirectory = join("tests", "dotnet", "init");
@@ -42,15 +41,16 @@ describe("init", () => {
 
     test('init -> check for settings', async () => {
         await runHandler();
-        
-        const settings = JSON.parse(await io.readFromPrunerFile("settings.json")) as ProviderSettings;
+
+        const settings = await pruner.readSettings();
         expect(settings).not.toBeNull();
 
-        const dotNetSettings = settings["dotnet"] as DotNetSettings[];
+        const dotNetSettings = settings.providers;
         expect(dotNetSettings).not.toBeNull();
         expect(dotNetSettings).toHaveLength(1);
 
         const dotNetSetting = dotNetSettings[0];
         expect(dotNetSetting).not.toBeNull();
+        expect(dotNetSetting.id).not.toBeNull();
     });
 });

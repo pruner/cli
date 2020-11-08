@@ -1,25 +1,22 @@
-import { flatMap } from "lodash";
+import { create, flatMap } from "lodash";
 import DotNetProvider from "./dotnet/DotNetProvider";
-import io from '../io';
+import pruner from '../pruner';
 import { ProviderClass, ProviderSettings } from "./types";
 
-export const allProviders: ProviderClass<any>[] = [DotNetProvider];
+export const allProviderClasses: ProviderClass[] = [DotNetProvider];
 
-export async function createProvidersFromArguments(providerName: string) {
-    const classes = providerName ?
-        [allProviders.find(x => x.providerName === providerName)] :
-        allProviders;
+export async function createProvidersFromProvider(provider: string) {
+	const settings = await pruner.readSettings();
 
-    const providers = await Promise.all(classes.map(createProvidersFromClass));
-    return flatMap(providers);
-}
-
-async function createProvidersFromClass(Provider: ProviderClass) {
-    const settings = JSON.parse(
-        await io.readFromPrunerFile('settings.json'));
-
-    const providerSettings = settings[Provider.providerName] as ProviderSettings[];
-
-    return providerSettings.map(
-        settings => new Provider(settings));
+	return settings.providers
+		.filter(x =>
+			!provider ||
+			x.id === provider ||
+			x.name === provider ||
+			x.type === provider)
+		.map(x => ({
+			settings: x,
+			ProviderClass: allProviderClasses.find(p => p.providerType === x.type)
+		}))
+		.map(x => new x.ProviderClass(x.settings));
 }

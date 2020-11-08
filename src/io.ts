@@ -10,20 +10,17 @@ const exported = {
     safeStat,
     writeToFile,
     readFromFile,
-    getPrunerPath,
-    writeToPrunerFile,
-    readFromPrunerFile,
     normalizePathSeparators,
     removeDirectory
 };
 
 async function glob(workingDirectory: string, pattern: string): Promise<string[]> {
-    return new Promise(resolve => 
+    return new Promise(resolve =>
         internalGlob(
-            pattern, 
+            pattern,
             {
                 cwd: workingDirectory
-            }, 
+            },
             (_, matches) => resolve(matches)));
 }
 
@@ -40,11 +37,11 @@ async function globContents(globPattern: string, options?: {
     const coverageFileBuffers = await Promise.all(filePaths
         .map(filePath => fs.promises.readFile(
             join(options?.workingDirectory, filePath))));
-            
+
     const fileContents = coverageFileBuffers
         .map(file => file.toString());
 
-    if(options?.deleteAfterRead) {
+    if (options?.deleteAfterRead) {
         await Promise.all(filePaths
             .map(filePath => fs.promises.unlink(
                 join(options?.workingDirectory, filePath))));
@@ -57,7 +54,7 @@ async function safeStat(path: string) {
     try {
         const stat = await fs.promises.lstat(path);
         return stat;
-    } catch(ex) {
+    } catch (ex) {
         return null;
     }
 }
@@ -73,7 +70,7 @@ async function readFromFile(path: string) {
     try {
         const result = await fs.promises.readFile(path);
         return result.toString();
-    } catch(ex) {
+    } catch (ex) {
         return null;
     }
 }
@@ -91,31 +88,6 @@ async function ensurePathExists(path: string) {
     }
 }
 
-async function getPrunerPath() {
-    let currentPath = process.cwd();
-    while(true) {
-        const directories = await fs.promises.readdir(currentPath);
-        if(!!directories.find(x => basename(x) === ".pruner"))
-            return normalizePathSeparators(join(currentPath, ".pruner"));
-
-        currentPath = dirname(currentPath);
-        if(currentPath.indexOf(sep) === -1 || currentPath.lastIndexOf(sep) === currentPath.length - 1)
-            break;
-    }
-
-    return "";
-}
-
-async function writeToPrunerFile(path: string, contents: string) {
-    const prunerDirectory = await exported.getPrunerPath();
-    await writeToFile(join(prunerDirectory, path), contents);
-}
-
-async function readFromPrunerFile(path: string) {
-    const prunerDirectory = await exported.getPrunerPath();
-    return await readFromFile(join(prunerDirectory, path));
-}
-
 async function removeDirectory(path: string) {
     return new Promise(resolve => {
         rimraf(path, resolve);
@@ -123,11 +95,11 @@ async function removeDirectory(path: string) {
 }
 
 function normalizePathSeparators(path: string) {
-    if(!path)
+    if (!path)
         return "";
 
     path = path.replace(/\\/g, "/");
-    while(path.indexOf("//") > -1)
+    while (path.indexOf("//") > -1)
         path = path.replace("//", "/");
 
     return path;

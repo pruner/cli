@@ -47,12 +47,12 @@ export function getFilterArguments(tests: TestsByAffectedState, settings: DotNet
                 [
                     affectedFilter,
                     unknownFilter
-                ], 
+                ],
                 '|'),
             combineFilterArguments(
-                categoriesFilter, 
+                categoriesFilter,
                 '|')
-        ], 
+        ],
         '&');
 
     return ["--filter", filterArgument];
@@ -66,9 +66,8 @@ export function combineFilterArguments(orFilters: string[], join: string) {
 }
 
 export function getTestFilterArgument(
-    tests: StateTest[], 
-    operandSettings: { join: string; compare: string; }) 
-{
+    tests: StateTest[],
+    operandSettings: { join: string; compare: string; }) {
     return tests
         .map(x => `FullyQualifiedName${operandSettings.compare}${x.name}`)
         .join(operandSettings.join);
