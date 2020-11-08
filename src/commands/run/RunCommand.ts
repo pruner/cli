@@ -6,8 +6,9 @@ import { Command, DefaultArgs } from '../Command';
 import con from '../../console';
 import git, { FileChanges } from '../../git';
 import io from '../../io';
-import { allProviders, Provider, State, ProviderClass, LineCoverage, Settings, Test } from '../../providers';
 import _ from 'lodash';
+import { allProviders } from '../../providers/providers';
+import { StateTest, State, Provider, ProviderClass, ProviderSettings, StateLineCoverage } from '../../providers/types';
 
 type Args = DefaultArgs & {
 	provider?: string;
@@ -15,15 +16,13 @@ type Args = DefaultArgs & {
 };
 
 type RunReport = {
-	testsRun: Test[];
+	testsRun: StateTest[];
 	mergedState: State;
 };
 
 export default {
-	command:
-		'run [provider]',
-	describe:
-		'Run tests.',
+	command: 'run [provider]',
+	describe: 'Run tests.',
 	builder: yargs => yargs
 		.positional('provider', {
 			choices: allProviders.map(x => x.providerName),
@@ -292,7 +291,7 @@ async function generateLcovFile(state?: State) {
 
 async function createProvidersFromClass(
 	Provider: ProviderClass<
-		Settings
+		ProviderSettings
 	>,
 ) {
 	const settings = JSON.parse(
@@ -303,7 +302,7 @@ async function createProvidersFromClass(
 	const providerSettings = settings[
 		Provider
 			.providerName
-	] as Settings[];
+	] as ProviderSettings[];
 
 	return providerSettings.map(
 		settings => new Provider(
@@ -313,7 +312,7 @@ async function createProvidersFromClass(
 }
 
 async function mergeState(
-	testsInFilter: Test[],
+	testsInFilter: StateTest[],
 	previousState: State,
 	newState: State,
 ): Promise<State> {
@@ -322,7 +321,7 @@ async function mergeState(
 		.uniq()
 		.value();
 
-	const linesToRemove: LineCoverage[] = [];
+	const linesToRemove: StateLineCoverage[] = [];
 	if (previousState) {
 		for (const previousLineCoverage of previousState.coverage) {
 			if (previousLineCoverage.testIds.length === 0)
@@ -405,8 +404,8 @@ async function getTestsToRun(
 ) {
 	if (!previousState) {
 		return {
-			affected: new Array<Test>(),
-			unaffected: new Array<Test>()
+			affected: new Array<StateTest>(),
+			unaffected: new Array<StateTest>()
 		};
 	}
 
@@ -453,7 +452,7 @@ function getAffectedTests(
 		.value();
 }
 
-function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, gitLineCoverage: LineCoverage) {
+function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, gitLineCoverage: StateLineCoverage) {
 	const gitUnchangedLine = gitChangedFile.unchanged
 		.find(x => x.oldLineNumber === gitLineCoverage.lineNumber);
 
@@ -462,7 +461,7 @@ function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, gitLineCov
 	return newLineNumber;
 }
 
-function getTestFromStateById(state: State, id: number): Test {
+function getTestFromStateById(state: State, id: number): StateTest {
 	return state.tests.find(y => y.id === id);
 }
 

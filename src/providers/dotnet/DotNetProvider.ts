@@ -1,23 +1,14 @@
-import { join } from "path";
-import fs from "fs";
-import {
-  Provider,
-  Settings,
-  SettingsQuestions,
-  State,
-  Test,
-  Tests,
-} from "../providers";
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
-import io from "../io";
+import io from "../../io";
 import { Root } from "./altcover";
 import { chain, range } from "lodash";
-import git from "../git";
+import git from "../../git";
 import { yellow, yellowBright } from "chalk";
 import { getAltCoverArguments, getFilterArguments } from "./arguments";
+import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, State } from "../types";
 
-export type DotNetSettings = Settings & {
+export type DotNetSettings = ProviderSettings & {
   msTest: {
     categories: string[];
   };
@@ -42,8 +33,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
     return {
       workingDirectory: {
         type: "text",
-        message:
-          "What relative directory would you like to run 'dotnet test' from?",
+        message: "What relative directory would you like to run 'dotnet test' from?",
       },
       msTest: null,
       excludeFromWatch: null,
@@ -55,7 +45,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
   }
 
   public async executeTestProcess(
-    tests: Tests
+    tests: TestsByAffectedState
   ): Promise<execa.ExecaReturnValue<string>> {
     const args = [
       ...getFilterArguments(tests, this.settings),
@@ -68,11 +58,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
       reject: false,
     });
     if (typeof result.exitCode === "undefined")
-      console.warn(
-        yellow(
-          "It could look like you don't have the .NET Core SDK installed, required for the .NET provider."
-        )
-      );
+      console.warn(yellow("It could look like you don't have the .NET Core SDK installed, required for the .NET provider."));
 
     return result;
   }
@@ -159,9 +145,6 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
       )
       .filter((x) => !!x.fileId && x.testIds.length > 0)
       .value();
-
-    console.debug("gather-state", "files", files);
-    console.debug("gather-state", "coverage", coverage);
 
     const result = {
       tests: tests,

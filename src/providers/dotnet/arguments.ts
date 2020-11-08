@@ -1,4 +1,4 @@
-import { Test, Tests } from "../providers";
+import { StateTest, TestsByAffectedState } from "../providers";
 import { DotNetSettings } from "./DotNetProvider";
 
 export function getCallContextArgument() {
@@ -25,7 +25,7 @@ export function getAltCoverArguments(reportName: string) {
     ];
 }
 
-export function getFilterArguments(tests: Tests, settings: DotNetSettings) {
+export function getFilterArguments(tests: TestsByAffectedState, settings: DotNetSettings) {
     const unknownFilter = getTestFilterArgument(tests.unaffected, {
         compare: "!=",
         join: "&"
@@ -66,7 +66,7 @@ export function combineFilterArguments(orFilters: string[], join: string) {
 }
 
 export function getTestFilterArgument(
-    tests: Test[], 
+    tests: StateTest[], 
     operandSettings: { join: string; compare: string; }) 
 {
     return tests

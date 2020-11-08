@@ -2,7 +2,6 @@ import execa from "execa";
 import io from "./io";
 import parseGitDiff, { Line } from "git-diff-parser";
 import { chain } from "lodash";
-import { State } from "./providers";
 
 const declarations = {
   isGitProject,

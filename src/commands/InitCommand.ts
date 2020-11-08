@@ -2,7 +2,7 @@ import { join } from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
 import _ from 'lodash';
-import { allProviders, ProviderClass } from '../providers';
+import { allProviders, ProviderClass } from '../providers/providers';
 import io from '../io';
 import git from '../git';
 import con from '../console';

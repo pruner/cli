@@ -3,8 +3,8 @@ jest.setTimeout(1000 * 60 * 5);
 import { join } from 'path';
 import { handler } from '../../../src/commands/InitCommand';
 import _ from 'lodash';
-import { Settings } from '../../../src/providers';
-import { DotNetSettings } from '../../../src/dotnet/DotNetProvider';
+import { ProviderSettings } from '../../../src/providers/providers';
+import { DotNetSettings } from '../../../src/providers/dotnet/DotNetProvider';
 
 import rimraf from 'rimraf';
 import { copy } from 'fs-extra';
@@ -43,7 +43,7 @@ describe("init", () => {
     test('init -> check for settings', async () => {
         await runHandler();
         
-        const settings = JSON.parse(await io.readFromPrunerFile("settings.json")) as Settings;
+        const settings = JSON.parse(await io.readFromPrunerFile("settings.json")) as ProviderSettings;
         expect(settings).not.toBeNull();
 
         const dotNetSettings = settings["dotnet"] as DotNetSettings[];
