@@ -49,7 +49,8 @@ namespace Sample.Tests.World
       for (var i = 0; i < count; i++)
       {
         Thread.Sleep(0);
-        SomeClass.DoSomething(argument);
+		var result = SomeClass.DoSomething(argument);
+		Assert.AreEqual(1, result);
       }
     }
   }

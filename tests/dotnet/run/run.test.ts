@@ -142,7 +142,11 @@ describe("run", () => {
 		expect(testRun.length).toBe(12);
 
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual(lineRange(10, 31));
+		expect(coverage).toEqual([
+			...lineRange(10, 20),
+			...lineRange(22, 31),
+			33
+		]);
 	});
 
 	test('run -> run -> check coverage', async () => {
@@ -153,7 +157,11 @@ describe("run", () => {
 		expect(testRun2.length).toBe(0);
 
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual(lineRange(10, 31));
+		expect(coverage).toEqual([
+			...lineRange(10, 20),
+			...lineRange(22, 31),
+			33
+		]);
 	});
 
 	test('run -> change condition -> run -> revert condition -> check coverage', async () => {
@@ -169,7 +177,11 @@ describe("run", () => {
 		expect(testRun3.length).toBe(12);
 
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual(lineRange(10, 31));
+		expect(coverage).toEqual([
+			...lineRange(10, 20),
+			...lineRange(22, 31),
+			33
+		]);
 	});
 
 	test('run -> change condition -> run -> check coverage', async () => {
@@ -183,7 +195,8 @@ describe("run", () => {
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 		expect(coverage).toEqual([
 			...lineRange(10, 11),
-			...lineRange(21, 31)
+			...lineRange(22, 31),
+			33
 		]);
 	});
 
@@ -201,7 +214,7 @@ describe("run", () => {
 		const coverageForClass = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 		expect(coverageForClass).toEqual([
 			...lineRange(10, 20),
-			...lineRange(31, 31)
+			33
 		]);
 	});
 
@@ -214,6 +227,26 @@ describe("run", () => {
 		expect(testRun2.length).toBe(6);
 
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual(lineRange(10, 31));
+		expect(coverage).toEqual([
+			...lineRange(10, 20),
+			...lineRange(22, 31),
+			33
+		]);
+	});
+
+	test('run -> make darkness tests fail -> run -> check coverage', async () => {
+		const testRun1 = await runHandler();
+		expect(testRun1.length).toBe(12);
+
+		await overwriteCode("Sample/SomeClass.darkness-test-fail.cs");
+		const testRun2 = await runHandler();
+		expect(testRun2.length).toBe(12);
+
+		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+		expect(coverage).toEqual([
+			...lineRange(10, 11),
+			...lineRange(22, 31),
+			33
+		]);
 	});
 });

@@ -155,13 +155,15 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			}))
 			.value();
 
+		console.debug("test-results", testResults);
+
 		return chain(altCoverModules)
 			.flatMap(x => x.TrackedMethods)
 			.flatMap(x => x.TrackedMethod)
 			.map(x => x?.$)
 			.filter(x => !!x)
 			.map(x => ({
-				...testResults.find(t => t.name === x.name),
+				...testResults.find(t => t.name === this.sanitizeMethodName(x.name)),
 				name: this.sanitizeMethodName(x.name),
 				id: +x.uid
 			}))

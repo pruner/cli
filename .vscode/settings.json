@@ -14,5 +14,6 @@
   "eslint.workingDirectories": ["."],
   "files.eol": "\n",
   "editor.insertSpaces": false,
-  "editor.detectIndentation": false
+  "editor.detectIndentation": false,
+  "vscode-json-editor.theme": "dark"
 }

@@ -28,7 +28,7 @@ namespace Sample
         Console.WriteLine("Hello darkness 6");
         Console.WriteLine("Hello darkness 7");
         Console.WriteLine("Hello darkness 8");
-		return 2;
+		return 3;
       }
     }
   }
