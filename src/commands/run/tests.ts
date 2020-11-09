@@ -108,8 +108,15 @@ export async function getTestsToRun(
 	const allKnownUnaffectedTests = previousState.tests
 		.filter(x => !affectedTests.find(y => y.id === x.id));
 
+	const failingTests = previousState.tests.filter(x => !x.passed);
 	return {
-		affected: affectedTests,
+		affected:
+			chain([
+				...affectedTests,
+				...failingTests
+			])
+				.uniqBy(x => x.id)
+				.value(),
 		unaffected: allKnownUnaffectedTests
 	};
 }

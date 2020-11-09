@@ -24,7 +24,11 @@ describe("run", () => {
 		rimraf.sync(join(currentDirectory, "temp"));
 	}
 
-	const lineRange = (from: number, to: number) => _.range(from, to + 1);
+	const passedLineRange = (from: number, to?: number) =>
+		_.range(from, (to || from) + 1);
+
+	const failedLineRange = (from: number, to?: number) =>
+		passedLineRange(from, to).map(x => -x);
 
 	const getState = async (): Promise<ProviderState> => {
 		const result = await io.readFromFile(join(currentDirectory, "temp", ".pruner", "state", "tests.json"));
@@ -40,18 +44,22 @@ describe("run", () => {
 		return states;
 	}
 
-	const getFileCoverage = async (fileName: string) => {
+	const getCoveredLineNumbersForFile = async (fileName: string) => {
 		const state = await getState();
 		const file = state.files.find(x => x.path.endsWith(fileName));
 		return _.chain(state.coverage)
 			.filter(x => x.fileId === file.id)
-			.orderBy(x => x.lineNumber)
+			.map(x => ({
+				...x,
+				tests: x.testIds.map(testId => state
+					.tests
+					.find(t => t.id === testId))
+			}))
+			.map(x => x.tests.find(y => !y.passed) ?
+				-x.lineNumber :
+				x.lineNumber)
+			.orderBy(Math.abs)
 			.value();
-	}
-
-	const getCoveredLineNumbersForFile = async (fileName: string) => {
-		const coverage = await getFileCoverage(fileName);
-		return coverage.map(x => x.lineNumber);
 	}
 
 	const revertCode = async (fileName: string) => {
@@ -137,86 +145,86 @@ describe("run", () => {
 			}));
 	});
 
-	test('run -> check coverage', async () => {
-		const testRun = await runHandler();
-		expect(testRun.length).toBe(12);
+	// test('run -> check coverage', async () => {
+	// 	const testRun = await runHandler();
+	// 	expect(testRun.length).toBe(12);
 
-		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual([
-			...lineRange(10, 20),
-			...lineRange(22, 31),
-			33
-		]);
-	});
+	// 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	// 	expect(coverage).toEqual([
+	// 		...passedLineRange(10, 20),
+	// 		...passedLineRange(22, 31),
+	// 		...passedLineRange(33)
+	// 	]);
+	// });
 
-	test('run -> run -> check coverage', async () => {
-		const testRun1 = await runHandler();
-		expect(testRun1.length).toBe(12);
+	// test('run -> run -> check coverage', async () => {
+	// 	const testRun1 = await runHandler();
+	// 	expect(testRun1.length).toBe(12);
 
-		const testRun2 = await runHandler();
-		expect(testRun2.length).toBe(0);
+	// 	const testRun2 = await runHandler();
+	// 	expect(testRun2.length).toBe(0);
 
-		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual([
-			...lineRange(10, 20),
-			...lineRange(22, 31),
-			33
-		]);
-	});
+	// 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	// 	expect(coverage).toEqual([
+	// 		...passedLineRange(10, 20),
+	// 		...passedLineRange(22, 31),
+	// 		...passedLineRange(33)
+	// 	]);
+	// });
 
-	test('run -> change condition -> run -> revert condition -> check coverage', async () => {
-		const testRun1 = await runHandler();
-		expect(testRun1.length).toBe(12);
+	// test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+	// 	const testRun1 = await runHandler();
+	// 	expect(testRun1.length).toBe(12);
 
-		await overwriteCode("Sample/SomeClass.condition-change.cs");
-		const testRun2 = await runHandler();
-		expect(testRun2.length).toBe(12);
+	// 	await overwriteCode("Sample/SomeClass.condition-change.cs");
+	// 	const testRun2 = await runHandler();
+	// 	expect(testRun2.length).toBe(12);
 
-		await revertCode("Sample/SomeClass.cs");
-		const testRun3 = await runHandler();
-		expect(testRun3.length).toBe(12);
+	// 	await revertCode("Sample/SomeClass.cs");
+	// 	const testRun3 = await runHandler();
+	// 	expect(testRun3.length).toBe(12);
 
-		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual([
-			...lineRange(10, 20),
-			...lineRange(22, 31),
-			33
-		]);
-	});
+	// 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	// 	expect(coverage).toEqual([
+	// 		...passedLineRange(10, 20),
+	// 		...passedLineRange(22, 31),
+	// 		...passedLineRange(33)
+	// 	]);
+	// });
 
-	test('run -> change condition -> run -> check coverage', async () => {
-		const testRun1 = await runHandler();
-		expect(testRun1.length).toBe(12);
+	// test('run -> change condition -> run -> check coverage', async () => {
+	// 	const testRun1 = await runHandler();
+	// 	expect(testRun1.length).toBe(12);
 
-		await overwriteCode("Sample/SomeClass.condition-change.cs");
-		const testRun2 = await runHandler();
-		expect(testRun2.length).toBe(12);
+	// 	await overwriteCode("Sample/SomeClass.condition-change.cs");
+	// 	const testRun2 = await runHandler();
+	// 	expect(testRun2.length).toBe(12);
 
-		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverage).toEqual([
-			...lineRange(10, 11),
-			...lineRange(22, 31),
-			33
-		]);
-	});
+	// 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	// 	expect(coverage).toEqual([
+	// 		...passedLineRange(10, 11),
+	// 		...passedLineRange(22, 31),
+	// 		...passedLineRange(33)
+	// 	]);
+	// });
 
-	test('run -> comment out test -> run -> check coverage', async () => {
-		const testRun1 = await runHandler();
-		expect(testRun1.length).toBe(12);
+	// test('run -> comment out test -> run -> check coverage', async () => {
+	// 	const testRun1 = await runHandler();
+	// 	expect(testRun1.length).toBe(12);
 
-		await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
-		const testRun2 = await runHandler();
-		expect(testRun2.length).toBe(0);
+	// 	await overwriteCode("Sample.Tests/SampleDarknessTests.commented.cs");
+	// 	const testRun2 = await runHandler();
+	// 	expect(testRun2.length).toBe(0);
 
-		const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
-		expect(coverageForTest).toEqual([]);
+	// 	const coverageForTest = await getCoveredLineNumbersForFile("Sample.Tests/SampleDarknessTests.cs");
+	// 	expect(coverageForTest).toEqual([]);
 
-		const coverageForClass = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-		expect(coverageForClass).toEqual([
-			...lineRange(10, 20),
-			33
-		]);
-	});
+	// 	const coverageForClass = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	// 	expect(coverageForClass).toEqual([
+	// 		...passedLineRange(10, 20),
+	// 		...passedLineRange(33)
+	// 	]);
+	// });
 
 	test('run -> make change in first if-branch -> run -> check coverage', async () => {
 		const testRun1 = await runHandler();
@@ -228,9 +236,9 @@ describe("run", () => {
 
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 		expect(coverage).toEqual([
-			...lineRange(10, 20),
-			...lineRange(22, 31),
-			33
+			...passedLineRange(10, 20),
+			...passedLineRange(22, 31),
+			...passedLineRange(33)
 		]);
 	});
 
@@ -240,13 +248,14 @@ describe("run", () => {
 
 		await overwriteCode("Sample/SomeClass.darkness-test-fail.cs");
 		const testRun2 = await runHandler();
-		expect(testRun2.length).toBe(12);
+		expect(testRun2.length).toBe(6);
 
 		const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 		expect(coverage).toEqual([
-			...lineRange(10, 11),
-			...lineRange(22, 31),
-			33
+			...failedLineRange(10),
+			...passedLineRange(11, 20),
+			...failedLineRange(22, 31),
+			...failedLineRange(33)
 		]);
 	});
 });
