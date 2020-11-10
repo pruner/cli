@@ -1,41 +1,42 @@
 import _, { chain, last, remove, sortBy } from "lodash";
 import { ProviderState, StateLineCoverage, StateTest } from "../../providers/types";
 
-function merge<T>(args: {
+export function merge<T>(args: {
 	a: T[],
 	b: T[],
-	identifierAccessor: string,
-	groupingKeyAccessor: string,
+	identifierAccessor: keyof T,
+	groupingKeyAccessor: keyof T,
 	onIdentifierChanged: (a: number, b: number) => void
 }) {
-	const groupingKeyMapA = new Map<string, T>();
-	const identifierMapA = new Map<number, T>();
-	for (let a of args.a) {
-		groupingKeyMapA.set(a[args.groupingKeyAccessor], a);
-		identifierMapA.set(a[args.identifierAccessor], a);
-	}
+	const merged = [...args.a, ...args.b];
 
-	const groupingKeyMapB = new Map<string, T>();
-	const identifierMapB = new Map<number, T>();
-	for (let b of args.b) {
-		groupingKeyMapB.set(b[args.groupingKeyAccessor], b);
-		identifierMapB.set(b[args.identifierAccessor], b);
-	}
+	avoidIdentifierCollisions();
 
-	for (let a of args.a) {
-		const groupingKeyA = a[args.groupingKeyAccessor] as string;
-		if (!groupingKeyMapB.has(groupingKeyA))
-			continue;
+	return merged;
 
-		const identifierA = a[args.identifierAccessor];
+	function avoidIdentifierCollisions() {
+		const illegalIdentifiers = new Set<number>();
+		const seenIdentifiers = new Set<number>();
+		for (let item of merged) {
+			const identifier = item[args.identifierAccessor as string];
+			if (seenIdentifiers.has(identifier))
+				illegalIdentifiers.add(identifier);
 
-		const b = groupingKeyMapB.get(groupingKeyA);
-		const identifierB = b[args.identifierAccessor];
-		if (identifierB === identifierA)
-			continue;
+			seenIdentifiers.add(identifier);
+		}
 
-		b[args.identifierAccessor] = identifierA;
-		args.onIdentifierChanged(identifierB, identifierA);
+		for (let item of args.b) {
+			let identifier = item[args.identifierAccessor as string];
+			const oldIdentifier = identifier;
+
+			while (illegalIdentifiers.has(identifier))
+				identifier++;
+
+			illegalIdentifiers.add(identifier);
+			item[args.identifierAccessor as string] = identifier;
+
+			args.onIdentifierChanged(oldIdentifier, identifier);
+		}
 	}
 }
 
