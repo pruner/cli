@@ -8,7 +8,7 @@ namespace Sample
   {
     public static int DoSomething(int argument)
     {
-      if (argument > 13370) {
+      if (argument > 1337) {
         Console.WriteLine("Hello world 1");
         Console.WriteLine("Hello world 2");
         Console.WriteLine("Hello world 3");

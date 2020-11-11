@@ -163,6 +163,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			.map(x => x?.$)
 			.filter(x => !!x)
 			.map(x => ({
+				passed: true,
 				...testResults.find(t => t.name === this.sanitizeMethodName(x.name)),
 				name: this.sanitizeMethodName(x.name),
 				id: +x.uid
