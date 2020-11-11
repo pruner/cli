@@ -163,6 +163,21 @@ beforeEach(async () => {
 		}));
 });
 
+test('run -> run -> check coverage', async () => {
+	const testRun1 = await runHandler();
+	expect(testRun1.length).toBe(12);
+
+	const testRun2 = await runHandler();
+	expect(testRun2.length).toBe(0);
+
+	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	expect(coverage).toEqual([
+		...passedLineRange(10, 20),
+		...passedLineRange(22, 31),
+		...passedLineRange(33)
+	]);
+});
+
 test('run -> change condition -> run -> check coverage', async () => {
 	const testRun1 = await runHandler();
 	expect(testRun1.length).toBe(12);
@@ -182,21 +197,6 @@ test('run -> change condition -> run -> check coverage', async () => {
 test('run -> check coverage', async () => {
 	const testRun = await runHandler();
 	expect(testRun.length).toBe(12);
-
-	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-	expect(coverage).toEqual([
-		...passedLineRange(10, 20),
-		...passedLineRange(22, 31),
-		...passedLineRange(33)
-	]);
-});
-
-test('run -> run -> check coverage', async () => {
-	const testRun1 = await runHandler();
-	expect(testRun1.length).toBe(12);
-
-	const testRun2 = await runHandler();
-	expect(testRun2.length).toBe(0);
 
 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
