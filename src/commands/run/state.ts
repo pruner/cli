@@ -1,4 +1,4 @@
-import _, { add, chain, groupBy, last, remove, sortBy } from "lodash";
+import _, { add, chain, first, groupBy, last, remove, sortBy } from "lodash";
 import { ProviderState, StateLineCoverage, StateTest } from "../../providers/types";
 
 export function merge<T>(args: {
@@ -97,7 +97,14 @@ export async function mergeStates(
 				l.fileId === x.fileId &&
 				l.lineNumber === x.lineNumber))
 			.groupBy(x => `${x.fileId}_${x.lineNumber}`)
-			.map(last)
+			.map(x => ({
+				fileId: last(x).fileId,
+				lineNumber: last(x).lineNumber,
+				testIds: _.chain(x)
+					.flatMap(t => t.testIds)
+					.uniq()
+					.value()
+			}))
 			.value()
 	};
 

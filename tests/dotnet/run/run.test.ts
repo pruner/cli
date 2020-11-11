@@ -4,7 +4,7 @@ import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/run/RunCommand';
 import _, { last } from 'lodash';
 import rimraf from 'rimraf';
-import { copy, copyFile, existsSync, pathExists } from 'fs-extra';
+import { copy, copyFile, existsSync, pathExists, readFile, writeFile } from 'fs-extra';
 
 import git from '../../../src/git';
 import io from '../../../src/io';
@@ -19,16 +19,35 @@ git.getCurrentDiffText = async () => mockCurrentDiff;
 
 const currentDirectory = join("tests", "dotnet", "run");
 const stateDirectory = join(currentDirectory, "temp", ".pruner", "state");
-
-const cleanup = async () => {
-	rimraf.sync(join(currentDirectory, "temp"));
-}
+const temporaryFolderPath = join(currentDirectory, "temp");
 
 const passedLineRange = (from: number, to?: number) =>
 	_.range(from, (to || from) + 1);
 
 const failedLineRange = (from: number, to?: number) =>
 	passedLineRange(from, to).map(x => -x);
+
+const removeGitIgnoreContents = async () => {
+	const gitignoreContents = await io.readFromFile(join(temporaryFolderPath, ".gitignore"));
+	const directoriesToRemove = await Promise.all(_
+		.chain(gitignoreContents)
+		.split('\n')
+		.map(x => io.glob(temporaryFolderPath, x))
+		.value());
+	const directoriesToRemoveFlat = _.chain(directoriesToRemove)
+		.flatMap(x => x)
+		.map(x => join(temporaryFolderPath, x))
+		.value();
+	for (let directory of directoriesToRemoveFlat) {
+		if (!await pathExists(directory)) {
+			console.debug("not-present", directory);
+			continue;
+		}
+
+		console.debug("purging", directory);
+		rimraf.sync(directory);
+	}
+}
 
 const getState = async (): Promise<ProviderState> => {
 	const result = await io.readFromFile(join(stateDirectory, "tests.json"));
@@ -100,14 +119,24 @@ const replaceCodeFiles = async (fromPath: string, toPath: string) => {
 }
 
 const runHandler = async () => {
+	await removeGitIgnoreContents();
+
 	const result = await handler({
 		provider: "dotnet",
 		verbosity: "verbose"
 	});
 
-	if (existsSync(join(stateDirectory, "tests.json"))) {
+	const stateJsonFilePath = join(stateDirectory, "tests.json");
+	if (existsSync(stateJsonFilePath)) {
+		await writeFile(
+			stateJsonFilePath,
+			JSON.stringify(
+				JSON.parse(
+					await readFile(stateJsonFilePath) + ""),
+				null,
+				"\t"));
 		await copyFile(
-			join(stateDirectory, "tests.json"),
+			stateJsonFilePath,
 			join(stateDirectory, "tests.previous.json"));
 	}
 
@@ -115,32 +144,13 @@ const runHandler = async () => {
 }
 
 beforeEach(async () => {
-	await cleanup();
+	rimraf.sync(join(currentDirectory, "temp"));
 
-	const temporaryFolderPath = join(__dirname, "temp");
 	await copy(
 		join(__dirname, "..", "sample"),
 		temporaryFolderPath);
 
-	const gitignoreContents = await io.readFromFile(join(temporaryFolderPath, ".gitignore"));
-	const directoriesToRemove = await Promise.all(_
-		.chain(gitignoreContents)
-		.split('\n')
-		.map(x => io.glob(temporaryFolderPath, x))
-		.value());
-	const directoriesToRemoveFlat = _.chain(directoriesToRemove)
-		.flatMap(x => x)
-		.map(x => join(temporaryFolderPath, x))
-		.value();
-	for (let directory of directoriesToRemoveFlat) {
-		if (!await pathExists(directory)) {
-			console.debug("not-present", directory);
-			continue;
-		}
-
-		console.debug("purging", directory);
-		rimraf.sync(directory);
-	}
+	await removeGitIgnoreContents();
 
 	await io.writeToFile(
 		join(__dirname, "temp", ".pruner", "settings.json"),
@@ -151,6 +161,22 @@ beforeEach(async () => {
 				"workingDirectory": "tests/dotnet/run/temp"
 			}]
 		}));
+});
+
+test('run -> change condition -> run -> check coverage', async () => {
+	const testRun1 = await runHandler();
+	expect(testRun1.length).toBe(12);
+
+	await overwriteCode("Sample/SomeClass.condition-change.cs");
+	const testRun2 = await runHandler();
+	expect(testRun2.length).toBe(12);
+
+	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	expect(coverage).toEqual([
+		...failedLineRange(10, 11),
+		...failedLineRange(22, 31),
+		...failedLineRange(33)
+	]);
 });
 
 test('run -> check coverage', async () => {
@@ -195,22 +221,6 @@ test('run -> change condition -> run -> revert condition -> check coverage', asy
 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
 		...passedLineRange(10, 20),
-		...passedLineRange(22, 31),
-		...passedLineRange(33)
-	]);
-});
-
-test('run -> change condition -> run -> check coverage', async () => {
-	const testRun1 = await runHandler();
-	expect(testRun1.length).toBe(12);
-
-	await overwriteCode("Sample/SomeClass.condition-change.cs");
-	const testRun2 = await runHandler();
-	expect(testRun2.length).toBe(12);
-
-	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-	expect(coverage).toEqual([
-		...passedLineRange(10, 11),
 		...passedLineRange(22, 31),
 		...passedLineRange(33)
 	]);
