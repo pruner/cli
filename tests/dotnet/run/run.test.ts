@@ -4,7 +4,7 @@ import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/run/RunCommand';
 import _, { last } from 'lodash';
 import rimraf from 'rimraf';
-import { copy, pathExists } from 'fs-extra';
+import { copy, copyFile, existsSync, pathExists } from 'fs-extra';
 
 import git from '../../../src/git';
 import io from '../../../src/io';
@@ -18,6 +18,7 @@ let mockCurrentDiff = "";
 git.getCurrentDiffText = async () => mockCurrentDiff;
 
 const currentDirectory = join("tests", "dotnet", "run");
+const stateDirectory = join(currentDirectory, "temp", ".pruner", "state");
 
 const cleanup = async () => {
 	rimraf.sync(join(currentDirectory, "temp"));
@@ -30,7 +31,7 @@ const failedLineRange = (from: number, to?: number) =>
 	passedLineRange(from, to).map(x => -x);
 
 const getState = async (): Promise<ProviderState> => {
-	const result = await io.readFromFile(join(currentDirectory, "temp", ".pruner", "state", "tests.json"));
+	const result = await io.readFromFile(join(stateDirectory, "tests.json"));
 	if (!result) {
 		return {
 			coverage: [],
@@ -99,10 +100,18 @@ const replaceCodeFiles = async (fromPath: string, toPath: string) => {
 }
 
 const runHandler = async () => {
-	return await handler({
+	const result = await handler({
 		provider: "dotnet",
 		verbosity: "verbose"
 	});
+
+	if (existsSync(join(stateDirectory, "tests.json"))) {
+		await copyFile(
+			join(stateDirectory, "tests.json"),
+			join(stateDirectory, "tests.previous.json"));
+	}
+
+	return result;
 }
 
 beforeEach(async () => {
@@ -251,8 +260,8 @@ test('run -> make darkness tests fail -> run -> check coverage', async () => {
 
 	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...failedLineRange(10),
-		...passedLineRange(11, 20),
+		...failedLineRange(10, 11),
+		...passedLineRange(12, 20),
 		...failedLineRange(22, 31),
 		...failedLineRange(33)
 	]);

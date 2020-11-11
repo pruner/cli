@@ -1,39 +1,49 @@
-import _, { chain, last, remove, sortBy } from "lodash";
+import _, { add, chain, groupBy, last, remove, sortBy } from "lodash";
 import { ProviderState, StateLineCoverage, StateTest } from "../../providers/types";
 
 export function merge<T>(args: {
 	a: T[],
 	b: T[],
-	identifierAccessor: keyof T,
-	groupingKeyAccessor: keyof T,
+	identifierProperty: keyof T,
+	groupingKeyProperty: keyof T,
 	onIdentifierChanged: (a: number, b: number) => void
 }) {
 	const merged = [...args.a, ...args.b];
 
 	avoidIdentifierCollisions();
 
-	return merged;
+	return chain(merged)
+		.groupBy(x => x[args.groupingKeyProperty])
+		.map(last)
+		.value();
 
 	function avoidIdentifierCollisions() {
-		const illegalIdentifiers = new Set<number>();
-		const seenIdentifiers = new Set<number>();
+		const illegalIdentifiers = new Map<number, T>();
+		const seenIdentifiers = new Map<number, T>();
 		for (let item of merged) {
-			const identifier = item[args.identifierAccessor as string];
-			if (seenIdentifiers.has(identifier))
-				illegalIdentifiers.add(identifier);
-
-			seenIdentifiers.add(identifier);
+			const identifier = item[args.identifierProperty as string];
+			const groupingKey = item[args.groupingKeyProperty as string];
+			if (seenIdentifiers.has(identifier)) {
+				const seenIdentifierItem = seenIdentifiers.get(identifier);
+				if (seenIdentifierItem[args.groupingKeyProperty as string] !== groupingKey)
+					illegalIdentifiers.set(identifier, item);
+			} else {
+				seenIdentifiers.set(identifier, item);
+			}
 		}
 
 		for (let item of args.b) {
-			let identifier = item[args.identifierAccessor as string];
+			let identifier = item[args.identifierProperty as string];
 			const oldIdentifier = identifier;
 
 			while (illegalIdentifiers.has(identifier))
 				identifier++;
 
-			illegalIdentifiers.add(identifier);
-			item[args.identifierAccessor as string] = identifier;
+			if (identifier === oldIdentifier)
+				continue;
+
+			illegalIdentifiers.set(identifier, item);
+			item[args.identifierProperty as string] = identifier;
 
 			args.onIdentifierChanged(oldIdentifier, identifier);
 		}
@@ -45,33 +55,38 @@ export async function mergeStates(
 	previousState: ProviderState,
 	newState: ProviderState,
 ): Promise<ProviderState> {
+
+	const mergedFiles = merge({
+		a: previousState?.files || [],
+		b: newState.files,
+		identifierProperty: "id",
+		groupingKeyProperty: "path",
+		onIdentifierChanged: (oldId, newId) => {
+			const coveredLinesInFile = newState.coverage.filter(x => x.fileId === oldId);
+			for (let coveredLine of coveredLinesInFile)
+				coveredLine.fileId = newId;
+		}
+	});
+
+	const mergedTests = merge({
+		a: previousState?.tests || [],
+		b: newState.tests,
+		identifierProperty: "id",
+		groupingKeyProperty: "name",
+		onIdentifierChanged: (oldId, newId) => {
+			const coveredLinesWithTest = newState.coverage.filter(x => x.testIds.indexOf(oldId) > -1);
+			for (let coveredLine of coveredLinesWithTest) {
+				remove(coveredLine.testIds, testId => testId === oldId);
+				coveredLine.testIds.push(newId);
+			}
+		}
+	});
+
 	const linesToRemove = getLinesPresentInOldCoverageButNotNew(previousState, newState);
 
 	const mergedState: ProviderState = {
-		tests: _
-			.chain([
-				previousState?.tests || [],
-				newState.tests || []
-			])
-			.flatMap()
-			.groupBy(x => x.name)
-			.map(x => x
-				.find(y => newState
-					.tests
-					.find(t => t.name === y.name)) || x[0])
-			.value(),
-		files: _
-			.chain([
-				previousState?.files || [],
-				newState.files || [],
-			])
-			.flatMap()
-			.groupBy(x => x.path)
-			.map(x => x
-				.find(y => newState
-					.files
-					.find(t => t.path === y.path)) || x[0])
-			.value(),
+		tests: mergedTests,
+		files: mergedFiles,
 		coverage: _
 			.chain([
 				previousState?.coverage || [],
@@ -81,13 +96,8 @@ export async function mergeStates(
 			.filter(x => !linesToRemove.find(l =>
 				l.fileId === x.fileId &&
 				l.lineNumber === x.lineNumber))
-			.groupBy(x => `${x.fileId}-${x.lineNumber}`)
-			.map(x => x
-				.find(y => newState
-					.coverage
-					.find(l =>
-						l.fileId === y.fileId &&
-						l.lineNumber === y.lineNumber)) || x[0])
+			.groupBy(x => `${x.fileId}_${x.lineNumber}`)
+			.map(last)
 			.value()
 	};
 
