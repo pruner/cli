@@ -2,6 +2,7 @@
 	"providers": [
 		{
 			"id": "63148e55-2c92-42b2-81df-4cfd52b2b238",
+			"container": "mcr.microsoft.com/dotnet/sdk:5.0",
 			"type": "dotnet",
 			"workingDirectory": "tests/dotnet/sample"
 		}
