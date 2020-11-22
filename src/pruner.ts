@@ -34,8 +34,12 @@ async function getPrunerPath() {
 }
 
 async function writeToFile(path: string, contents: string) {
-    const prunerDirectory = await exported.getPrunerPath();
-    await io.writeToFile(join(prunerDirectory, path), contents);
+	const prunerDirectory = await exported.getPrunerPath();
+	
+	const fullPath = join(prunerDirectory, path);
+	await io.writeToFile(fullPath, contents);
+	
+	return fullPath;
 }
 
 async function readFromFile(path: string) {

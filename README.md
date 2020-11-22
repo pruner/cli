@@ -29,3 +29,7 @@ When you want to run your tests, use:
 There's also a watch mode available:
 
 `pruner run --watch`
+
+# Contributing
+To contribute, you need to have the following installed:
+- .NET SDK 5

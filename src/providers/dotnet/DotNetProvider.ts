@@ -4,10 +4,13 @@ import io from "../../io";
 import { ModuleModule, AltCoverRoot } from "./altcover";
 import { chain, range } from "lodash";
 import git from "../../git";
+import pruner from "../../pruner";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getFilterArguments, getLoggerArguments } from "./arguments";
+import { getAltCoverArguments, getLoggerArguments, getRunSettingArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx";
+import { getFilter } from "./filter";
+import { makeRunSettingsFile } from "./runsettings";
 
 export type DotNetSettings = ProviderSettings & {
 	msTest: {
@@ -48,12 +51,16 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async executeTestProcess(
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
+		const filter = getFilter(tests, this.settings);
+		const runSettingsFilePath = await makeRunSettingsFile(this.settings, filter);
+
 		const args = [
-			...getFilterArguments(tests, this.settings),
+			...getRunSettingArguments(runSettingsFilePath),
 			...getAltCoverArguments(coverageXmlFileName),
 			...getLoggerArguments(summaryFileName)
 		];
 		console.debug("execute-settings", this.settings);
+		console.debug("execute-args", args);
 
 		const result = await execa("dotnet", ["test", ...args], {
 			cwd: this.settings.workingDirectory,
