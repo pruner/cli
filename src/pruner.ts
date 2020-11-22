@@ -1,7 +1,7 @@
 import io from './io';
 import git from './git';
 import fs from 'fs';
-import { basename, dirname, join, sep } from 'path';
+import { basename, dirname, join, resolve, sep } from 'path';
 import { ProviderSettings, ProviderState } from './providers/types';
 
 const exported = {
@@ -39,7 +39,7 @@ async function writeToFile(path: string, contents: string) {
 	const fullPath = join(prunerDirectory, path);
 	await io.writeToFile(fullPath, contents);
 	
-	return fullPath;
+	return resolve(fullPath);
 }
 
 async function readFromFile(path: string) {

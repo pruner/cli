@@ -8,17 +8,10 @@ export async function makeRunSettingsFile(settings: DotNetSettings, filter: stri
 	const content = `
 <RunSettings>
     <RunConfiguration>
-        <TestCaseFilter>FullyQualifiedName=Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld</TestCaseFilter>
+        <TestCaseFilter>${xmlescape(filter)}</TestCaseFilter>
     </RunConfiguration>
 </RunSettings>
 `;
-// 	const content = `
-// <RunSettings>
-//     <RunConfiguration>
-//         <TestCaseFilter>${xmlescape(filter)}</TestCaseFilter>
-//     </RunConfiguration>
-// </RunSettings>
-// `;
 	
 	const path = await pruner.writeToTempFile(
 		`${settings.id}.settings`, 

@@ -10,7 +10,6 @@ import { copy } from 'fs-extra';
 import pruner from '../../../src/pruner';
 import con from '../../../src/console';
 import git from '../../../src/git';
-import { DotNetSettings } from '../../../src/providers/dotnet/DotNetProvider';
 
 con.ask = async () => ({});
 git.getGitTopDirectory = async () => "tests/dotnet/init/temp";
