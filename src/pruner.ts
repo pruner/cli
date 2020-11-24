@@ -19,8 +19,8 @@ const exported = {
 	getPrunerTempPath
 };
 
-async function getPrunerPath() {
-	let currentPath = process.cwd();
+async function getPrunerPath(cwd?: string) {
+	let currentPath = cwd || process.cwd();
 	while (true) {
 		const directories = await fs.promises.readdir(currentPath);
 		if (!!directories.find(x => basename(x) === ".pruner"))
@@ -34,8 +34,8 @@ async function getPrunerPath() {
 	return "";
 }
 
-async function getPrunerTempPath() {
-	return join(await exported.getPrunerPath(), "temp");
+async function getPrunerTempPath(cwd?: string) {
+	return join(await exported.getPrunerPath(cwd), "temp");
 }
 
 async function writeToFile(path: string, contents: string) {
