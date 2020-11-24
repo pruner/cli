@@ -2,19 +2,31 @@ import pruner from '../../pruner';
 import { DotNetSettings } from './DotNetProvider';
 
 import xmlescape from 'xml-escape';
+import _ from 'lodash';
+import { join } from 'path';
 
 export async function makeRunSettingsFile(settings: DotNetSettings, filter: string) {
-	//hidden feature, described here: https://github.com/microsoft/vstest/pull/2356
+	const environment = settings.environment || {};
 	const content = `
 <RunSettings>
     <RunConfiguration>
         <TestCaseFilter>${xmlescape(filter)}</TestCaseFilter>
-    </RunConfiguration>
+		<EnvironmentVariables>
+			${_
+			.keys(environment)
+			.map(key => ({
+				key,
+				value: environment[key]
+			}))
+			.map(tuple =>
+				`<${tuple.key}>${xmlescape(tuple.value)}</${tuple.key}>`)}
+		</EnvironmentVariables>
+	</RunConfiguration>
 </RunSettings>
 `;
-	
+
 	const path = await pruner.writeToTempFile(
-		`${settings.id}.settings`, 
+		join(settings.id, "runsettings.settings"),
 		content.trim());
 	return path;
 }

@@ -4,16 +4,23 @@ import io from "../../io";
 import { ModuleModule, AltCoverRoot } from "./altcover";
 import { chain, range } from "lodash";
 import git from "../../git";
-import pruner from "../../pruner";
 import { yellow, yellowBright } from "chalk";
 import { getAltCoverArguments, getLoggerArguments, getRunSettingArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
+import { join } from "path";
+import { pruner } from "../../exports";
 
 export type DotNetSettings = ProviderSettings & {
-	msTest: {
+	environment: {
+		[property: string]: any
+	};
+	mstest: {
+		categories: string[];
+	};
+	nunit: {
 		categories: string[];
 	};
 };
@@ -40,7 +47,9 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 				type: "text",
 				message: "What relative directory would you like to run 'dotnet test' from?",
 			},
-			msTest: null
+			mstest: null,
+			nunit: null,
+			environment: null
 		};
 	}
 
@@ -51,7 +60,9 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async executeTestProcess(
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
+
 		const filter = getFilter(tests, this.settings);
+
 		const runSettingsFilePath = await makeRunSettingsFile(this.settings, filter);
 
 		const args = [
@@ -70,6 +81,10 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			console.warn(yellow("It could look like you don't have the .NET Core SDK installed, required for the .NET provider."));
 
 		return result;
+	}
+
+	private async getCoverageXmlFilePath(settings: DotNetSettings) {
+		return join(await pruner.getPrunerTempPath(), settings.id, `$(ProjectName).coverage.xml`);
 	}
 
 	public async gatherState(): Promise<ProviderState> {

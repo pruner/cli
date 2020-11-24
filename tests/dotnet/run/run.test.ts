@@ -2,7 +2,7 @@ jest.setTimeout(1000 * 60 * 5);
 
 import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/run/RunCommand';
-import _, { last } from 'lodash';
+import _ from 'lodash';
 import rimraf from 'rimraf';
 import { copy, copyFile, existsSync, pathExists, readFile, writeFile } from 'fs-extra';
 
@@ -158,7 +158,10 @@ beforeEach(async () => {
 			providers: [{
 				"id": "tests",
 				"type": "dotnet",
-				"workingDirectory": "tests/dotnet/run/temp"
+				"workingDirectory": "tests/dotnet/run/temp",
+				"environment": {
+					"FOO": "BAR"
+				}
 			}]
 		}));
 });

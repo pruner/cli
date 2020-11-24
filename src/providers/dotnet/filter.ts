@@ -12,10 +12,11 @@ export function getFilter(tests: TestsByAffectedState, settings: DotNetSettings)
 		join: "|"
 	});
 
-	const categoriesFilter = settings
-		.msTest
-		?.categories
-		.map(x => `TestCategory=${x}`);
+	const categories =
+		settings.mstest?.categories ??
+		settings.nunit?.categories ??
+		[];
+	const categoriesFilter = categories.map(x => `TestCategory=${x}`);
 
 	const filterArgument = combineFilterArguments(
 		[
