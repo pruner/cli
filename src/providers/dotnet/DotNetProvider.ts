@@ -83,10 +83,6 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		return result;
 	}
 
-	private async getCoverageXmlFilePath(settings: DotNetSettings) {
-		return join(await pruner.getPrunerTempPath(), settings.id, `$(ProjectName).coverage.xml`);
-	}
-
 	public async gatherState(): Promise<ProviderState> {
 		const projectRootDirectory = await git.getGitTopDirectory();
 
