@@ -10,8 +10,6 @@ import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, Pr
 import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
-import { join } from "path";
-import { pruner } from "../../exports";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {

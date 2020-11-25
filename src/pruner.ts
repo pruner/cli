@@ -47,8 +47,8 @@ async function writeToFile(path: string, contents: string) {
 	return resolve(fullPath);
 }
 
-async function readFromFile(path: string) {
-	const prunerDirectory = await exported.getPrunerPath();
+async function readFromFile(path: string, cwd?: string) {
+	const prunerDirectory = await exported.getPrunerPath(cwd);
 	return await io.readFromFile(join(prunerDirectory, path));
 }
 
@@ -69,10 +69,10 @@ async function persistState(providerId: string, state: ProviderState) {
 		JSON.stringify(state));
 }
 
-async function readState(providerId: string): Promise<ProviderState> {
+async function readState(providerId: string, cwd?: string): Promise<ProviderState> {
 	const fileName = getStateFileName(providerId);
 	return JSON.parse(
-		await exported.readFromFile(fileName));
+		await exported.readFromFile(fileName, cwd));
 }
 
 async function persistSettings(settings: SettingsFile) {
