@@ -1,9 +1,10 @@
-import { create, flatMap } from "lodash";
 import DotNetProvider from "./dotnet/DotNetProvider";
 import pruner from '../pruner';
-import { ProviderClass, ProviderSettings } from "./types";
+import { ProviderClass } from "./types";
 
-export const allProviderClasses: ProviderClass[] = [DotNetProvider];
+export const allProviderClasses: ProviderClass[] = [
+	DotNetProvider
+];
 
 export async function createProvidersFromProvider(provider: string) {
 	const settings = await pruner.readSettings();
