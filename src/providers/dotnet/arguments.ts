@@ -18,7 +18,8 @@ export function getAltCoverArguments(reportName: string) {
 		"/p:AltCover=true",
 		`/p:AltCoverCallContext=${callContextArgument}`,
 		"/p:AltCoverForce=true",
-		`/p:AltCoverXmlReport=${reportName}`
+		`/p:AltCoverXmlReport=${reportName}`,
+		"/p:AltCoverSummaryFormat=N"
 	];
 }
 
