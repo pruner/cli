@@ -19,7 +19,8 @@ export async function makeRunSettingsFile(settings: DotNetSettings, filter: stri
 				value: environment[key]
 			}))
 			.map(tuple =>
-				`<${tuple.key}>${xmlescape(tuple.value)}</${tuple.key}>`)}
+				`<${tuple.key}>${xmlescape(tuple.value)}</${tuple.key}>`)
+			.join('')}
 		</EnvironmentVariables>
 	</RunConfiguration>
 </RunSettings>
