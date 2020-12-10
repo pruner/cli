@@ -1,4 +1,4 @@
-import _, { add, chain, first, groupBy, last, remove, sortBy } from "lodash";
+import _, { chain, last, remove } from "lodash";
 import { ProviderState, StateLineCoverage, StateTest } from "../../providers/types";
 
 export function merge<T>(args: {
@@ -55,7 +55,6 @@ export async function mergeStates(
 	previousState: ProviderState,
 	newState: ProviderState,
 ): Promise<ProviderState> {
-
 	const mergedFiles = merge({
 		a: previousState?.files || [],
 		b: newState.files,
@@ -146,17 +145,17 @@ function getLinesPresentInOldCoverageButNotNew(previousState: ProviderState, new
 		if (newLineCoverage)
 			continue;
 
-		let remove = false;
+		let shouldRemove = false;
 
 		const previousTestIds = previousLineCoverage.testIds;
 
 		for (const previousTestId of previousTestIds) {
 			const existsInNewTests = !!allNewTestIds.find(newTestId => newTestId === previousTestId);
 			if (existsInNewTests)
-				remove = true;
+				shouldRemove = true;
 		}
 
-		if (remove)
+		if (shouldRemove)
 			linesToRemove.push(previousLineCoverage);
 	}
 

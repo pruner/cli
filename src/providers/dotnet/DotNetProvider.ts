@@ -74,11 +74,11 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		console.debug("execute-args", args);
 
 		const result = await execa("dotnet", ["test", ...args], {
-			cwd: resolve(join(await git.getGitTopDirectory(), this.settings.workingDirectory)),
+			cwd: resolve(join(
+				await git.getGitTopDirectory(),
+				this.settings.workingDirectory)),
 			reject: false,
 		});
-		if (typeof result.exitCode === "undefined")
-			console.warn(yellow("It could look like you don't have the .NET Core SDK installed, required for the .NET provider."));
 
 		return result;
 	}

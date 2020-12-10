@@ -1,5 +1,5 @@
 import { uniqBy } from 'lodash';
-import { red, white, yellow } from 'chalk';
+import { green, red, white, yellow } from 'chalk';
 import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
 import pruner from '../../pruner';
@@ -45,14 +45,14 @@ export async function handler(args: Args) {
 	}
 
 	const providers = await createProvidersFromIdOrNameOrType(args.provider);
-	const stateChanges = await runTestsForProviders(providers);
+	const states = await runTestsForProviders(providers);
 
 	if (args.watch) {
 		for (const provider of providers)
 			watchProvider(provider);
 	}
 
-	return stateChanges;
+	return states;
 }
 
 function watchProvider(provider: Provider) {
@@ -71,6 +71,7 @@ function watchProvider(provider: Provider) {
 	const onFilesChanged = async () => {
 		if (isRunning) {
 			hasPending = true;
+			console.log(yellow('Changes have been detected during the current test run. A new test run has been scheduled after the current one is complete.'));
 			return;
 		}
 
@@ -81,6 +82,8 @@ function watchProvider(provider: Provider) {
 			results.push(...await runTests());
 
 			while (hasPending) {
+				console.log(yellow('Changes were detected during the previous test run. A new test run will be started to include the most recent changes.'));
+
 				hasPending = false;
 				results.push(...await runTests());
 			}

@@ -67,7 +67,7 @@ async function patchTopDirectoryGitIgnoreFile(topDirectoryPath: string) {
 			.split('\n')
 			.filter(x => x !== ignoreLine),
 		ignoreLine
-	].join('\n'));
+	].join('\n').trim());
 }
 
 async function createPrunerDirectory(topDirectoryPath: string) {

@@ -53,6 +53,8 @@ async function getBranchName() {
 
 async function getGitTopDirectory() {
 	const path = await runGitCommand("rev-parse", "--show-toplevel");
+	console.debug('git-top-directory', path);
+
 	if (!path)
 		return path;
 
