@@ -46,7 +46,6 @@ export async function runTestsForProvider(
 		} else {
 			console.error(`${red(`Could not run tests. Exit code ${processResult.exitCode}.`)}\n${yellow(processResult.stdout)}\n${red(processResult.stderr)}`);
 		}
-		return [];
 	} else {
 		console.log(green('Tests ran successfully:'));
 		console.log(white(processResult.stdout));
