@@ -66,7 +66,7 @@ async function persistState(providerId: string, state: ProviderState) {
 	const fileName = getStateFileName(providerId);
 	await exported.writeToFile(
 		fileName,
-		JSON.stringify(state));
+		JSON.stringify(state, null, "\t"));
 }
 
 async function readState(providerId: string, cwd?: string): Promise<ProviderState> {
