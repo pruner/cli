@@ -82,10 +82,10 @@ async function persistSettings(settings: SettingsFile) {
 		JSON.stringify(settings, null, "\t"));
 }
 
-async function readSettings(): Promise<SettingsFile> {
+async function readSettings(cwd?: string): Promise<SettingsFile> {
 	const fileName = getSettingsFileName();
 	return JSON.parse(
-		await exported.readFromFile(fileName));
+		await exported.readFromFile(fileName, cwd));
 }
 
 async function readGitState() {
