@@ -11,6 +11,7 @@ import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
 import { join, resolve } from "path";
+import { LogSettings } from "../../console";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -109,7 +110,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		const projectRootDirectory = await git.getGitTopDirectory();
 		const coverageFileContents = await io.globContents(glob, {
 			workingDirectory: resolve(join(projectRootDirectory, this.settings.workingDirectory)),
-			deleteAfterRead: true
+			deleteAfterRead: LogSettings.verbosity !== "verbose"
 		});
 		return await Promise.all(
 			coverageFileContents.map((file) => parseStringPromise(file, {

@@ -65,7 +65,11 @@ const getState = async (): Promise<ProviderState> => {
 
 const getCoveredLineNumbersForFile = async (fileName: string) => {
 	const state = await getState();
+
 	const file = state.files.find(x => x.path.endsWith(fileName));
+	if (!file)
+		throw new Error("File not covered.");
+
 	return _.chain(state.coverage)
 		.filter(x => x.fileId === file.id)
 		.map(x => ({

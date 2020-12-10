@@ -3,6 +3,7 @@ import { red, white, yellow } from 'chalk';
 import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
 import pruner from '../../pruner';
+import con from '../../console';
 import _ from 'lodash';
 import { allProviderClasses, createProvidersFromProvider as createProvidersFromIdOrNameOrType } from '../../providers/factories';
 import { StateTest, Provider } from '../../providers/types';
@@ -34,8 +35,7 @@ export default {
 } as Command<Args>;
 
 export async function handler(args: Args) {
-	if (args.verbosity !== 'verbose')
-		console.debug = () => { };
+	con.applyVerbosityLevel(args.verbosity);
 
 	const prunerDirectory = await pruner.getPrunerPath();
 	if (!prunerDirectory) {

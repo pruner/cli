@@ -26,12 +26,16 @@ export default {
 } as Command<Args>;
 
 export async function handler(args: Args) {
-	if (args.verbosity !== 'verbose')
-		console.debug = () => { };
+	con.applyVerbosityLevel(args.verbosity);
 
 	const topDirectoryPath = await git.getGitTopDirectory();
 	if (!topDirectoryPath) {
 		console.error('Pruner requires that the current directory is in GIT.');
+		return;
+	}
+
+	if (!await git.hasInitialCommitBeenMade()) {
+		console.error('Pruner requires that an initial commit has been made in GIT.');
 		return;
 	}
 
