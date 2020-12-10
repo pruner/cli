@@ -83,8 +83,6 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	}
 
 	public async gatherState(): Promise<ProviderState> {
-		const projectRootDirectory = await git.getGitTopDirectory();
-
 		const altCoverXmlAsJson: AltCoverRoot[] = await this.globContentsFromXmlToJson(`**/${coverageXmlFileName}`);
 		if (altCoverXmlAsJson.length === 0) {
 			console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}. Make sure AltCover is installed in your test projects.`));
@@ -95,6 +93,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 
 		const modules = this.parseModules(altCoverXmlAsJson);
 
+		const projectRootDirectory = await git.getGitTopDirectory();
 		const files = this.parseFiles(modules, projectRootDirectory);
 		const tests = this.parseTests(modules, summaryFileContents);
 		const coverage = this.parseLineCoverage(modules);
@@ -107,8 +106,9 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	}
 
 	private async globContentsFromXmlToJson(glob: string) {
+		const projectRootDirectory = await git.getGitTopDirectory();
 		const coverageFileContents = await io.globContents(glob, {
-			workingDirectory: this.settings.workingDirectory,
+			workingDirectory: resolve(join(projectRootDirectory, this.settings.workingDirectory)),
 			deleteAfterRead: true
 		});
 		return await Promise.all(
