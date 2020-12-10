@@ -10,6 +10,7 @@ import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, Pr
 import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
+import { join, resolve } from "path";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -72,7 +73,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		console.debug("execute-args", args);
 
 		const result = await execa("dotnet", ["test", ...args], {
-			cwd: this.settings.workingDirectory,
+			cwd: resolve(join(await git.getGitTopDirectory(), this.settings.workingDirectory)),
 			reject: false,
 		});
 		if (typeof result.exitCode === "undefined")

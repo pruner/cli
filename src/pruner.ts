@@ -79,7 +79,7 @@ async function persistSettings(settings: SettingsFile) {
 	const fileName = getSettingsFileName();
 	await exported.writeToFile(
 		fileName,
-		JSON.stringify(settings));
+		JSON.stringify(settings, null, "\t"));
 }
 
 async function readSettings(): Promise<SettingsFile> {
@@ -104,7 +104,7 @@ async function persistGitState(commitId: string) {
 	await exported.writeToTempFile("git.json", JSON.stringify({
 		commit: commitId,
 		branch: await git.getBranchName()
-	} as GitState));
+	} as GitState, null, "\t"));
 }
 
 function getStateFileName(providerId: string) {

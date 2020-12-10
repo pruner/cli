@@ -40,8 +40,8 @@ export async function runTestsForProvider(
 		'Running tests',
 		async () => await provider.executeTestProcess(testsToRun));
 
-	if (processResult.exitCode !== 0) {		
-		if(processResult.exitCode === undefined) {
+	if (processResult.exitCode !== 0) {
+		if (processResult.exitCode === undefined) {
 			console.error(`${red(`It seems like the .NET SDK is not installed.\n${red(processResult.stderr)}`)}`)
 		} else {
 			console.error(`${red(`Could not run tests. Exit code ${processResult.exitCode}.`)}\n${yellow(processResult.stdout)}\n${red(processResult.stderr)}`);
