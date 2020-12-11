@@ -31,40 +31,34 @@
 			"id": 6
 		},
 		{
-			"passed": false,
-			"id": 7,
+			"passed": true,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
-			"duration": "00:00:00.1256205"
+			"id": 7
 		},
 		{
-			"passed": false,
-			"id": 8,
+			"passed": true,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
-			"duration": "00:00:00.0005921"
+			"id": 8
 		},
 		{
-			"passed": false,
-			"id": 9,
+			"passed": true,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
-			"duration": "00:00:00.0006151"
+			"id": 9
 		},
 		{
-			"passed": false,
-			"id": 10,
+			"passed": true,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
-			"duration": "00:00:00.0005277"
+			"id": 10
 		},
 		{
-			"passed": false,
-			"id": 11,
+			"passed": true,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
-			"duration": "00:00:00.0004329"
+			"id": 11
 		},
 		{
-			"passed": false,
-			"id": 12,
+			"passed": true,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
-			"duration": "00:00:00.0004396"
+			"id": 12
 		}
 	],
 	"files": [
@@ -679,6 +673,192 @@
 		{
 			"fileId": 10,
 			"lineNumber": 53,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 22,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 23,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 24,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 25,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 26,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 27,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 28,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 29,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 30,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 31,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 13,
+			"testIds": [
+				7
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 19,
+			"testIds": [
+				8
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 25,
+			"testIds": [
+				9
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 31,
+			"testIds": [
+				10
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 37,
+			"testIds": [
+				11
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 43,
+			"testIds": [
+				12
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 54,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 55,
 			"testIds": [
 				7,
 				8,
