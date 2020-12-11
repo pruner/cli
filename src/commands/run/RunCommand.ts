@@ -3,7 +3,7 @@ import { green, red, white, yellow } from 'chalk';
 import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
 import pruner from '../../pruner';
-import con from '../../console';
+import con, { LogSettings } from '../../console';
 import _ from 'lodash';
 import { allProviderClasses, createProvidersFromProvider as createProvidersFromIdOrNameOrType } from '../../providers/factories';
 import { StateTest, Provider } from '../../providers/types';
@@ -68,10 +68,12 @@ function watchProvider(provider: Provider) {
 		return await runTestsForProviders([provider]);
 	};
 
-	const onFilesChanged = async () => {
+	const onFilesChanged = async (path: string) => {
+		console.debug("file-changed", path);
+
 		if (isRunning) {
 			hasPending = true;
-			console.log(yellow('Changes have been detected during the current test run. A new test run has been scheduled after the current one is complete.'));
+			console.log(yellow(' Changes have been detected during the current test run. A new test run has been scheduled after the current one is complete. '));
 			return;
 		}
 
@@ -82,7 +84,7 @@ function watchProvider(provider: Provider) {
 			results.push(...await runTests());
 
 			while (hasPending) {
-				console.log(yellow('Changes were detected during the previous test run. A new test run will be started to include the most recent changes.'));
+				console.log(yellow(' Changes were detected during the previous test run. A new test run will be started to include the most recent changes. '));
 
 				hasPending = false;
 				results.push(...await runTests());

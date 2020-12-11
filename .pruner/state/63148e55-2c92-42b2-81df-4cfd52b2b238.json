@@ -1,76 +1,70 @@
 {
 	"tests": [
 		{
-			"id": 1,
+			"passed": true,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld",
-			"passed": true,
-			"duration": "00:00:00.0845283"
+			"id": 1
 		},
 		{
-			"id": 2,
+			"passed": true,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld",
-			"passed": true,
-			"duration": "00:00:00.0004308"
+			"id": 2
 		},
 		{
-			"id": 3,
+			"passed": true,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld",
-			"passed": true,
-			"duration": "00:00:00.0001803"
+			"id": 3
 		},
 		{
-			"id": 4,
+			"passed": true,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld",
-			"passed": true,
-			"duration": "00:00:00.0001283"
+			"id": 4
 		},
 		{
-			"id": 5,
+			"passed": true,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld",
-			"passed": true,
-			"duration": "00:00:00.0001000"
+			"id": 5
 		},
 		{
-			"id": 6,
+			"passed": true,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld",
-			"passed": true,
-			"duration": "00:00:00.0000827"
+			"id": 6
 		},
 		{
+			"passed": false,
 			"id": 7,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
-			"passed": false,
-			"duration": "00:00:00.0234794"
+			"duration": "00:00:00.1256205"
 		},
 		{
+			"passed": false,
 			"id": 8,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
-			"passed": false,
-			"duration": "00:00:00.0005299"
+			"duration": "00:00:00.0005921"
 		},
 		{
+			"passed": false,
 			"id": 9,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
-			"passed": false,
-			"duration": "00:00:00.0004348"
+			"duration": "00:00:00.0006151"
 		},
 		{
+			"passed": false,
 			"id": 10,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
-			"passed": false,
-			"duration": "00:00:00.0006161"
+			"duration": "00:00:00.0005277"
 		},
 		{
+			"passed": false,
 			"id": 11,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
-			"passed": false,
-			"duration": "00:00:00.0005560"
+			"duration": "00:00:00.0004329"
 		},
 		{
+			"passed": false,
 			"id": 12,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
-			"passed": false,
-			"duration": "00:00:00.0005272"
+			"duration": "00:00:00.0004396"
 		}
 	],
 	"files": [
@@ -91,16 +85,18 @@
 			"path": "tests/dotnet/sample/Sample/SomeOtherClass.cs"
 		},
 		{
-			"id": 6,
+			"id": 9,
 			"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs"
 		},
 		{
-			"id": 7,
+			"id": 10,
 			"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs"
 		}
 	],
 	"coverage": [
 		{
+			"fileId": 2,
+			"lineNumber": 10,
 			"testIds": [
 				1,
 				2,
@@ -114,11 +110,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 2,
-			"lineNumber": 10
+			]
 		},
 		{
+			"fileId": 2,
+			"lineNumber": 11,
 			"testIds": [
 				1,
 				2,
@@ -132,239 +128,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 2,
-			"lineNumber": 11
+			]
 		},
 		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
 			"fileId": 2,
-			"lineNumber": 12
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 13
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 14
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 15
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 16
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 17
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 18
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 19
-		},
-		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 2,
-			"lineNumber": 20
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 22
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 23
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 24
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 25
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 26
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 27
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 28
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 29
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 30
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 2,
-			"lineNumber": 31
-		},
-		{
+			"lineNumber": 12,
 			"testIds": [
 				1,
 				2,
@@ -378,149 +146,299 @@
 				10,
 				11,
 				12
-			],
+			]
+		},
+		{
 			"fileId": 2,
-			"lineNumber": 33
+			"lineNumber": 13,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
 		},
 		{
+			"fileId": 2,
+			"lineNumber": 14,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 15,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 16,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 17,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 18,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 19,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 20,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 33,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 9,
+			"lineNumber": 12,
 			"testIds": [
 				1
-			],
-			"fileId": 6,
-			"lineNumber": 12
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 13,
 			"testIds": [
 				1
-			],
-			"fileId": 6,
-			"lineNumber": 13
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 14,
 			"testIds": [
 				1
-			],
-			"fileId": 6,
-			"lineNumber": 14
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 18,
 			"testIds": [
 				2
-			],
-			"fileId": 6,
-			"lineNumber": 18
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 19,
 			"testIds": [
 				2
-			],
-			"fileId": 6,
-			"lineNumber": 19
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 20,
 			"testIds": [
 				2
-			],
-			"fileId": 6,
-			"lineNumber": 20
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 24,
 			"testIds": [
 				3
-			],
-			"fileId": 6,
-			"lineNumber": 24
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 25,
 			"testIds": [
 				3
-			],
-			"fileId": 6,
-			"lineNumber": 25
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 26,
 			"testIds": [
 				3
-			],
-			"fileId": 6,
-			"lineNumber": 26
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 30,
 			"testIds": [
 				4
-			],
-			"fileId": 6,
-			"lineNumber": 30
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 31,
 			"testIds": [
 				4
-			],
-			"fileId": 6,
-			"lineNumber": 31
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 32,
 			"testIds": [
 				4
-			],
-			"fileId": 6,
-			"lineNumber": 32
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 36,
 			"testIds": [
 				5
-			],
-			"fileId": 6,
-			"lineNumber": 36
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 37,
 			"testIds": [
 				5
-			],
-			"fileId": 6,
-			"lineNumber": 37
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 38,
 			"testIds": [
 				5
-			],
-			"fileId": 6,
-			"lineNumber": 38
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 42,
 			"testIds": [
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 42
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 43,
 			"testIds": [
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 43
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 44,
 			"testIds": [
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 44
+			]
 		},
 		{
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			],
-			"fileId": 6,
-			"lineNumber": 48
-		},
-		{
+			"fileId": 9,
+			"lineNumber": 48,
 			"testIds": [
 				1,
 				2,
@@ -528,11 +446,11 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 49
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 49,
 			"testIds": [
 				1,
 				2,
@@ -540,11 +458,11 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 50
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 50,
 			"testIds": [
 				1,
 				2,
@@ -552,11 +470,11 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 51
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 51,
 			"testIds": [
 				1,
 				2,
@@ -564,11 +482,11 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 52
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 52,
 			"testIds": [
 				1,
 				2,
@@ -576,11 +494,11 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 53
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 53,
 			"testIds": [
 				1,
 				2,
@@ -588,11 +506,11 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 54
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 54,
 			"testIds": [
 				1,
 				2,
@@ -600,95 +518,107 @@
 				4,
 				5,
 				6
-			],
-			"fileId": 6,
-			"lineNumber": 55
+			]
 		},
 		{
+			"fileId": 9,
+			"lineNumber": 55,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 10,
+			"lineNumber": 11,
 			"testIds": [
 				7
-			],
-			"fileId": 7,
-			"lineNumber": 11
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 12,
 			"testIds": [
 				7
-			],
-			"fileId": 7,
-			"lineNumber": 12
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 17,
 			"testIds": [
 				8
-			],
-			"fileId": 7,
-			"lineNumber": 17
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 18,
 			"testIds": [
 				8
-			],
-			"fileId": 7,
-			"lineNumber": 18
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 23,
 			"testIds": [
 				9
-			],
-			"fileId": 7,
-			"lineNumber": 23
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 24,
 			"testIds": [
 				9
-			],
-			"fileId": 7,
-			"lineNumber": 24
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 29,
 			"testIds": [
 				10
-			],
-			"fileId": 7,
-			"lineNumber": 29
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 30,
 			"testIds": [
 				10
-			],
-			"fileId": 7,
-			"lineNumber": 30
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 35,
 			"testIds": [
 				11
-			],
-			"fileId": 7,
-			"lineNumber": 35
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 36,
 			"testIds": [
 				11
-			],
-			"fileId": 7,
-			"lineNumber": 36
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 41,
 			"testIds": [
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 41
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 42,
 			"testIds": [
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 42
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 48,
 			"testIds": [
 				7,
 				8,
@@ -696,11 +626,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 48
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 49,
 			"testIds": [
 				7,
 				8,
@@ -708,11 +638,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 49
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 50,
 			"testIds": [
 				7,
 				8,
@@ -720,11 +650,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 50
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 51,
 			"testIds": [
 				7,
 				8,
@@ -732,11 +662,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 51
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 52,
 			"testIds": [
 				7,
 				8,
@@ -744,11 +674,11 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 52
+			]
 		},
 		{
+			"fileId": 10,
+			"lineNumber": 53,
 			"testIds": [
 				7,
 				8,
@@ -756,75 +686,7 @@
 				10,
 				11,
 				12
-			],
-			"fileId": 7,
-			"lineNumber": 53
-		},
-		{
-			"testIds": [
-				7
-			],
-			"fileId": 7,
-			"lineNumber": 13
-		},
-		{
-			"testIds": [
-				8
-			],
-			"fileId": 7,
-			"lineNumber": 19
-		},
-		{
-			"testIds": [
-				9
-			],
-			"fileId": 7,
-			"lineNumber": 25
-		},
-		{
-			"testIds": [
-				10
-			],
-			"fileId": 7,
-			"lineNumber": 31
-		},
-		{
-			"testIds": [
-				11
-			],
-			"fileId": 7,
-			"lineNumber": 37
-		},
-		{
-			"testIds": [
-				12
-			],
-			"fileId": 7,
-			"lineNumber": 43
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 7,
-			"lineNumber": 54
-		},
-		{
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			],
-			"fileId": 7,
-			"lineNumber": 55
+			]
 		}
 	]
 }

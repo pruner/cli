@@ -73,10 +73,18 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		console.debug("execute-settings", this.settings);
 		console.debug("execute-args", args);
 
+		const cwd = resolve(join(
+			await git.getGitTopDirectory(),
+			this.settings.workingDirectory));
+		const cleanResult = await execa("dotnet", ["clean"], {
+			cwd,
+			reject: false
+		});
+		if (cleanResult.exitCode !== 0)
+			return cleanResult;
+
 		const result = await execa("dotnet", ["test", ...args], {
-			cwd: resolve(join(
-				await git.getGitTopDirectory(),
-				this.settings.workingDirectory)),
+			cwd,
 			reject: false,
 		});
 

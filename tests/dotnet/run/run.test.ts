@@ -27,28 +27,6 @@ const passedLineRange = (from: number, to?: number) =>
 const failedLineRange = (from: number, to?: number) =>
 	passedLineRange(from, to).map(x => -x);
 
-const removeGitIgnoreContents = async () => {
-	const gitignoreContents = await io.readFromFile(join(temporaryFolderPath, ".gitignore"));
-	const directoriesToRemove = await Promise.all(_
-		.chain(gitignoreContents)
-		.split('\n')
-		.map(x => io.glob(temporaryFolderPath, x))
-		.value());
-	const directoriesToRemoveFlat = _.chain(directoriesToRemove)
-		.flatMap(x => x)
-		.map(x => join(temporaryFolderPath, x))
-		.value();
-	for (let directory of directoriesToRemoveFlat) {
-		if (!await pathExists(directory)) {
-			console.debug("not-present", directory);
-			continue;
-		}
-
-		console.debug("purging", directory);
-		rimraf.sync(directory);
-	}
-}
-
 const getState = async (): Promise<ProviderState> => {
 	const result = await io.readFromFile(join(stateDirectory, "tests.json"));
 	if (!result) {
@@ -123,8 +101,6 @@ const replaceCodeFiles = async (fromPath: string, toPath: string) => {
 }
 
 const runHandler = async () => {
-	await removeGitIgnoreContents();
-
 	const result = await handler({
 		provider: "dotnet",
 		verbosity: "verbose"
@@ -153,8 +129,6 @@ beforeEach(async () => {
 	await copy(
 		join(__dirname, "..", "sample"),
 		temporaryFolderPath);
-
-	await removeGitIgnoreContents();
 
 	await io.writeToFile(
 		join(__dirname, "temp", ".pruner", "settings.json"),
