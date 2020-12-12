@@ -4,6 +4,7 @@ import io from "../../io";
 import { ModuleModule, AltCoverRoot } from "./altcover";
 import { chain, range } from "lodash";
 import git from "../../git";
+import con from "../../console";
 import { yellow, yellowBright } from "chalk";
 import { getAltCoverArguments, getLoggerArguments, getRunSettingArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
@@ -76,14 +77,15 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
 			this.settings.workingDirectory));
-		const cleanResult = await execa("dotnet", ["clean"], {
+		const cleanResult = await con.execaPiped("dotnet", ["clean"], {
 			cwd,
 			reject: false
 		});
+
 		if (cleanResult.exitCode !== 0)
 			return cleanResult;
 
-		const result = await execa("dotnet", ["test", ...args], {
+		const result = await con.execaPiped("dotnet", ["test", ...args], {
 			cwd,
 			reject: false,
 		});

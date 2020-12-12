@@ -1,11 +1,25 @@
+import execa, { ExecaChildProcess, Options } from 'execa';
 import ora from 'ora';
 import prompts from 'prompts';
 
 const declarations = {
 	useSpinner,
 	ask,
-	applyVerbosityLevel
+	applyVerbosityLevel,
+	execaPiped
 };
+
+async function execaPiped(
+	file: string,
+	args?: string[],
+	options?: Options
+) {
+	const result = execa(file, args, options);
+	result.stdout.pipe(process.stdout);
+	result.stderr.pipe(process.stderr);
+
+	return await result;
+}
 
 async function useSpinner<T>(text: string, callback: () => Promise<T>) {
 	const spinner = ora(text);
