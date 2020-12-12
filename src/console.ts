@@ -15,8 +15,10 @@ async function execaPiped(
 	options?: Options
 ) {
 	const result = execa(file, args, options);
-	result.stdout.pipe(process.stdout);
-	result.stderr.pipe(process.stderr);
+	if (LogSettings.verbosity === "verbose") {
+		result.stdout.pipe(process.stdout);
+		result.stderr.pipe(process.stderr);
+	}
 
 	return await result;
 }
