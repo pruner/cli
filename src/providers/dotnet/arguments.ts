@@ -33,6 +33,8 @@ export function getRunSettingArguments(runSettingFilePath: string) {
 export function getLoggerArguments(reportName: string) {
 	return [
 		"--logger",
-		`trx;LogFileName=../${reportName}`
+		`trx;LogFileName=../${reportName}`,
+		"--logger",
+		"console;verbosity=detailed"
 	];
 }
