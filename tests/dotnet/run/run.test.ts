@@ -4,13 +4,14 @@ import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/run/RunCommand';
 import _ from 'lodash';
 import rimraf from 'rimraf';
-import { copy, copyFile, existsSync, pathExists, readFile, writeFile } from 'fs-extra';
+import { copy, copyFile, existsSync, readFile, writeFile } from 'fs-extra';
 
 import git from '../../../src/git';
 import io from '../../../src/io';
 import pruner from '../../../src/pruner';
 import { gitDiff } from '../../helpers/git';
 import { ProviderState } from '../../../src/providers/types';
+import execa from 'execa';
 
 pruner.getPrunerPath = async () => "tests/dotnet/run/temp/.pruner";
 
@@ -56,7 +57,7 @@ const getCoveredLineNumbersForFile = async (fileName: string) => {
 				.tests
 				.find(t => t.id === testId))
 		}))
-		.map(x => x.tests.find(y => !y.passed) ?
+		.map(x => x.tests.find(y => !!y.failure) ?
 			-x.lineNumber :
 			x.lineNumber)
 		.orderBy(Math.abs)
@@ -126,8 +127,13 @@ const runHandler = async () => {
 beforeEach(async () => {
 	rimraf.sync(join(currentDirectory, "temp"));
 
+	const sampleOriginDirectoryPath = join(__dirname, "..", "sample");
+	await execa("dotnet", ["clean"], {
+		cwd: sampleOriginDirectoryPath
+	});
+
 	await copy(
-		join(__dirname, "..", "sample"),
+		sampleOriginDirectoryPath,
 		temporaryFolderPath);
 
 	await io.writeToFile(

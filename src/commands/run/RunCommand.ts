@@ -1,14 +1,14 @@
 import { uniqBy } from 'lodash';
-import { green, red, white, yellow } from 'chalk';
+import { gray, red, white, yellow } from 'chalk';
 import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
 import pruner from '../../pruner';
-import con, { LogSettings } from '../../console';
-import _ from 'lodash';
+import con from '../../console';
 import { allProviderClasses, createProvidersFromProvider as createProvidersFromIdOrNameOrType } from '../../providers/factories';
 import { StateTest, Provider } from '../../providers/types';
 import { join } from 'path';
 import { runTestsForProviders } from './tests';
+import { git } from '../../exports';
 
 type Args = DefaultArgs & {
 	provider?: string;
@@ -69,11 +69,17 @@ function watchProvider(provider: Provider) {
 	};
 
 	const onFilesChanged = async (path: string) => {
-		console.debug("file-changed", path);
+		const isFileInGitIgnore = await git.isFileInGitIgnore(path);
+		console.debug("file-changed", path, isFileInGitIgnore);
+
+		if (isFileInGitIgnore)
+			return;
+
+		console.log(gray(path + " changed."));
 
 		if (isRunning) {
 			hasPending = true;
-			console.log(yellow(' Changes have been detected during the current test run. A new test run has been scheduled after the current one is complete. '));
+			console.log(yellow('Changes have been detected during the current test run. A new test run has been scheduled after the current one is complete.'));
 			return;
 		}
 
@@ -84,13 +90,15 @@ function watchProvider(provider: Provider) {
 			results.push(...await runTests());
 
 			while (hasPending) {
-				console.log(yellow(' Changes were detected during the previous test run. A new test run will be started to include the most recent changes. '));
+				console.log(yellow('Changes were detected during the previous test run. A new test run will be started to include the most recent changes.'));
 
 				hasPending = false;
 				results.push(...await runTests());
 			}
 
-			console.log(white('Waiting for file changes...'));
+			console.log();
+			console.log(gray('Waiting for further file changes...'));
+			console.log();
 
 			return uniqBy(results, x => x.id);
 		} finally {

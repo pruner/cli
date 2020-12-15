@@ -2,63 +2,183 @@
 	"tests": [
 		{
 			"passed": true,
+			"id": 1,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld",
-			"id": 1
+			"duration": "00:00:00.3116231",
+			"failure": {
+				"stdout": [
+					"Hello world 1",
+					"Hello world 2",
+					"Hello world 3",
+					"Hello world 4",
+					"Hello world 5",
+					"Hello world 6",
+					"Hello world 7",
+					"Hello world 8"
+				],
+				"message": "Assert.AreEqual failed. Expected:<1>. Actual:<12>.",
+				"stackTrace": [
+					"at Sample.Tests.World.SampleWorldTests.RunScenario(Int32 count, Int32 argument) in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 53",
+					"at Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld() in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 13"
+				]
+			}
 		},
 		{
 			"passed": true,
+			"id": 2,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld",
-			"id": 2
+			"duration": "00:00:00.0033754",
+			"failure": {
+				"stdout": [
+					"Hello world 1",
+					"Hello world 2",
+					"Hello world 3",
+					"Hello world 4",
+					"Hello world 5",
+					"Hello world 6",
+					"Hello world 7",
+					"Hello world 8"
+				],
+				"message": "Assert.AreEqual failed. Expected:<1>. Actual:<12>.",
+				"stackTrace": [
+					"at Sample.Tests.World.SampleWorldTests.RunScenario(Int32 count, Int32 argument) in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 53",
+					"at Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld() in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 19"
+				]
+			}
 		},
 		{
 			"passed": true,
+			"id": 3,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld",
-			"id": 3
+			"duration": "00:00:00.0012028",
+			"failure": {
+				"stdout": [
+					"Hello world 1",
+					"Hello world 2",
+					"Hello world 3",
+					"Hello world 4",
+					"Hello world 5",
+					"Hello world 6",
+					"Hello world 7",
+					"Hello world 8"
+				],
+				"message": "Assert.AreEqual failed. Expected:<1>. Actual:<12>.",
+				"stackTrace": [
+					"at Sample.Tests.World.SampleWorldTests.RunScenario(Int32 count, Int32 argument) in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 53",
+					"at Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld() in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 25"
+				]
+			}
 		},
 		{
 			"passed": true,
+			"id": 4,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld",
-			"id": 4
+			"duration": "00:00:00.0010333",
+			"failure": {
+				"stdout": [
+					"Hello world 1",
+					"Hello world 2",
+					"Hello world 3",
+					"Hello world 4",
+					"Hello world 5",
+					"Hello world 6",
+					"Hello world 7",
+					"Hello world 8"
+				],
+				"message": "Assert.AreEqual failed. Expected:<1>. Actual:<12>.",
+				"stackTrace": [
+					"at Sample.Tests.World.SampleWorldTests.RunScenario(Int32 count, Int32 argument) in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 53",
+					"at Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld() in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 31"
+				]
+			}
 		},
 		{
 			"passed": true,
+			"id": 5,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld",
-			"id": 5
+			"duration": "00:00:00.0008669",
+			"failure": {
+				"stdout": [
+					"Hello world 1",
+					"Hello world 2",
+					"Hello world 3",
+					"Hello world 4",
+					"Hello world 5",
+					"Hello world 6",
+					"Hello world 7",
+					"Hello world 8"
+				],
+				"message": "Assert.AreEqual failed. Expected:<1>. Actual:<12>.",
+				"stackTrace": [
+					"at Sample.Tests.World.SampleWorldTests.RunScenario(Int32 count, Int32 argument) in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 53",
+					"at Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld() in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 37"
+				]
+			}
 		},
 		{
 			"passed": true,
+			"id": 6,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld",
-			"id": 6
+			"duration": "00:00:00.0029160",
+			"failure": {
+				"stdout": [
+					"Hello world 1",
+					"Hello world 2",
+					"Hello world 3",
+					"Hello world 4",
+					"Hello world 5",
+					"Hello world 6",
+					"Hello world 7",
+					"Hello world 8"
+				],
+				"message": "Assert.AreEqual failed. Expected:<1>. Actual:<12>.",
+				"stackTrace": [
+					"at Sample.Tests.World.SampleWorldTests.RunScenario(Int32 count, Int32 argument) in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 53",
+					"at Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld() in C:\\Users\\mathi\\source\\repos\\pruner\\cli\\tests\\dotnet\\sample\\Sample.Tests\\SampleWorldTests.cs:line 43"
+				]
+			}
 		},
 		{
 			"passed": true,
+			"id": 7,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
-			"id": 7
+			"duration": "00:00:00.0039473",
+			"failure": null
 		},
 		{
 			"passed": true,
+			"id": 8,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
-			"id": 8
+			"duration": "00:00:00.0025371",
+			"failure": null
 		},
 		{
 			"passed": true,
+			"id": 9,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
-			"id": 9
+			"duration": "00:00:00.0004067",
+			"failure": null
 		},
 		{
 			"passed": true,
+			"id": 10,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
-			"id": 10
+			"duration": "00:00:00.0018993",
+			"failure": null
 		},
 		{
 			"passed": true,
+			"id": 11,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
-			"id": 11
+			"duration": "00:00:00.0016698",
+			"failure": null
 		},
 		{
 			"passed": true,
+			"id": 12,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
-			"id": 12
+			"duration": "00:00:00.0019208",
+			"failure": null
 		}
 	],
 	"files": [
@@ -79,11 +199,11 @@
 			"path": "tests/dotnet/sample/Sample/SomeOtherClass.cs"
 		},
 		{
-			"id": 9,
+			"id": 6,
 			"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs"
 		},
 		{
-			"id": 10,
+			"id": 7,
 			"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs"
 		}
 	],
@@ -371,133 +491,91 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 12,
 			"testIds": [
 				1
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 13,
 			"testIds": [
 				1
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 14,
-			"testIds": [
-				1
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 18,
 			"testIds": [
 				2
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 19,
 			"testIds": [
 				2
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 20,
-			"testIds": [
-				2
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 24,
 			"testIds": [
 				3
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 25,
 			"testIds": [
 				3
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 26,
-			"testIds": [
-				3
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 30,
 			"testIds": [
 				4
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 31,
 			"testIds": [
 				4
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 32,
-			"testIds": [
-				4
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 36,
 			"testIds": [
 				5
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 37,
 			"testIds": [
 				5
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 38,
-			"testIds": [
-				5
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 42,
 			"testIds": [
 				6
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 43,
 			"testIds": [
 				6
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 44,
-			"testIds": [
-				6
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 48,
 			"testIds": [
 				1,
@@ -509,7 +587,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 49,
 			"testIds": [
 				1,
@@ -521,7 +599,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 50,
 			"testIds": [
 				1,
@@ -533,7 +611,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 51,
 			"testIds": [
 				1,
@@ -545,7 +623,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 52,
 			"testIds": [
 				1,
@@ -557,7 +635,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 53,
 			"testIds": [
 				1,
@@ -569,157 +647,133 @@
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 54,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 9,
-			"lineNumber": 55,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 11,
 			"testIds": [
 				7
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 12,
 			"testIds": [
 				7
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 13,
 			"testIds": [
 				7
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 17,
 			"testIds": [
 				8
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 18,
 			"testIds": [
 				8
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 19,
 			"testIds": [
 				8
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 23,
 			"testIds": [
 				9
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 24,
 			"testIds": [
 				9
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 25,
 			"testIds": [
 				9
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 29,
 			"testIds": [
 				10
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 30,
 			"testIds": [
 				10
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 31,
 			"testIds": [
 				10
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 35,
 			"testIds": [
 				11
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 36,
 			"testIds": [
 				11
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 37,
 			"testIds": [
 				11
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 41,
 			"testIds": [
 				12
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 42,
 			"testIds": [
 				12
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 43,
 			"testIds": [
 				12
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 48,
 			"testIds": [
 				7,
@@ -731,7 +785,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 49,
 			"testIds": [
 				7,
@@ -743,7 +797,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 50,
 			"testIds": [
 				7,
@@ -755,7 +809,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 51,
 			"testIds": [
 				7,
@@ -767,7 +821,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 52,
 			"testIds": [
 				7,
@@ -779,7 +833,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 53,
 			"testIds": [
 				7,
@@ -791,7 +845,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 54,
 			"testIds": [
 				7,
@@ -803,7 +857,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 55,
 			"testIds": [
 				7,

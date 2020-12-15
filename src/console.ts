@@ -58,8 +58,8 @@ async function useSpinner<T>(text: string, callback: () => Promise<T>) {
 	} finally {
 		spinner.stop();
 
-		for (let method of methodsToProxy) {
-			global.console[method] = oldMethods[method];
+		for (let methodToProxy of methodsToProxy) {
+			global.console[methodToProxy] = oldMethods[methodToProxy];
 		}
 	}
 }

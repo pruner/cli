@@ -1,3 +1,5 @@
+import { LogSettings } from "../../console";
+
 export function getCallContextArgument() {
 	const attributes = [
 		"TestMethod",
@@ -19,7 +21,11 @@ export function getAltCoverArguments(reportName: string) {
 		`/p:AltCoverCallContext=${callContextArgument}`,
 		"/p:AltCoverForce=true",
 		`/p:AltCoverXmlReport=${reportName}`,
-		"/p:AltCoverSummaryFormat=N"
+		"/p:AltCoverSummaryFormat=N",
+		"/p:AltCoverLocalSource=true",
+		`/p:AltCoverVerbosity=${LogSettings.verbosity === "verbose" ?
+			"Info" :
+			"Error"}`
 	];
 }
 
@@ -27,6 +33,15 @@ export function getRunSettingArguments(runSettingFilePath: string) {
 	return [
 		"--settings",
 		runSettingFilePath
+	];
+}
+
+export function getVerbosityArguments() {
+	return [
+		"--verbosity",
+		LogSettings.verbosity === "verbose" ?
+			"detailed" :
+			"minimal"
 	];
 }
 
