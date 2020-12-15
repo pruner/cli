@@ -64,8 +64,8 @@ export async function runTestsForProvider(
 		if (processResult.exitCode === undefined) {
 			console.error(`${red(`It seems like the .NET SDK is not installed.\n${red(processResult.stderr)}`)}`)
 		} else {
-			console.error(bgRed.whiteBright(`Could not run tests. Exit code ${processResult.exitCode}.`));
 			console.error(red(processResult.stderr));
+			console.error(bgRed.whiteBright(`Could not run tests. Exit code ${processResult.exitCode}.\nSometimes the logs above contain more information on the root cause.`));
 
 			const failedTests = newState.tests.filter(x => !!x.failure);
 			if (failedTests.length > 0) {
