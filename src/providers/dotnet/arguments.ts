@@ -1,4 +1,6 @@
+import { dirname, join } from "path";
 import { LogSettings } from "../../console";
+import { pruner } from "../../exports";
 
 export function getCallContextArgument() {
 	const attributes = [
@@ -33,6 +35,14 @@ export function getRunSettingArguments(runSettingFilePath: string) {
 	return [
 		"--settings",
 		runSettingFilePath
+	];
+}
+
+export async function getOutputArguments(providerId: string) {
+	const temporaryPath = await pruner.writeToTempFile(join(providerId, "build", ".gitignore"), "**");
+	return [
+		"--output",
+		dirname(temporaryPath)
 	];
 }
 

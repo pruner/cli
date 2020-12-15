@@ -4,67 +4,73 @@
 			"failure": null,
 			"id": 1,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld",
-			"duration": "00:00:00.1567424"
+			"duration": "00:00:00.1069313"
 		},
 		{
 			"failure": null,
 			"id": 2,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld",
-			"duration": "00:00:00.0008141"
+			"duration": "00:00:00.0008100"
 		},
 		{
 			"failure": null,
 			"id": 3,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld",
-			"duration": "00:00:00.0004011"
+			"duration": "00:00:00.0003466"
 		},
 		{
 			"failure": null,
 			"id": 4,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld",
-			"duration": "00:00:00.0002765"
+			"duration": "00:00:00.0001469"
 		},
 		{
 			"failure": null,
 			"id": 5,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld",
-			"duration": "00:00:00.0002253"
+			"duration": "00:00:00.0001191"
 		},
 		{
 			"failure": null,
 			"id": 6,
 			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld",
-			"duration": "00:00:00.0001625"
+			"duration": "00:00:00.0001445"
 		},
 		{
 			"failure": null,
+			"id": 7,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
-			"id": 7
+			"duration": "00:00:00.0023687"
 		},
 		{
 			"failure": null,
+			"id": 8,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
-			"id": 8
+			"duration": "00:00:00.0020229"
 		},
 		{
 			"failure": null,
+			"id": 9,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
-			"id": 9
+			"duration": "00:00:00.0011507"
 		},
 		{
 			"failure": null,
+			"id": 10,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
-			"id": 10
+			"duration": "00:00:00.0001374"
 		},
 		{
 			"failure": null,
+			"id": 11,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
-			"id": 11
+			"duration": "00:00:00.0001083"
 		},
 		{
 			"failure": null,
+			"id": 12,
 			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
-			"id": 12
+			"duration": "00:00:00.0000994"
 		}
 	],
 	"files": [
@@ -132,114 +138,6 @@
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 12,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 13,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 14,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 15,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 16,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 17,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 18,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 19,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 20,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 2,
 			"lineNumber": 22,
 			"testIds": [
 				7,
@@ -247,7 +145,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -259,7 +163,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -271,7 +181,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -283,7 +199,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -295,7 +217,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -307,7 +235,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -319,7 +253,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -331,7 +271,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -343,7 +289,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -355,7 +307,13 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -752,6 +710,114 @@
 				10,
 				11,
 				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 12,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 13,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 14,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 15,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 16,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 17,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 18,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 19,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 20,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
