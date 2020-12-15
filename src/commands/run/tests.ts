@@ -67,30 +67,32 @@ export async function runTestsForProvider(
 			console.error(bgRed.whiteBright(`Could not run tests. Exit code ${processResult.exitCode}.`));
 			console.error(red(processResult.stderr));
 
-			console.error();
-			console.error(bgRed.whiteBright("Failed tests"));
-
 			const failedTests = newState.tests.filter(x => !!x.failure);
-			for (let failedTest of failedTests) {
-				console.error(red(`❌ ${failedTest.name}`));
+			if (failedTests.length > 0) {
+				console.error();
+				console.error(bgRed.whiteBright("Failed tests"));
 
-				const failure = failedTest.failure;
-				failure.message && console.error("   " + yellow(`${failure.message}`));
+				for (let failedTest of failedTests) {
+					console.error(red(`❌ ${failedTest.name}`));
 
-				if (failure.stackTrace) {
-					for (let stackTraceLine of failure.stackTrace)
-						console.error("     " + white(`${stackTraceLine}`));
-				}
+					const failure = failedTest.failure;
+					failure.message && console.error("   " + yellow(`${failure.message}`));
 
-				const lastStdoutMessages = takeRight(failure.stdout || [], 3);
-				if (lastStdoutMessages.length > 0) {
-					console.log();
-					console.error("   " + bgGray.whiteBright(`Latest output`));
+					if (failure.stackTrace) {
+						for (let stackTraceLine of failure.stackTrace)
+							console.error("     " + white(`${stackTraceLine}`));
+					}
 
-					for (let message of lastStdoutMessages)
-						console.error("     " + gray(`${message}`));
+					const lastStdoutMessages = takeRight(failure.stdout || [], 3);
+					if (lastStdoutMessages.length > 0) {
+						console.log();
+						console.error("   " + bgGray.whiteBright(`Latest output`));
 
-					console.log();
+						for (let message of lastStdoutMessages)
+							console.error("     " + gray(`${message}`));
+
+						console.log();
+					}
 				}
 			}
 		}
