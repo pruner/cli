@@ -74,7 +74,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...await getOutputArguments(this.settings.id)
 		];
 		console.debug("execute-settings", this.settings);
-		console.debug("execute-args", args);
+		console.debug("execute-args", args.join(' '));
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
