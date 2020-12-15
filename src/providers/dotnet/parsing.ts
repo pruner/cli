@@ -89,7 +89,6 @@ export function parseTests(
 		.value();
 
 	console.debug("test-results", testResults);
-	console.debug("trx-summary", JSON.stringify(trxSummary));
 
 	return chain(altCoverModules)
 		.flatMap(x => x.TrackedMethods)
