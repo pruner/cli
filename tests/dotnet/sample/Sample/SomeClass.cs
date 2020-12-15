@@ -17,7 +17,7 @@ namespace Sample
         Console.WriteLine("Hello world 6");
         Console.WriteLine("Hello world 7");
         Console.WriteLine("Hello world 8");
-		return 12;
+		return 1;
     } else
       {
         Console.WriteLine("Hello darkness 1");
