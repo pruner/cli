@@ -15,10 +15,22 @@ async function execaPiped(
 	args?: string[],
 	options?: Options
 ) {
-	const result = execa(file, args, options);
+	const result = execa(file, args, {
+		env: {
+			FORCE_COLOR: 'true'
+		},
+		...options
+	});
 
-	const onStdout = (buffer: Buffer) => console.log(gray(buffer.toString()));
-	const onStderr = (buffer: Buffer) => console.error(red(buffer.toString()))
+	function trimTrailingWhitespace(text: string) {
+		if (text.endsWith("\n"))
+			return text.substr(0, text.lastIndexOf("\n"));
+
+		return text;
+	}
+
+	const onStdout = (buffer: Buffer) => console.log(gray(trimTrailingWhitespace(buffer.toString())));
+	const onStderr = (buffer: Buffer) => console.error(red(trimTrailingWhitespace(buffer.toString())));
 	result.stdout.on('data', onStdout);
 	result.stderr.on('data', onStderr);
 

@@ -82,7 +82,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 
 		const result = await con.execaPiped("dotnet", ["test", ...args], {
 			cwd,
-			reject: false,
+			reject: false
 		});
 
 		return result;
