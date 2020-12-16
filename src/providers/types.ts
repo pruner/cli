@@ -49,7 +49,7 @@ export interface Provider<TSettings extends ProviderSettings = ProviderSettings>
 	gatherState(): Promise<ProviderState>;
 }
 
-export type ProviderType = "dotnet";
+export type ProviderType = "dotnet" | "mocha";
 
 export type ProviderClass<TSettings extends ProviderSettings = ProviderSettings> = {
 	providerType: ProviderType;

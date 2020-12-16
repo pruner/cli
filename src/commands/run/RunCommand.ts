@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash';
+import { throttle, uniqBy } from 'lodash';
 import { gray, red, white, yellow } from 'chalk';
 import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
@@ -68,7 +68,7 @@ function watchProvider(provider: Provider) {
 		return await runTestsForProviders([provider]);
 	};
 
-	const onFilesChanged = async (path: string) => {
+	const onFilesChanged = throttle(async (path: string) => {
 		const isFileInGitIgnore = await git.isFileInGitIgnore(path);
 		console.debug("file-changed", path, isFileInGitIgnore);
 
@@ -86,25 +86,25 @@ function watchProvider(provider: Provider) {
 		isRunning = true;
 
 		try {
-			const results = new Array<StateTest>();
-			results.push(...await runTests());
+			await runTests();
 
 			while (hasPending) {
 				console.log(yellow('Changes were detected during the previous test run. A new test run will be started to include the most recent changes.'));
 
 				hasPending = false;
-				results.push(...await runTests());
+				await runTests();
 			}
 
 			console.log();
 			console.log(gray('Waiting for further file changes...'));
 			console.log();
-
-			return uniqBy(results, x => x.id);
 		} finally {
 			isRunning = false;
 		}
-	};
+	}, 1000, {
+		leading: false,
+		trailing: true
+	});
 
 	const paths = provider
 		.getGlobPatterns()

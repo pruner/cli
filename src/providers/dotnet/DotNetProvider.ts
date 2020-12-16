@@ -5,7 +5,7 @@ import { AltCoverRoot } from "./altcover";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
+import { getAltCoverArguments, getBuildArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
@@ -34,12 +34,12 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		return this._settings;
 	}
 
-	constructor(private readonly _settings: DotNetSettings) {
-		console.debug("dotnet-init", _settings);
-	}
-
 	public static get providerType(): ProviderType {
 		return "dotnet";
+	}
+
+	constructor(private readonly _settings: DotNetSettings) {
+		console.debug("dotnet-init", _settings);
 	}
 
 	public static getInitQuestions(): SettingsQuestions<DotNetSettings> {
@@ -71,6 +71,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...getAltCoverArguments(coverageXmlFileName),
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
+			...getBuildArguments(),
 			...await getOutputArguments(this.settings.id)
 		];
 		console.debug("execute-settings", this.settings);

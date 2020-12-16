@@ -76,9 +76,10 @@ export function parseTests(
 
 			const message = first(errorInformation?.Message || [])?.trim();
 
+			const previousDefinition = testDefinitions.find(t => t.id === x.$.testId);
 			return ({
-				...testDefinitions.find(t => t.id === x.$.testId),
-				duration: x.$.duration,
+				duration: x.$.duration || null,
+				...previousDefinition,
 				failure: passed ? null : {
 					stdout: stdout.length > 0 ? stdout : null,
 					message: message || null,
@@ -95,14 +96,17 @@ export function parseTests(
 		.flatMap(x => x.TrackedMethod)
 		.map(x => x?.$)
 		.filter(x => !!x)
-		.map(x => ({
-			failure: null,
-			errorMessage: void 0,
-			stdout: void 0,
-			...testResults.find(t => t.name === sanitizeMethodName(x.name)),
-			name: sanitizeMethodName(x.name),
-			id: +x.uid
-		}))
+		.map(x => {
+			const previousResult = testResults.find(t => t.name === sanitizeMethodName(x.name));
+			return {
+				failure: null,
+				errorMessage: void 0,
+				stdout: void 0,
+				...previousResult,
+				name: sanitizeMethodName(x.name),
+				id: +x.uid
+			};
+		})
 		.value();
 }
 

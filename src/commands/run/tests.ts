@@ -11,6 +11,8 @@ import git from '../../git';
 import pruner from '../../pruner';
 import con from '../../console';
 import { getLineCoverageForGitChangedFile, getNewLineNumberForLineCoverage, hasCoverageOfLineInSurroundingLines } from "./changes";
+import rimraf from "rimraf";
+import minimatch from "minimatch";
 
 export async function runTestsForProviders(providers: Provider[]) {
 	const results = await runInGitStateTransaction(async commitRange =>
@@ -31,6 +33,7 @@ export async function runTestsForProvider(
 	const previousState = await pruner.readState(providerId);
 
 	const testsToRun = await getTestsToRun(
+		provider.getGlobPatterns(),
 		previousState,
 		commitRange);
 	if (!testsToRun.hasChanges) {
@@ -65,7 +68,8 @@ export async function runTestsForProvider(
 			console.error(`${red(`It seems like the .NET SDK is not installed.\n${red(processResult.stderr)}`)}`)
 		} else {
 			console.error(red(processResult.stderr));
-			console.error(bgRed.whiteBright(`Could not run tests. Exit code ${processResult.exitCode}.\nSometimes the logs above contain more information on the root cause.`));
+			console.error(bgRed.whiteBright(`Could not run tests`));
+			console.error(red(`Sometimes the logs above contain more information on the root cause. Exit code was ${processResult.exitCode}.`));
 
 			const failedTests = newState.tests.filter(x => !!x.failure);
 			if (failedTests.length > 0) {
@@ -116,6 +120,8 @@ export async function runTestsForProvider(
  */
 async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) => Promise<T>) {
 	const gitState = await pruner.readGitState();
+	if (!gitState.branch)
+		rimraf.sync(await pruner.getPrunerTempPath());
 
 	const commitRange: CommitRange = {
 		from: gitState.commit,
@@ -129,6 +135,7 @@ async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) =>
 }
 
 export async function getTestsToRun(
+	globPatterns: string[],
 	previousState: ProviderState,
 	commitRange: CommitRange
 ) {
@@ -141,7 +148,10 @@ export async function getTestsToRun(
 	}
 
 	const gitChangedFiles = await git.getChangedFiles(commitRange);
-	if (gitChangedFiles.length === 0) {
+	const relevantGitChangedFiles = gitChangedFiles
+		.filter(f => !!globPatterns
+			.find(p => minimatch(f.filePath, p)));
+	if (relevantGitChangedFiles.length === 0) {
 		return {
 			affected: new Array<StateTest>(),
 			unaffected: new Array<StateTest>(),
@@ -150,7 +160,7 @@ export async function getTestsToRun(
 	}
 
 	const affectedTests = getAffectedTests(
-		gitChangedFiles,
+		relevantGitChangedFiles,
 		previousState);
 
 	const allKnownUnaffectedTests = previousState.tests

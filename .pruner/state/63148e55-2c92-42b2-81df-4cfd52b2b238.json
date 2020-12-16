@@ -2,63 +2,75 @@
 	"tests": [
 		{
 			"failure": null,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld",
-			"id": 1
+			"duration": "00:00:00.0860674",
+			"id": 1,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld",
-			"id": 2
+			"duration": "00:00:00.0003869",
+			"id": 2,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld",
-			"id": 3
+			"duration": "00:00:00.0001653",
+			"id": 3,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld",
-			"id": 4
+			"duration": "00:00:00.0001196",
+			"id": 4,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld",
-			"id": 5
+			"duration": "00:00:00.0000955",
+			"id": 5,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld",
-			"id": 6
+			"duration": "00:00:00.0000775",
+			"id": 6,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
-			"id": 7
+			"duration": "00:00:00.0011525",
+			"id": 7,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
-			"id": 8
+			"duration": "00:00:00.0003584",
+			"id": 8,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
-			"id": 9
+			"duration": "00:00:00.0002448",
+			"id": 9,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
-			"id": 10
+			"duration": "00:00:00.0001314",
+			"id": 10,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
-			"id": 11
+			"duration": "00:00:00.0001536",
+			"id": 11,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness"
 		},
 		{
 			"failure": null,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
-			"id": 12
+			"duration": "00:00:00.0001165",
+			"id": 12,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness"
 		}
 	],
 	"files": [

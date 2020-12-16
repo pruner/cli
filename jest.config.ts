@@ -4,14 +4,14 @@
  */
 
 export default {
-  bail: 1,
-  maxConcurrency: 1,
-  testEnvironment: 'node',
-  coverageProvider: "babel",
-  testPathIgnorePatterns: [
-    "\\\\node_modules\\\\",
-    "\\\\dist\\\\"
-  ],
-  verbose: false,
-  silent: false
+	bail: 1,
+	maxConcurrency: 1,
+	testEnvironment: 'node',
+	coverageProvider: "babel",
+	testPathIgnorePatterns: [
+		"\\\\node_modules\\\\",
+		"\\\\dist\\\\"
+	],
+	verbose: false,
+	silent: false
 };
