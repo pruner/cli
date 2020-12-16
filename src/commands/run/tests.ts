@@ -62,8 +62,6 @@ export async function runTestsForProvider(
 	console.debug('new-state', newState);
 	console.debug('merged-state', newState);
 
-	await pruner.persistState(providerId, mergedState);
-
 	if (processResult.exitCode !== 0) {
 		if (processResult.exitCode === undefined) {
 			console.error(`${red(`It seems like the .NET SDK is not installed.\n${red(processResult.stderr)}`)}`)
@@ -102,6 +100,7 @@ export async function runTestsForProvider(
 			}
 		}
 	} else {
+		await pruner.persistState(providerId, mergedState);
 		console.log(bgGreen.whiteBright('✔ Tests ran successfully!'));
 	}
 
