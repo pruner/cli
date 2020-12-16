@@ -31,12 +31,13 @@ export async function runTestsForProvider(
 	const providerId = provider.settings.id;
 
 	const previousState = await pruner.readState(providerId);
+	const hadFailedTestsBefore = !!previousState?.tests?.find(x => !!x.failure);
 
 	const testsToRun = await getTestsToRun(
 		provider.getGlobPatterns(),
 		previousState,
 		commitRange);
-	if (!testsToRun.hasChanges) {
+	if (!testsToRun.hasChanges && !hadFailedTestsBefore) {
 		console.log(gray("No GIT changes were detected since the last test run, so there are no affected tests."));
 		return [];
 	}
