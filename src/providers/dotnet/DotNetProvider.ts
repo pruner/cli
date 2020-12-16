@@ -5,7 +5,7 @@ import { AltCoverRoot } from "./altcover";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getBuildArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
+import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
@@ -71,7 +71,6 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...getAltCoverArguments(coverageXmlFileName),
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
-			...getBuildArguments(),
 			...await getOutputArguments(this.settings.id)
 		];
 		console.debug("execute-settings", this.settings);

@@ -38,10 +38,6 @@ export function getRunSettingArguments(runSettingFilePath: string) {
 	];
 }
 
-export function getBuildArguments() {
-	return ["--no-restore"];
-}
-
 export async function getOutputArguments(providerId: string) {
 	const temporaryPath = await pruner.writeToTempFile(join(providerId, "build", ".gitignore"), "**");
 	return [
