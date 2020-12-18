@@ -2,7 +2,7 @@
 The Pruner CLI only runs the tests that are affected by your pending GIT changes. 
 In addition, it also has a Visual Studio Code extension that highlights coverage on the fly.
 
-[![Watch a demo-video](/assets/Pruner.gif)](/assets/Pruner.webm)
+[![Watch a demo-video](/assets/Pruner.gif)](https://github.com/pruner/cli/blob/main/assets/Pruner.webm?raw=true)
 
 # Optional: Get the Visual Studio Code extension
 https://marketplace.visualstudio.com/items?itemName=Pruner.vscode
