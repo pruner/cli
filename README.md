@@ -1,5 +1,8 @@
 # What is this?
-The Pruner CLI is a wrapper around your default way of running tests, to only run the tests that have been affected by your GIT pending changes, to significantly boost performance.
+The Pruner CLI only runs the tests that are affected by your pending GIT changes. 
+In addition, it also has a Visual Studio Code extension that highlights coverage on the fly.
+
+[![Watch a demo-video](/assets/Pruner.gif)](/assets/Pruner.webm)
 
 # Optional: Get the Visual Studio Code extension
 https://marketplace.visualstudio.com/items?itemName=Pruner.vscode
