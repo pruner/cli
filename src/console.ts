@@ -15,12 +15,7 @@ async function execaPiped(
 	args?: string[],
 	options?: Options
 ) {
-	const result = execa(file, args, {
-		env: {
-			FORCE_COLOR: 'true'
-		},
-		...options
-	});
+	const result = execa(file, args, options);
 
 	function trimTrailingWhitespace(text: string) {
 		if (text.endsWith("\n"))

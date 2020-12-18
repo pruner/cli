@@ -1,9 +1,11 @@
 import DotNetProvider from "./dotnet/DotNetProvider";
 import pruner from '../pruner';
 import { ProviderClass } from "./types";
+import MochaProvider from "./javascript/mocha/MochaProvider";
 
 export const allProviderClasses: ProviderClass[] = [
-	DotNetProvider
+	DotNetProvider,
+	MochaProvider
 ];
 
 export async function createProvidersFromProvider(provider: string) {
