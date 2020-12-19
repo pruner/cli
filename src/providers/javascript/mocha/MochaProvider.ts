@@ -45,11 +45,17 @@ export default class MochaProvider implements Provider<MochaSettings> {
 	public async executeTestProcess(
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
-		const affectedFilter = this.getTestFilterArgument(tests.affected, "|");
+		const affectedFilter = tests.affected
+			.map(x => `(?:${regexEscape(x.name)})`)
+			.join("|");
 
-		// const filterArgument = this.combineFilterArguments(
-		// 	[affectedFilter],
-		// 	"|");
+		const unknownFilter = tests.unaffected
+			.map(x => `(?:^(?!${regexEscape(x.name)}$).*)`)
+			.join("");
+
+		const filterArgument = [affectedFilter, unknownFilter]
+			.map(x => `(${x})`)
+			.join("|");
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
@@ -57,18 +63,10 @@ export default class MochaProvider implements Provider<MochaSettings> {
 
 		console.log("filter", affectedFilter);
 
-		return await con.execaPiped("nyc", ["--reporter", "none", "mocha", "--reporter", compiledMochaReporterFilePath, "--grep", affectedFilter], {
+		return await con.execaPiped("nyc", ["--reporter", "none", "mocha", "--reporter", compiledMochaReporterFilePath, "--grep", filterArgument], {
 			cwd,
 			reject: false
 		});
-	}
-
-	private getTestFilterArgument(
-		tests: StateTest[],
-		join: string) {
-		return tests
-			.map(x => `(?:${regexEscape(x.name)})`)
-			.join(join);
 	}
 
 	public async gatherState(): Promise<ProviderState> {
