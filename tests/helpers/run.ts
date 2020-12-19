@@ -1,4 +1,4 @@
-import { basename, dirname, join } from 'path';
+import { basename, dirname, extname, join } from 'path';
 import { handler } from '../../src/commands/run/RunCommand';
 import _ from 'lodash';
 import { copy, copyFile, existsSync } from 'fs-extra';
@@ -77,7 +77,8 @@ export function prepareRunTest(
 		const fromPath = join(currentDirectory, filePath);
 
 		const fileName = basename(filePath);
-		const toPath = join(currentDirectory, "temp", dirname(filePath), `${fileName.substr(0, fileName.indexOf("."))}.cs`);
+		const extension = extname(filePath);
+		const toPath = join(currentDirectory, "temp", dirname(filePath), `${fileName.substr(0, fileName.indexOf("."))}${extension}`);
 
 		await replaceCodeFiles(fromPath, toPath);
 	}
