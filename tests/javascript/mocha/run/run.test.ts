@@ -45,19 +45,3 @@ test('run - change condition - run - check coverage', async () => {
 		...context.failedLineRange(33)
 	]);
 });
-
-// test('run - change condition - run - check coverage', async () => {
-// 	const testRun1 = await context.runHandler();
-// 	expect(testRun1.length).toBe(12);
-
-// 	await context.overwriteCode("Sample/SomeClass.condition-change.cs");
-// 	const testRun2 = await context.runHandler();
-// 	expect(testRun2.length).toBe(12);
-
-// 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-// 	expect(coverage).toEqual([
-// 		...context.failedLineRange(10, 11),
-// 		...context.failedLineRange(22, 31),
-// 		...context.failedLineRange(33)
-// 	]);
-// });
