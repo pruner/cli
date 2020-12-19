@@ -1,64 +1,76 @@
 {
 	"tests": [
 		{
-			"passed": true,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld",
-			"id": 1
+			"failure": null,
+			"duration": "00:00:00.1176517",
+			"id": 1,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld",
-			"id": 2
+			"failure": null,
+			"duration": "00:00:00.0004141",
+			"id": 2,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld",
-			"id": 3
+			"failure": null,
+			"duration": "00:00:00.0001667",
+			"id": 3,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld",
-			"id": 4
+			"failure": null,
+			"duration": "00:00:00.0001201",
+			"id": 4,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld",
-			"id": 5
+			"failure": null,
+			"duration": "00:00:00.0001051",
+			"id": 5,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld",
-			"id": 6
+			"failure": null,
+			"duration": "00:00:00.0000834",
+			"id": 6,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
-			"id": 7
+			"failure": null,
+			"duration": "00:00:00.0008683",
+			"id": 7,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
-			"id": 8
+			"failure": null,
+			"duration": "00:00:00.0004097",
+			"id": 8,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
-			"id": 9
+			"failure": null,
+			"duration": "00:00:00.0002072",
+			"id": 9,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
-			"id": 10
+			"failure": null,
+			"duration": "00:00:00.0002031",
+			"id": 10,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
-			"id": 11
+			"failure": null,
+			"duration": "00:00:00.0002960",
+			"id": 11,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness"
 		},
 		{
-			"passed": true,
-			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
-			"id": 12
+			"failure": null,
+			"duration": "00:00:00.0001637",
+			"id": 12,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness"
 		}
 	],
 	"files": [
@@ -79,11 +91,11 @@
 			"path": "tests/dotnet/sample/Sample/SomeOtherClass.cs"
 		},
 		{
-			"id": 9,
+			"id": 6,
 			"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs"
 		},
 		{
-			"id": 10,
+			"id": 7,
 			"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs"
 		}
 	],
@@ -126,164 +138,164 @@
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 12,
+			"lineNumber": 22,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 13,
+			"lineNumber": 23,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 14,
+			"lineNumber": 24,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 15,
+			"lineNumber": 26,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 16,
+			"lineNumber": 27,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 17,
+			"lineNumber": 28,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 18,
+			"lineNumber": 29,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 19,
+			"lineNumber": 30,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
 			"fileId": 2,
-			"lineNumber": 20,
+			"lineNumber": 31,
 			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-				12
+				12,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
 			]
 		},
 		{
@@ -305,133 +317,91 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 12,
 			"testIds": [
 				1
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 13,
 			"testIds": [
 				1
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 14,
-			"testIds": [
-				1
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 18,
 			"testIds": [
 				2
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 19,
 			"testIds": [
 				2
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 20,
-			"testIds": [
-				2
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 24,
 			"testIds": [
 				3
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 25,
 			"testIds": [
 				3
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 26,
-			"testIds": [
-				3
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 30,
 			"testIds": [
 				4
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 31,
 			"testIds": [
 				4
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 32,
-			"testIds": [
-				4
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 36,
 			"testIds": [
 				5
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 37,
 			"testIds": [
 				5
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 38,
-			"testIds": [
-				5
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 42,
 			"testIds": [
 				6
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 43,
 			"testIds": [
 				6
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 44,
-			"testIds": [
-				6
-			]
-		},
-		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 48,
 			"testIds": [
 				1,
@@ -443,7 +413,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 49,
 			"testIds": [
 				1,
@@ -455,7 +425,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 50,
 			"testIds": [
 				1,
@@ -467,7 +437,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 51,
 			"testIds": [
 				1,
@@ -479,7 +449,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 52,
 			"testIds": [
 				1,
@@ -491,7 +461,7 @@
 			]
 		},
 		{
-			"fileId": 9,
+			"fileId": 6,
 			"lineNumber": 53,
 			"testIds": [
 				1,
@@ -503,115 +473,133 @@
 			]
 		},
 		{
-			"fileId": 9,
-			"lineNumber": 54,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 9,
-			"lineNumber": 55,
-			"testIds": [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6
-			]
-		},
-		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 11,
 			"testIds": [
 				7
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 12,
 			"testIds": [
 				7
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
+			"lineNumber": 13,
+			"testIds": [
+				7
+			]
+		},
+		{
+			"fileId": 7,
 			"lineNumber": 17,
 			"testIds": [
 				8
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 18,
 			"testIds": [
 				8
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
+			"lineNumber": 19,
+			"testIds": [
+				8
+			]
+		},
+		{
+			"fileId": 7,
 			"lineNumber": 23,
 			"testIds": [
 				9
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 24,
 			"testIds": [
 				9
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
+			"lineNumber": 25,
+			"testIds": [
+				9
+			]
+		},
+		{
+			"fileId": 7,
 			"lineNumber": 29,
 			"testIds": [
 				10
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 30,
 			"testIds": [
 				10
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
+			"lineNumber": 31,
+			"testIds": [
+				10
+			]
+		},
+		{
+			"fileId": 7,
 			"lineNumber": 35,
 			"testIds": [
 				11
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 36,
 			"testIds": [
 				11
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
+			"lineNumber": 37,
+			"testIds": [
+				11
+			]
+		},
+		{
+			"fileId": 7,
 			"lineNumber": 41,
 			"testIds": [
 				12
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 42,
 			"testIds": [
 				12
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
+			"lineNumber": 43,
+			"testIds": [
+				12
+			]
+		},
+		{
+			"fileId": 7,
 			"lineNumber": 48,
 			"testIds": [
 				7,
@@ -623,7 +611,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 49,
 			"testIds": [
 				7,
@@ -635,7 +623,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 50,
 			"testIds": [
 				7,
@@ -647,7 +635,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 51,
 			"testIds": [
 				7,
@@ -659,7 +647,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 52,
 			"testIds": [
 				7,
@@ -671,7 +659,7 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 53,
 			"testIds": [
 				7,
@@ -683,169 +671,7 @@
 			]
 		},
 		{
-			"fileId": 2,
-			"lineNumber": 22,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 23,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 24,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 25,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 26,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 27,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 28,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 29,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 30,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 2,
-			"lineNumber": 31,
-			"testIds": [
-				7,
-				8,
-				9,
-				10,
-				11,
-				12
-			]
-		},
-		{
-			"fileId": 10,
-			"lineNumber": 13,
-			"testIds": [
-				7
-			]
-		},
-		{
-			"fileId": 10,
-			"lineNumber": 19,
-			"testIds": [
-				8
-			]
-		},
-		{
-			"fileId": 10,
-			"lineNumber": 25,
-			"testIds": [
-				9
-			]
-		},
-		{
-			"fileId": 10,
-			"lineNumber": 31,
-			"testIds": [
-				10
-			]
-		},
-		{
-			"fileId": 10,
-			"lineNumber": 37,
-			"testIds": [
-				11
-			]
-		},
-		{
-			"fileId": 10,
-			"lineNumber": 43,
-			"testIds": [
-				12
-			]
-		},
-		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 54,
 			"testIds": [
 				7,
@@ -857,9 +683,177 @@
 			]
 		},
 		{
-			"fileId": 10,
+			"fileId": 7,
 			"lineNumber": 55,
 			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 12,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 13,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 14,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 16,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 14,
+			"testIds": [
+				1
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 20,
+			"testIds": [
+				2
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 26,
+			"testIds": [
+				3
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 32,
+			"testIds": [
+				4
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 38,
+			"testIds": [
+				5
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 44,
+			"testIds": [
+				6
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 54,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 6,
+			"lineNumber": 55,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 32,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 34,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 35,
+			"testIds": [
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		},
+		{
+			"fileId": 2,
+			"lineNumber": 37,
+			"testIds": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
 				7,
 				8,
 				9,

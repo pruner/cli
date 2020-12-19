@@ -3,12 +3,12 @@ import { DotNetSettings } from "./DotNetProvider";
 
 export function getFilter(tests: TestsByAffectedState, settings: DotNetSettings) {
 	const unknownFilter = getTestFilterArgument(tests.unaffected, {
-		compare: "!=",
+		compare: "!~",
 		join: "&"
 	});
 
 	const affectedFilter = getTestFilterArgument(tests.affected, {
-		compare: "=",
+		compare: "~",
 		join: "|"
 	});
 

@@ -1,18 +1,18 @@
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
 import io from "../../io";
-import { ModuleModule, AltCoverRoot } from "./altcover";
-import { chain, range } from "lodash";
+import { AltCoverRoot } from "./altcover";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getLoggerArguments, getRunSettingArguments } from "./arguments";
+import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
 import { join, resolve } from "path";
 import { LogSettings } from "../../console";
+import { parseFiles, parseLineCoverage, parseModules, parseTests } from "./parsing";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -34,12 +34,12 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		return this._settings;
 	}
 
-	constructor(private readonly _settings: DotNetSettings) {
-		console.debug("dotnet-init", _settings);
-	}
-
 	public static get providerType(): ProviderType {
 		return "dotnet";
+	}
+
+	constructor(private readonly _settings: DotNetSettings) {
+		console.debug("dotnet-init", _settings);
 	}
 
 	public static getInitQuestions(): SettingsQuestions<DotNetSettings> {
@@ -69,25 +69,20 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 		const args = [
 			...getRunSettingArguments(runSettingsFilePath),
 			...getAltCoverArguments(coverageXmlFileName),
-			...getLoggerArguments(summaryFileName)
+			...getLoggerArguments(summaryFileName),
+			...getVerbosityArguments(),
+			...await getOutputArguments(this.settings.id)
 		];
 		console.debug("execute-settings", this.settings);
-		console.debug("execute-args", args);
+		console.debug("execute-args", args.join(' '));
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
 			this.settings.workingDirectory));
-		const cleanResult = await con.execaPiped("dotnet", ["clean"], {
-			cwd,
-			reject: false
-		});
-
-		if (cleanResult.exitCode !== 0)
-			return cleanResult;
 
 		const result = await con.execaPiped("dotnet", ["test", ...args], {
 			cwd,
-			reject: false,
+			reject: false
 		});
 
 		return result;
@@ -102,12 +97,12 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 
 		const summaryFileContents: TrxRoot[] = await this.globContentsFromXmlToJson(`**/${summaryFileName}`);
 
-		const modules = this.parseModules(altCoverXmlAsJson);
+		const modules = parseModules(altCoverXmlAsJson);
 
 		const projectRootDirectory = await git.getGitTopDirectory();
-		const files = this.parseFiles(modules, projectRootDirectory);
-		const tests = this.parseTests(modules, summaryFileContents);
-		const coverage = this.parseLineCoverage(modules);
+		const files = parseFiles(modules, projectRootDirectory);
+		const tests = parseTests(modules, summaryFileContents);
+		const coverage = parseLineCoverage(modules);
 
 		return {
 			tests: tests,
@@ -126,116 +121,5 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			coverageFileContents.map((file) => parseStringPromise(file, {
 				async: true,
 			})));
-	}
-
-	private parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
-		return chain(altCoverXmlAsJson)
-			.map((x) => x.CoverageSession)
-			.flatMap((x) => x.Modules)
-			.flatMap((x) => x.Module)
-			.filter((x) => !!x)
-			.value();
-	}
-
-	private parseFiles(modules: ModuleModule[], projectRootDirectory: string) {
-		return chain(modules)
-			.flatMap((x) => x.Files)
-			.flatMap((x) => x.File)
-			.map((x) => x?.$)
-			.filter((x) => !!x)
-			.map((x) => ({
-				id: +x.uid,
-				path: io.normalizePathSeparators(x.fullPath),
-			}))
-			.filter((x) => x.path.startsWith(projectRootDirectory))
-			.map((x) => ({
-				...x,
-				path: this.sanitizeStatePath(projectRootDirectory, x.path),
-			}))
-			.value();
-	}
-
-	private parseTests(
-		altCoverModules: ModuleModule[],
-		trxSummary: TrxRoot[]
-	) {
-		const testRuns = trxSummary.map(x => x.TestRun);
-		const testDefinitions = chain(testRuns)
-			.flatMap(x => x.TestDefinitions)
-			.flatMap(x => x?.UnitTest)
-			.filter(x => !!x)
-			.flatMap(x => x
-				.TestMethod
-				.map(t => ({
-					id: x.$.id,
-					name: `${t.$.className}.${t.$.name}`
-				})))
-			.value();
-		const testResults = chain(testRuns)
-			.flatMap(x => x.Results)
-			.flatMap(x => x?.UnitTestResult)
-			.filter(x => !!x)
-			.map(x => x.$)
-			.map(x => ({
-				...testDefinitions.find(t => t.id === x.testId),
-				passed: x.outcome === "Passed",
-				duration: x.duration
-			}))
-			.value();
-
-		console.debug("test-results", testResults);
-
-		return chain(altCoverModules)
-			.flatMap(x => x.TrackedMethods)
-			.flatMap(x => x.TrackedMethod)
-			.map(x => x?.$)
-			.filter(x => !!x)
-			.map(x => ({
-				passed: true,
-				...testResults.find(t => t.name === this.sanitizeMethodName(x.name)),
-				name: this.sanitizeMethodName(x.name),
-				id: +x.uid
-			}))
-			.value();
-	}
-
-	private parseLineCoverage(modules: ModuleModule[]) {
-		return chain(modules)
-			.flatMap((x) => x.Classes)
-			.flatMap((x) => x.Class)
-			.filter((x) => !!x)
-			.flatMap((x) => x.Methods)
-			.flatMap((x) => x.Method)
-			.filter((x) => !!x)
-			.flatMap((x) => x.SequencePoints)
-			.flatMap((x) => x.SequencePoint)
-			.filter((x) => !!x)
-			.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => ({
-				testIds: chain(x.TrackedMethodRefs || [])
-					.flatMap((m) => m.TrackedMethodRef)
-					.map((m) => m?.$)
-					.filter((m) => !!m)
-					.map((m) => +m.uid)
-					.value(),
-				fileId: +x?.$.fileid,
-				lineNumber: l,
-			})))
-			.filter((x) =>
-				!!x.fileId &&
-				x.testIds.length > 0)
-			.value();
-	}
-
-	private sanitizeStatePath(projectRootDirectory: string, path: string): string {
-		path = path.substring(projectRootDirectory.length + 1);
-		return path;
-	}
-
-	private sanitizeMethodName(name: string) {
-		const typeSplit = name.split(" ");
-
-		const namespaceAndName = typeSplit[1].replace(/::/g, ".");
-
-		return namespaceAndName.substr(0, namespaceAndName.indexOf("("));
 	}
 }

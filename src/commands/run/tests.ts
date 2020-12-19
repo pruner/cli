@@ -1,17 +1,18 @@
-import { flatMap, chain } from "lodash";
+import { flatMap, chain, takeRight } from "lodash";
 import { CommitRange, FileChanges } from "../../git";
 import { ProviderState, StateTest } from "../../providers/types";
 import { getTestFromStateById } from "./state";
 
-import { red, yellow, green, white } from "chalk";
+import { red, gray, bgGreen, bgRed, white, bgGray, yellow } from "chalk";
 import { Provider } from "../../providers/types";
-import { generateLcovFile } from "./lcov";
 import { mergeStates } from "./state";
 
 import git from '../../git';
 import pruner from '../../pruner';
 import con from '../../console';
 import { getLineCoverageForGitChangedFile, getNewLineNumberForLineCoverage, hasCoverageOfLineInSurroundingLines } from "./changes";
+import rimraf from "rimraf";
+import minimatch from "minimatch";
 
 export async function runTestsForProviders(providers: Provider[]) {
 	const results = await runInGitStateTransaction(async commitRange =>
@@ -28,30 +29,24 @@ export async function runTestsForProvider(
 	commitRange: CommitRange
 ) {
 	const providerId = provider.settings.id;
-	await generateLcovFile(providerId);
 
 	const previousState = await pruner.readState(providerId);
+	const hadFailedTestsBefore = !!previousState?.tests?.find(x => !!x.failure);
 
 	const testsToRun = await getTestsToRun(
+		provider.getGlobPatterns(),
 		previousState,
 		commitRange);
+	if (!testsToRun.hasChanges && !hadFailedTestsBefore) {
+		console.log(gray("No GIT changes were detected since the last test run, so there are no affected tests."));
+		return [];
+	}
 
 	const processResult = await con.useSpinner(
 		'Running tests',
 		async () => await provider.executeTestProcess(testsToRun));
 
-	if (processResult.exitCode !== 0) {
-		if (processResult.exitCode === undefined) {
-			console.error(`${red(`It seems like the .NET SDK is not installed.\n${red(processResult.stderr)}`)}`)
-		} else {
-			console.error(`${red(`Could not run tests. Exit code ${processResult.exitCode}.`)}\n${yellow(processResult.stdout)}\n${red(processResult.stderr)}`);
-		}
-	} else {
-		console.log(green('Tests ran successfully:'));
-		console.log(white(processResult.stdout));
-	}
-
-	const state = await provider.gatherState() || {
+	const newState = await provider.gatherState() || {
 		coverage: [],
 		files: [],
 		tests: []
@@ -60,20 +55,60 @@ export async function runTestsForProvider(
 	const mergedState = await mergeStates(
 		testsToRun.affected,
 		previousState,
-		state
+		newState
 	);
 
 	console.debug('previous-state', previousState);
-	console.debug('new-state', state);
-	console.debug('merged-state', state);
+	console.debug('new-state', newState);
+	console.debug('merged-state', newState);
 
 	await pruner.persistState(providerId, mergedState);
-	await generateLcovFile(providerId, mergedState);
 
-	const actualTestRuns = chain(state.coverage)
+	if (processResult.exitCode !== 0) {
+		if (processResult.exitCode === undefined) {
+			console.error(`${red(`It seems like the .NET SDK is not installed.\n${red(processResult.stderr)}`)}`)
+		} else {
+			console.error(red(processResult.stderr));
+			console.error(bgRed.whiteBright(`Could not run tests`));
+			console.error(red(`Sometimes the logs above contain more information on the root cause. Exit code was ${processResult.exitCode}.`));
+
+			const failedTests = newState.tests.filter(x => !!x.failure);
+			if (failedTests.length > 0) {
+				console.error();
+				console.error(bgRed.whiteBright("Failed tests"));
+
+				for (let failedTest of failedTests) {
+					console.error(red(`❌ ${failedTest.name}`));
+
+					const failure = failedTest.failure;
+					failure.message && console.error("   " + yellow(`${failure.message}`));
+
+					if (failure.stackTrace) {
+						for (let stackTraceLine of failure.stackTrace)
+							console.error("     " + white(`${stackTraceLine}`));
+					}
+
+					const lastStdoutMessages = takeRight(failure.stdout || [], 3);
+					if (lastStdoutMessages.length > 0) {
+						console.log();
+						console.error("   " + bgGray.whiteBright(`Latest output`));
+
+						for (let message of lastStdoutMessages)
+							console.error("     " + gray(`${message}`));
+
+						console.log();
+					}
+				}
+			}
+		}
+	} else {
+		console.log(bgGreen.whiteBright('✔ Tests ran successfully!'));
+	}
+
+	const actualTestRuns = chain(newState.coverage)
 		.flatMap(x => x.testIds)
 		.uniq()
-		.map(x => state
+		.map(x => newState
 			.tests
 			.find(y => y.id === x))
 		.value();
@@ -86,6 +121,8 @@ export async function runTestsForProvider(
  */
 async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) => Promise<T>) {
 	const gitState = await pruner.readGitState();
+	if (!gitState.branch)
+		rimraf.sync(await pruner.getPrunerTempPath());
 
 	const commitRange: CommitRange = {
 		from: gitState.commit,
@@ -99,26 +136,40 @@ async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) =>
 }
 
 export async function getTestsToRun(
+	globPatterns: string[],
 	previousState: ProviderState,
 	commitRange: CommitRange
 ) {
 	if (!previousState) {
 		return {
 			affected: new Array<StateTest>(),
-			unaffected: new Array<StateTest>()
+			unaffected: new Array<StateTest>(),
+			hasChanges: true
 		};
 	}
 
 	const gitChangedFiles = await git.getChangedFiles(commitRange);
+	const relevantGitChangedFiles = gitChangedFiles
+		.filter(f => !!globPatterns
+			.find(p => minimatch(f.filePath, p)));
+	if (relevantGitChangedFiles.length === 0) {
+		return {
+			affected: new Array<StateTest>(),
+			unaffected: new Array<StateTest>(),
+			hasChanges: false
+		};
+	}
+
 	const affectedTests = getAffectedTests(
-		gitChangedFiles,
+		relevantGitChangedFiles,
 		previousState);
 
 	const allKnownUnaffectedTests = previousState.tests
 		.filter(x => !affectedTests.find(y => y.id === x.id));
 
-	const failingTests = previousState.tests.filter(x => !x.passed);
+	const failingTests = previousState.tests.filter(x => !!x.failure);
 	return {
+		hasChanges: true,
 		affected:
 			chain([
 				...affectedTests,

@@ -1,6 +1,5 @@
 import { ExecaReturnValue } from "execa";
 import prompts from "prompts";
-import { allProviderClasses } from "./factories";
 
 export type SettingsQuestions<TSettings> = TSettings extends ProviderSettings & { [key: string]: any; } ?
 	{
@@ -11,8 +10,12 @@ export type SettingsQuestions<TSettings> = TSettings extends ProviderSettings & 
 export type StateTest = {
 	name: string;
 	id: number;
-	passed: boolean;
 	duration: string;
+	failure: {
+		stdout?: string[];
+		message?: string;
+		stackTrace?: string[];
+	}
 };
 
 export type StateLineCoverage = {
@@ -46,7 +49,7 @@ export interface Provider<TSettings extends ProviderSettings = ProviderSettings>
 	gatherState(): Promise<ProviderState>;
 }
 
-export type ProviderType = "dotnet";
+export type ProviderType = "dotnet" | "mocha";
 
 export type ProviderClass<TSettings extends ProviderSettings = ProviderSettings> = {
 	providerType: ProviderType;

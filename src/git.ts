@@ -1,7 +1,10 @@
 import execa from "execa";
 import io from "./io";
-import parseGitDiff, { Line } from "git-diff-parser";
+import parseGitDiff from "git-diff-parser";
+import fs from 'fs';
 import { chain } from "lodash";
+import { basename, dirname, join, sep } from "path";
+import minimatch from "minimatch";
 
 const declarations = {
 	isGitProject,
@@ -11,7 +14,8 @@ const declarations = {
 	getChangedFiles,
 	createStashCommit,
 	getBranchName,
-	hasInitialCommitBeenMade
+	hasInitialCommitBeenMade,
+	isFileInGitIgnore
 };
 
 export type FileChanges = {
@@ -49,6 +53,39 @@ async function getGitVersion() {
 
 async function getBranchName() {
 	return await runGitCommand("rev-parse", "--abbrev-ref", "HEAD");
+}
+
+async function isFileInGitIgnore(path: string) {
+	let currentPath = dirname(path);
+
+	const gitIgnoreLines = new Array<string>();
+	while (true) {
+		const files = await fs.promises.readdir(currentPath);
+		const gitIgnoreFile = files.find(x => basename(x) === ".gitignore");
+		if (!!gitIgnoreFile) {
+			const gitIgnorePath = join(currentPath, gitIgnoreFile);
+			console.debug('is-file-in-gitignore detected', gitIgnorePath);
+
+			const contentsBuffer = await fs.promises.readFile(gitIgnorePath);
+			const contents = contentsBuffer.toString();
+			gitIgnoreLines.push(...contents
+				.replace(/\r/g, "")
+				.split('\n')
+				.map(p => join(
+					currentPath,
+					p))
+				.map(p => p.endsWith(sep) ?
+					p + "**" :
+					p));
+		}
+
+		currentPath = dirname(currentPath);
+		if (currentPath.indexOf(sep) === -1 || currentPath.lastIndexOf(sep) === currentPath.length - 1)
+			break;
+	}
+
+	console.debug('is-file-in-gitignore result', path, gitIgnoreLines);
+	return !!gitIgnoreLines.find(line => minimatch(path, line));
 }
 
 async function getGitTopDirectory() {

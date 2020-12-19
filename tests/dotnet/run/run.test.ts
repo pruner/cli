@@ -4,13 +4,14 @@ import { basename, dirname, join } from 'path';
 import { handler } from '../../../src/commands/run/RunCommand';
 import _ from 'lodash';
 import rimraf from 'rimraf';
-import { copy, copyFile, existsSync, pathExists, readFile, writeFile } from 'fs-extra';
+import { copy, copyFile, existsSync } from 'fs-extra';
 
 import git from '../../../src/git';
 import io from '../../../src/io';
 import pruner from '../../../src/pruner';
 import { gitDiff } from '../../helpers/git';
 import { ProviderState } from '../../../src/providers/types';
+import execa from 'execa';
 
 pruner.getPrunerPath = async () => "tests/dotnet/run/temp/.pruner";
 
@@ -56,7 +57,7 @@ const getCoveredLineNumbersForFile = async (fileName: string) => {
 				.tests
 				.find(t => t.id === testId))
 		}))
-		.map(x => x.tests.find(y => !y.passed) ?
+		.map(x => x.tests.find(y => !!y.failure) ?
 			-x.lineNumber :
 			x.lineNumber)
 		.orderBy(Math.abs)
@@ -103,18 +104,11 @@ const replaceCodeFiles = async (fromPath: string, toPath: string) => {
 const runHandler = async () => {
 	const result = await handler({
 		provider: "dotnet",
-		verbosity: "verbose"
+		verbosity: "normal"
 	});
 
 	const stateJsonFilePath = join(stateDirectory, "tests.json");
 	if (existsSync(stateJsonFilePath)) {
-		await writeFile(
-			stateJsonFilePath,
-			JSON.stringify(
-				JSON.parse(
-					await readFile(stateJsonFilePath) + ""),
-				null,
-				"\t"));
 		await copyFile(
 			stateJsonFilePath,
 			join(stateDirectory, "tests.previous.json"));
@@ -126,8 +120,13 @@ const runHandler = async () => {
 beforeEach(async () => {
 	rimraf.sync(join(currentDirectory, "temp"));
 
+	const sampleOriginDirectoryPath = join(__dirname, "..", "sample");
+	await execa("dotnet", ["clean"], {
+		cwd: sampleOriginDirectoryPath
+	});
+
 	await copy(
-		join(__dirname, "..", "sample"),
+		sampleOriginDirectoryPath,
 		temporaryFolderPath);
 
 	await io.writeToFile(
@@ -136,15 +135,12 @@ beforeEach(async () => {
 			providers: [{
 				"id": "tests",
 				"type": "dotnet",
-				"workingDirectory": "tests/dotnet/run/temp",
-				"environment": {
-					"FOO": "BAR"
-				}
+				"workingDirectory": "tests/dotnet/run/temp"
 			}]
 		}));
 });
 
-test('run -> run -> check coverage', async () => {
+test('run - run - check coverage', async () => {
 	const testRun1 = await runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -159,7 +155,7 @@ test('run -> run -> check coverage', async () => {
 	]);
 });
 
-test('run -> change condition -> run -> check coverage', async () => {
+test('run - change condition - run - check coverage', async () => {
 	const testRun1 = await runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -175,7 +171,7 @@ test('run -> change condition -> run -> check coverage', async () => {
 	]);
 });
 
-test('run -> check coverage', async () => {
+test('run - check coverage', async () => {
 	const testRun = await runHandler();
 	expect(testRun.length).toBe(12);
 
@@ -187,7 +183,7 @@ test('run -> check coverage', async () => {
 	]);
 });
 
-test('run -> change condition -> run -> revert condition -> check coverage', async () => {
+test('run - change condition - run - revert condition - check coverage', async () => {
 	const testRun1 = await runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -207,7 +203,7 @@ test('run -> change condition -> run -> revert condition -> check coverage', asy
 	]);
 });
 
-test('run -> comment out test -> run -> check coverage', async () => {
+test('run - comment out test - run - check coverage', async () => {
 	const testRun1 = await runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -225,23 +221,7 @@ test('run -> comment out test -> run -> check coverage', async () => {
 	]);
 });
 
-test('run -> make change in first if-branch -> run -> check coverage', async () => {
-	const testRun1 = await runHandler();
-	expect(testRun1.length).toBe(12);
-
-	await overwriteCode("Sample/SomeClass.first-branch-change.cs");
-	const testRun2 = await runHandler();
-	expect(testRun2.length).toBe(6);
-
-	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
-	expect(coverage).toEqual([
-		...passedLineRange(10, 20),
-		...passedLineRange(22, 31),
-		...passedLineRange(33)
-	]);
-});
-
-test('run -> make darkness tests fail -> run -> check coverage', async () => {
+test('run - make darkness tests fail - run - check coverage', async () => {
 	const testRun1 = await runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -255,5 +235,21 @@ test('run -> make darkness tests fail -> run -> check coverage', async () => {
 		...passedLineRange(12, 20),
 		...failedLineRange(22, 31),
 		...failedLineRange(33)
+	]);
+});
+
+test('run - make change in first if-branch - run - check coverage', async () => {
+	const testRun1 = await runHandler();
+	expect(testRun1.length).toBe(12);
+
+	await overwriteCode("Sample/SomeClass.first-branch-change.cs");
+	const testRun2 = await runHandler();
+	expect(testRun2.length).toBe(6);
+
+	const coverage = await getCoveredLineNumbersForFile("Sample/SomeClass.cs");
+	expect(coverage).toEqual([
+		...passedLineRange(10, 20),
+		...passedLineRange(22, 31),
+		...passedLineRange(33)
 	]);
 });
