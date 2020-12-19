@@ -7,6 +7,7 @@ import { prepareRunTest } from '../../helpers/run';
 
 const context = prepareRunTest(
 	"dotnet",
+	"dotnet",
 	async (sampleOriginDirectoryPath: string) => {
 		await execa("dotnet", ["clean"], {
 			cwd: sampleOriginDirectoryPath

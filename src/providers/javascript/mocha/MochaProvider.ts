@@ -6,7 +6,7 @@ import { Provider, ProviderSettings, ProviderState, ProviderType, SettingsQuesti
 
 export type MochaSettings = ProviderSettings;
 
-export const compiledMochaReporterFilePath = resolve(join(__dirname, "..", "..", "..", "dist", "providers", "javascript", "mocha", "reporter.js"));
+export const compiledMochaReporterFilePath = resolve(join(__dirname, "..", "..", "..", "..", "dist", "providers", "javascript", "mocha", "reporter.js"));
 export default class MochaProvider implements Provider<MochaSettings> {
 	public get settings() {
 		return this._settings;
@@ -42,6 +42,8 @@ export default class MochaProvider implements Provider<MochaSettings> {
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
 			this.settings.workingDirectory));
+
+		console.log("execute-test-process", cwd);
 
 		return await con.execaPiped("nyc", ["--reporter", "none", `mocha --reporter ${compiledMochaReporterFilePath}`], {
 			cwd,

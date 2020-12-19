@@ -12,14 +12,15 @@ import rimraf from 'rimraf';
 
 export function prepareRunTest(
 	providerType: ProviderType,
+	directory: string,
 	onBeforeEach?: (sampleOriginDirectoryPath: string) => Promise<void>
 ) {
-	pruner.getPrunerPath = async () => `tests/${providerType}/run/temp/.pruner`;
+	pruner.getPrunerPath = async () => `tests/${directory}/run/temp/.pruner`;
 
 	let mockCurrentDiff = "";
 	git.getCurrentDiffText = async () => mockCurrentDiff;
 
-	const currentDirectory = join("tests", providerType, "run");
+	const currentDirectory = join("tests", directory, "run");
 	const stateDirectory = join(currentDirectory, "temp", ".pruner", "state");
 	const temporaryFolderPath = join(currentDirectory, "temp");
 
@@ -66,7 +67,7 @@ export function prepareRunTest(
 	}
 
 	const revertCode = async (fileName: string) => {
-		const fromPath = join("tests", providerType, "sample", fileName);
+		const fromPath = join("tests", directory, "sample", fileName);
 		const toPath = join(currentDirectory, "temp", fileName);
 
 		await replaceCodeFiles(fromPath, toPath);
@@ -144,7 +145,7 @@ export function prepareRunTest(
 				providers: [{
 					"id": "tests",
 					"type": providerType,
-					"workingDirectory": `tests/${providerType}/run/temp`
+					"workingDirectory": `tests/${directory}/run/temp`
 				}]
 			}));
 	});
