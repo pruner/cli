@@ -1,13 +1,13 @@
 import { parseStringPromise } from "xml2js";
 import execa from "execa";
 import io from "../../io";
-import { AltCoverRoot } from "./altcover";
+import { AltCoverRoot } from "./altcover.types";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
 import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
-import { TrxRoot } from "./trx";
+import { TrxRoot } from "./trx.types";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
 import { join, resolve } from "path";

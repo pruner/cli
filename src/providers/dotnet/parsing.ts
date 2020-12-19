@@ -1,6 +1,6 @@
 import { chain, first, flatMap, range } from "lodash";
-import { AltCoverRoot, ModuleModule } from "./altcover";
-import { TrxRoot } from "./trx";
+import { AltCoverRoot, ModuleModule } from "./altcover.types";
+import { TrxRoot } from "./trx.types";
 import io from "../../io";
 
 export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {

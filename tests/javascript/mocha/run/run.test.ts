@@ -1,6 +1,6 @@
 jest.setTimeout(1000 * 60 * 5);
 
-import { prepareRunTest } from '../../helpers/run';
+import { prepareRunTest } from '../../../helpers/run';
 
 const context = prepareRunTest("mocha");
 
