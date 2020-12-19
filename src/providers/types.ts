@@ -24,12 +24,14 @@ export type StateLineCoverage = {
 	testIds: number[];
 };
 
+export type StateFile = {
+	id: number;
+	path: string;
+}
+
 export type ProviderState = {
 	tests: StateTest[];
-	files: {
-		id: number;
-		path: string;
-	}[];
+	files: StateFile[];
 	coverage: StateLineCoverage[];
 };
 

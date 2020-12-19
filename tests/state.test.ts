@@ -1,4 +1,4 @@
-import { merge, mergeStates } from "../../../src/commands/run/state";
+import { merge } from "../src/commands/run/state";
 
 test("merge identical identifiers", () => {
 	const oldObject = {

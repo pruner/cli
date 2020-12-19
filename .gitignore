@@ -3,3 +3,4 @@ node_modules/
 **/*.tmp.pruner
 .pruner/state.json
 check
+.nyc_output/
