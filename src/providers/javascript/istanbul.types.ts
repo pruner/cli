@@ -60,7 +60,7 @@ export interface BranchCoverage {
 }
 
 export interface BranchMaps {
-	[key: string]: {
+	[id: string]: {
 		loc: StatementMap;
 		type: string;
 		locations: StatementMap[];
