@@ -38,7 +38,7 @@ module.exports = exports = class MochaReporter extends BaseReporter {
 		});
 
 		runner.on(constants.EVENT_RUN_END, async function () {
-			await pruner.writeToTempFile("mocha.json", JSON.stringify(coveragePerTest));
+			await pruner.writeToTempFile("mocha.json", JSON.stringify(coveragePerTest, null, "\t"));
 		});
 	}
 }

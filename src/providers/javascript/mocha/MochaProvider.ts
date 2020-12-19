@@ -46,16 +46,14 @@ export default class MochaProvider implements Provider<MochaSettings> {
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
 		const affectedFilter = tests.affected
-			.map(x => `(?:${regexEscape(x.name)})`)
+			.map(x => `(?:^${regexEscape(x.name)}$)`)
 			.join("|");
 
 		const unknownFilter = tests.unaffected
 			.map(x => `(?:^(?!${regexEscape(x.name)}$).*)`)
 			.join("");
 
-		const filterArgument = [affectedFilter, unknownFilter]
-			.map(x => `(${x})`)
-			.join("|");
+		const filterArgument = [affectedFilter, unknownFilter].join("|");
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
