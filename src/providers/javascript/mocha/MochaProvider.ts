@@ -61,6 +61,12 @@ export default class MochaProvider implements Provider<MochaSettings> {
 
 		console.log("filter", affectedFilter);
 
+		//TODO: instead of this, use the Mocha API
+		//that way, we can reference the required reporters
+		//new Mocha(opts)
+
+		// const mochaLocation = join(cwd, "node_modules", "mocha");
+
 		return await con.execaPiped("nyc", ["--reporter", "none", "mocha", "--reporter", compiledMochaReporterFilePath, "--grep", filterArgument], {
 			cwd,
 			reject: false
@@ -113,10 +119,7 @@ export default class MochaProvider implements Provider<MochaSettings> {
 						typeof statementCoverage[x] === "number" &&
 						statementCoverage[x] > 0)
 					.map(x => statementMap[x])
-					.flatMap(x => [
-						x.start.line - 1,
-						x.end.line - 1
-					])
+					.flatMap(x => x.start.line)
 					.uniq()
 					.value();
 				if (coveredLineNumbers.length === 0)
