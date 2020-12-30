@@ -87,7 +87,7 @@
 		"prompts": "^2.4.0",
 		"regex-escape": "^3.4.10",
 		"rimraf": "^3.0.2",
-		"uuid": "^8.3.1",
+		"uuid": "^8.3.2",
 		"xml-escape": "^1.1.0",
 		"xml2js": "^0.4.23",
 		"yargs": "^16.1.1"
