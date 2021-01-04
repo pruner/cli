@@ -1,4 +1,4 @@
-import { chain, first, flatMap, range } from "lodash";
+import { chain, first, range } from "lodash";
 import { AltCoverRoot, ModuleModule } from "./altcover.types";
 import { TrxRoot } from "./trx.types";
 import io from "../../io";
@@ -78,7 +78,7 @@ export function parseTests(
 
 			const previousDefinition = testDefinitions.find(t => t.id === x.$.testId);
 			return ({
-				duration: x.$.duration || null,
+				duration: parseDuration() || null,
 				...previousDefinition,
 				failure: passed ? null : {
 					stdout: stdout.length > 0 ? stdout : null,
@@ -108,6 +108,10 @@ export function parseTests(
 			};
 		})
 		.value();
+}
+
+function parseDuration() {
+	return -1;
 }
 
 export function parseLineCoverage(modules: ModuleModule[]) {

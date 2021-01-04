@@ -4,19 +4,19 @@ import { prepareRunTest } from '../../../helpers/run';
 
 const context = prepareRunTest("mocha", "javascript/mocha");
 
-test('run - check coverage', async () => {
+test('mocha: run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(2);
 
 	const coverage = await context.getCoveredLineNumbersForFile("src/index.ts");
 	expect(coverage).toEqual([
-		context.passedLineRange(2, 9),
-		context.passedLineRange(3, 19),
-		context.passedLineRange(21)
+		...context.passedLineRange(2),
+		...context.passedLineRange(4, 12),
+		...context.passedLineRange(14, 21)
 	]);
 });
 
-test('run - run - check coverage', async () => {
+test('mocha: run - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(2);
 
@@ -25,12 +25,13 @@ test('run - run - check coverage', async () => {
 
 	const coverage = await context.getCoveredLineNumbersForFile("src/index.ts");
 	expect(coverage).toEqual([
-		context.passedLineRange(3, 19),
-		context.passedLineRange(21)
+		...context.passedLineRange(2),
+		...context.passedLineRange(4, 12),
+		...context.passedLineRange(14, 21)
 	]);
 });
 
-test('run - change condition - run - check coverage', async () => {
+test('mocha: run - change condition - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(2);
 
@@ -40,13 +41,13 @@ test('run - change condition - run - check coverage', async () => {
 
 	const coverage = await context.getCoveredLineNumbersForFile("src/index.ts");
 	expect(coverage).toEqual([
-		...context.failedLineRange(10, 11),
-		...context.failedLineRange(22, 31),
-		...context.failedLineRange(33)
+		...context.failedLineRange(2),
+		...context.failedLineRange(4, 12),
+		...context.failedLineRange(14, 21)
 	]);
 });
 
-test('run - make change in first if-branch - run - check coverage', async () => {
+test('mocha: run - make change in first if-branch - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(2);
 
@@ -56,8 +57,8 @@ test('run - make change in first if-branch - run - check coverage', async () => 
 
 	const coverage = await context.getCoveredLineNumbersForFile("src/index.ts");
 	expect(coverage).toEqual([
-		...context.passedLineRange(10, 20),
-		...context.passedLineRange(22, 31),
-		...context.passedLineRange(33)
+		...context.passedLineRange(2),
+		...context.passedLineRange(4, 12),
+		...context.passedLineRange(14, 21)
 	]);
 });

@@ -2,9 +2,9 @@ import { strictEqual } from "assert";
 import index from "./";
 
 it("hello world 1", () => {
-	strictEqual(index("world"), "world-static");
+	strictEqual(index("world"), 2);
 });
 
 it("hello darkness 1", () => {
-	strictEqual(index("darkness"), "darkness-static");
+	strictEqual(index("darkness"), 3);
 });

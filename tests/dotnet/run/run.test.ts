@@ -14,7 +14,7 @@ const context = prepareRunTest(
 		});
 	});
 
-test('run - run - check coverage', async () => {
+test('dotnet: run - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -29,7 +29,7 @@ test('run - run - check coverage', async () => {
 	]);
 });
 
-test('run - change condition - run - check coverage', async () => {
+test('dotnet: run - change condition - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -45,7 +45,7 @@ test('run - change condition - run - check coverage', async () => {
 	]);
 });
 
-test('run - check coverage', async () => {
+test('dotnet: run - check coverage', async () => {
 	const testRun = await context.runHandler();
 	expect(testRun.length).toBe(12);
 
@@ -57,7 +57,7 @@ test('run - check coverage', async () => {
 	]);
 });
 
-test('run - change condition - run - revert condition - check coverage', async () => {
+test('dotnet: run - change condition - run - revert condition - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -77,7 +77,7 @@ test('run - change condition - run - revert condition - check coverage', async (
 	]);
 });
 
-test('run - comment out test - run - check coverage', async () => {
+test('dotnet: run - comment out test - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -95,7 +95,7 @@ test('run - comment out test - run - check coverage', async () => {
 	]);
 });
 
-test('run - make darkness tests fail - run - check coverage', async () => {
+test('dotnet: run - make darkness tests fail - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(12);
 
@@ -112,7 +112,7 @@ test('run - make darkness tests fail - run - check coverage', async () => {
 	]);
 });
 
-test('run - make change in first if-branch - run - check coverage', async () => {
+test('dotnet: run - make change in first if-branch - run - check coverage', async () => {
 	const testRun1 = await context.runHandler();
 	expect(testRun1.length).toBe(12);
 

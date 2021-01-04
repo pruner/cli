@@ -68,7 +68,9 @@ export async function runTestsForProvider(
 		if (processResult.exitCode === undefined) {
 			console.error(`${red(`It looks like you may be missing a required runtime for the given provider.\n${red(processResult.stderr)}`)}`)
 		} else {
-			console.error(red(processResult.stderr));
+			if (processResult.stderr)
+				console.error(red(processResult.stderr));
+
 			console.error(bgRed.whiteBright(`Could not run tests`));
 			console.error(red(`Sometimes the logs above contain more information on the root cause. Exit code was ${processResult.exitCode}.`));
 

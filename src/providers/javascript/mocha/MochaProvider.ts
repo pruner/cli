@@ -3,12 +3,12 @@ import execa from "execa";
 import _, { chain } from "lodash";
 import { keys } from "lodash";
 import { join, resolve } from "path";
-import con from "../../../console";
+import con, { LogSettings } from "../../../console";
 import { io, pruner } from "../../../exports";
 import git from "../../../git";
 import { Provider, ProviderSettings, ProviderState, ProviderType, SettingsQuestions, StateFile, StateLineCoverage, StateTest, TestsByAffectedState } from "../../types";
-import { IstanbulCoverageRoot } from "../istanbul.types";
 import regexEscape from 'regex-escape';
+import { MochaCoverageContext } from "./reporter";
 
 export type MochaSettings = ProviderSettings;
 
@@ -59,59 +59,65 @@ export default class MochaProvider implements Provider<MochaSettings> {
 			await git.getGitTopDirectory(),
 			this.settings.workingDirectory));
 
-		console.log("filter", affectedFilter);
-
-		//TODO: instead of this, use the Mocha API
-		//that way, we can reference the required reporters
-		//new Mocha(opts)
-
-		// const mochaLocation = join(cwd, "node_modules", "mocha");
-
-		return await con.execaPiped("nyc", ["--reporter", "none", "mocha", "--reporter", compiledMochaReporterFilePath, "--grep", filterArgument], {
+		const nycReporter = LogSettings.verbosity === "verbose" ?
+			"json" :
+			"none";
+		const result = await con.execaPiped("nyc", ["--reporter", nycReporter, "mocha", "--reporter", compiledMochaReporterFilePath, "--grep", filterArgument], {
 			cwd,
 			reject: false
 		});
+
+		//since Mocha returns the amount of failing tests as its exit code (https://github.com/mochajs/mocha/issues/2438), we reset the exit code to 0.
+		result.exitCode = 0;
+
+		return result;
 	}
 
 	public async gatherState(): Promise<ProviderState> {
 		const coverageRootJson = await pruner.readFromTempFile("mocha.json");
 		if (!coverageRootJson) {
 			console.warn(yellow(`The Mocha Pruner reporter did not report any coverage.`));
+			console.warn(yellow(`This might mean that the provider has not been set up correctly.`));
 			return null;
 		}
 
 		const gitTopDirectory = await git.getGitTopDirectory();
 
-		const coverageRoot = JSON.parse(coverageRootJson) as IstanbulCoverageRoot;
+		const coverageRoots = JSON.parse(coverageRootJson) as MochaCoverageContext[];
 
 		const allFiles = new Array<StateFile>();
 		const allLineCoverage = new Array<StateLineCoverage>();
 		const allTests = new Array<StateTest>();
 
-		const testNames = keys(coverageRoot);
-		for (let testName of testNames) {
-			let test = allTests.find(x => x.name === testName);
-			if (!test) {
-				test = {
-					name: testName,
-					id: allTests.length,
-					duration: null,
-					failure: null
-				};
-				allTests.push(test);
-			}
+		for (let coverageRoot of coverageRoots) {
+			const testNames = keys(coverageRoot.coverage);
+			for (let testName of testNames) {
+				const testData = coverageRoot.coverage[testName];
 
-			const testData = coverageRoot[testName];
-			const fileNames = keys(testData);
-			for (let fileName of fileNames) {
+				let test = allTests.find(x => x.name === coverageRoot.name);
+				if (!test) {
+					test = {
+						name: coverageRoot.name,
+						id: allTests.length,
+						duration: coverageRoot.duration || null,
+						failure: coverageRoot.state === "failed" ?
+							{
+								message: coverageRoot.error?.message,
+								stackTrace: (coverageRoot.error && 'stack' in coverageRoot.error && coverageRoot.error['stack']) || null,
+								stdout: null
+							} : null
+					};
+					allTests.push(test);
+				}
+
+				const fileName = testData.path;
+
 				const normalizedFileName = io
 					.normalizePathSeparators(fileName)
 					.substr(resolve(gitTopDirectory).length + 1);
 
-				const fileTestData = testData[fileName];
-
-				const statementMap = fileTestData.statementMap;
-				const statementCoverage = fileTestData.s;
+				const statementMap = testData.statementMap;
+				const statementCoverage = testData.s;
 
 				const coveredLineNumbers = chain(statementMap)
 					.keys()

@@ -10,7 +10,7 @@ export type SettingsQuestions<TSettings> = TSettings extends ProviderSettings & 
 export type StateTest = {
 	name: string;
 	id: number;
-	duration: string;
+	duration: number;
 	failure: {
 		stdout?: string[];
 		message?: string;

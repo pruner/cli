@@ -27,7 +27,7 @@ export function getAltCoverArguments(reportName: string) {
 		"/p:AltCoverLocalSource=true",
 		`/p:AltCoverVerbosity=${LogSettings.verbosity === "verbose" ?
 			"Info" :
-			"Error"}`
+			"Warning"}`
 	];
 }
 

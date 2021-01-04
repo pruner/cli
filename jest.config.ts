@@ -10,7 +10,9 @@ export default {
 	coverageProvider: "babel",
 	testPathIgnorePatterns: [
 		"\\\\node_modules\\\\",
-		"\\\\dist\\\\"
+		"\\\\dist\\\\",
+		"\\\\sample\\\\",
+		"\\\\temp\\\\"
 	],
 	verbose: false,
 	silent: false

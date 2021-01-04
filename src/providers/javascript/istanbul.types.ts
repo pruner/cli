@@ -1,9 +1,5 @@
 export interface IstanbulCoverageRoot {
-	[testName: string]: TestCoverage;
-}
-
-export interface TestCoverage {
-	[fileName: string]: FileCoverage;
+	[testName: string]: FileCoverage;
 }
 
 export interface StatementCoverage {

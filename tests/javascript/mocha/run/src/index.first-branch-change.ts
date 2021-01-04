@@ -1,4 +1,5 @@
 export default function (incomingText: string) {
+	console.log("testing...");
 
 	if (incomingText === "world") {
 		console.log("hello 1");
@@ -8,6 +9,7 @@ export default function (incomingText: string) {
 		console.log("hello 5");
 		console.log("hello 6");
 		console.log("hello 7");
+		return 2;
 	} else {
 		console.log("darkness 1");
 		console.log("darkness 2");
@@ -16,7 +18,6 @@ export default function (incomingText: string) {
 		console.log("darkness 5");
 		console.log("darkness 6");
 		console.log("darkness 7");
+		return 3;
 	}
-
-	return `${incomingText}-static`;
 }
