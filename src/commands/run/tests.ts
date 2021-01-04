@@ -1,4 +1,4 @@
-import { flatMap, chain, takeRight } from "lodash";
+import { flatMap, chain, takeRight, orderBy } from "lodash";
 import { CommitRange, FileChanges } from "../../git";
 import { ProviderState, StateTest } from "../../providers/types";
 import { getTestFromStateById } from "./state";
@@ -31,6 +31,8 @@ export async function runTestsForProvider(
 	const providerId = provider.settings.id;
 
 	const previousState = await pruner.readState(providerId);
+	sanitizeState(previousState);
+
 	const hadFailedTestsBefore = !!previousState?.tests?.find(x => !!x.failure);
 
 	const testsToRun = await getTestsToRun(
@@ -51,12 +53,14 @@ export async function runTestsForProvider(
 		files: [],
 		tests: []
 	};
+	sanitizeState(newState);
 
 	const mergedState = await mergeStates(
 		testsToRun.affected,
 		previousState,
 		newState
 	);
+	sanitizeState(mergedState);
 
 	console.debug('previous-state', previousState);
 	console.debug('new-state', newState);
@@ -115,6 +119,15 @@ export async function runTestsForProvider(
 			.find(y => y.id === x))
 		.value();
 	return actualTestRuns;
+}
+
+function sanitizeState(state: ProviderState) {
+	if (!state)
+		return;
+
+	state.coverage = orderBy(state.coverage, x => x.fileId);
+	state.files = orderBy(state.files, x => x.path);
+	state.tests = orderBy(state.tests, x => x.name);
 }
 
 /**
