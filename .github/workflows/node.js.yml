@@ -33,10 +33,10 @@ jobs:
 
     - run: npm install
       working-directory: "tests/javascript/mocha/sample"
-      
-    - run: npm test
 
     - run: npm run build
+
+    - run: npm test
     
     - run: npm publish --access public || echo "Not published to NPM - possibly due to version conflict."
       env:
