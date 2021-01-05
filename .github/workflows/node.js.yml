@@ -16,17 +16,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.x'
+
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
         node-version: 10
         registry-url: "https://registry.npmjs.org"
+
     - run: npm install
+
     - run: npm install mocha -g
+
+    - run: npm install
+      working-directory: "tests/javascript/mocha/sample"
+      
     - run: npm test
+
     - run: npm run build
     
     - run: npm publish --access public || echo "Not published to NPM - possibly due to version conflict."
