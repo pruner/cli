@@ -7,7 +7,6 @@
 	"scripts": {
 		"compile": "tsc --declaration",
 		"lint": "tslint --project tsconfig.json",
-		"prepublish": "npm run compile",
 		"test": "mocha"
 	},
 	"directories": {

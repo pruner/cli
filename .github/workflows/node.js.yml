@@ -31,8 +31,8 @@ jobs:
 
     - run: npm install mocha -g
 
-    # - run: npm install
-    #   working-directory: "tests/javascript/mocha/sample"
+    - run: npm install
+      working-directory: "tests/javascript/mocha/sample"
 
     - run: npm run build
 
