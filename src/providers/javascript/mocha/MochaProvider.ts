@@ -13,6 +13,7 @@ import { MochaCoverageContext } from "./reporter";
 export type MochaSettings = ProviderSettings;
 
 export const compiledMochaReporterFilePath = resolve(join(__dirname, "..", "..", "..", "..", "dist", "providers", "javascript", "mocha", "reporter.js"));
+
 export default class MochaProvider implements Provider<MochaSettings> {
 	public get settings() {
 		return this._settings;
@@ -78,6 +79,7 @@ export default class MochaProvider implements Provider<MochaSettings> {
 		if (!coverageRootJson) {
 			console.warn(yellow(`The Mocha Pruner reporter did not report any coverage.`));
 			console.warn(yellow(`This might mean that the provider has not been set up correctly.`));
+			console.warn(yellow('Setup instructions: https://github.com/pruner/cli/blob/main/docs/mocha.md'));
 			return null;
 		}
 

@@ -91,7 +91,9 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async gatherState(): Promise<ProviderState> {
 		const altCoverXmlAsJson: AltCoverRoot[] = await this.globContentsFromXmlToJson(`**/${coverageXmlFileName}`);
 		if (altCoverXmlAsJson.length === 0) {
-			console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}. Make sure AltCover is installed in your test projects.`));
+			console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}.`));
+			console.warn(yellow(`Make sure AltCover is installed in your test projects.`));
+			console.warn(yellow('Setup instructions: https://github.com/pruner/cli/blob/main/docs/dotnet.md'));
 			return null;
 		}
 
