@@ -1,9 +1,11 @@
 # `mocha` recipe
 
 ## Prerequisites
-To use Pruner in your Mocha test project, you must install the `mocha` [NPM package](https://www.npmjs.com/package/mocha) globally.
+To use Pruner in your Mocha test project, you must install the [`mocha`](https://www.npmjs.com/package/mocha) and [`nyc`](https://www.npmjs.com/package/nyc) packages globally.
 
-`npm i mocha -g`
+```bash
+npm i nyc mocha -g
+```
 
 ## Initializing for first-time use
 `pruner init mocha`
