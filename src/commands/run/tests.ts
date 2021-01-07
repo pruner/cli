@@ -15,16 +15,11 @@ import rimraf from "rimraf";
 import minimatch from "minimatch";
 
 export async function runTestsForProviders(providers: Provider[]) {
-	const results = await runInGitStateTransaction(async commitRange =>
-		await Promise.all(providers
-			.map(async provider =>
-				await runTestsForProvider(
-					provider,
-					commitRange))));
+	const results = await runTestsInGitStateTransaction(providers);
 	return flatMap(results);
 }
 
-export async function runTestsForProvider(
+async function runTestsForProvider(
 	provider: Provider,
 	commitRange: CommitRange
 ) {
@@ -66,21 +61,24 @@ export async function runTestsForProvider(
 	console.debug('new-state', newState);
 	console.debug('merged-state', newState);
 
-	await pruner.persistState(providerId, mergedState);
-
 	if (processResult.exitCode !== 0) {
 		if (processResult.exitCode === undefined) {
 			console.error(`${red(`It looks like you may be missing a required runtime for the given provider.\n${red(processResult.stderr)}`)}`)
 		} else {
+			console.error();
+
 			if (processResult.stderr)
 				console.error(red(processResult.stderr));
 
-			console.error(bgRed.whiteBright(`Could not run tests`));
-			console.error(red(`Sometimes the logs above contain more information on the root cause. Exit code was ${processResult.exitCode}.`));
-
 			const failedTests = newState.tests.filter(x => !!x.failure);
-			if (failedTests.length > 0) {
-				console.error();
+			if (failedTests.length === 0) {
+				console.error(bgRed.whiteBright(`Could not run tests`));
+				console.error(red(`Sometimes the logs above contain more information on the root cause. Exit code was ${processResult.exitCode}.`));
+
+				return null;
+			} else {
+				await pruner.persistState(providerId, mergedState);
+
 				console.error(bgRed.whiteBright("Failed tests"));
 
 				for (let failedTest of failedTests) {
@@ -108,6 +106,7 @@ export async function runTestsForProvider(
 			}
 		}
 	} else {
+		await pruner.persistState(providerId, mergedState);
 		console.log(bgGreen.whiteBright('✔ Tests ran successfully!'));
 	}
 
@@ -132,9 +131,9 @@ function sanitizeState(state: ProviderState) {
 
 /**
  * This creates a snapshot between the last pending changes and the current pending changes with a stash commit,
- * and only saves the new snapshot commit if the action is performed without errors.
+ * and only saves the new snapshot commit if test run is performed without errors.
  */
-async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) => Promise<T>) {
+async function runTestsInGitStateTransaction(providers: Provider[]) {
 	const gitState = await pruner.readGitState();
 	if (!gitState.branch)
 		rimraf.sync(await pruner.getPrunerTempPath());
@@ -144,8 +143,14 @@ async function runInGitStateTransaction<T>(action: (commitRange: CommitRange) =>
 		to: await git.createStashCommit()
 	};
 
-	const results = await action(commitRange);
-	await pruner.persistGitState(commitRange.to);
+	const results = await Promise.all(providers
+		.map(async provider =>
+			await runTestsForProvider(
+				provider,
+				commitRange)));
+	const hasFailedTestRuns = !!results.find(x => x === null);
+	if (!hasFailedTestRuns)
+		await pruner.persistGitState(commitRange.to);
 
 	return results;
 }

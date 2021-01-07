@@ -1,11 +1,11 @@
-import { throttle, uniqBy } from 'lodash';
+import { throttle } from 'lodash';
 import { gray, red, white, yellow } from 'chalk';
 import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
 import pruner from '../../pruner';
 import con from '../../console';
 import { allProviderClasses, createProvidersFromProvider as createProvidersFromIdOrNameOrType } from '../../providers/factories';
-import { StateTest, Provider } from '../../providers/types';
+import { Provider } from '../../providers/types';
 import { join } from 'path';
 import { runTestsForProviders } from './tests';
 import { git } from '../../exports';
@@ -114,7 +114,9 @@ function watchProvider(provider: Provider) {
 		atomic: 1000,
 		ignorePermissionErrors: true,
 		useFsEvents: true,
-		persistent: true
+		persistent: true,
+		awaitWriteFinish: true,
+		alwaysStat: true
 	});
 	watcher.on('ready', () => {
 		watcher.on('change', onFilesChanged);

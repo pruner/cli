@@ -1,6 +1,8 @@
+import _ from "lodash";
 import { dirname, join } from "path";
 import { LogSettings } from "../../console";
 import { pruner } from "../../exports";
+import { DotNetSettings } from "./DotNetProvider";
 
 export function getCallContextArgument() {
 	const attributes = [
@@ -20,8 +22,11 @@ export function getAltCoverArguments(reportName: string) {
 	const callContextArgument = getCallContextArgument();
 	return [
 		"/p:AltCover=true",
+		"/p:AltCoverLineCover=true",
+		"/p:AltCoverVisibleBranches=true",
+		"/p:AltCoverSourceLink=false",
 		`/p:AltCoverCallContext=${callContextArgument}`,
-		"/p:AltCoverForce=true",
+		"/p:AltCoverForce=false",
 		`/p:AltCoverXmlReport=${reportName}`,
 		"/p:AltCoverSummaryFormat=N",
 		"/p:AltCoverLocalSource=true",
@@ -44,6 +49,14 @@ export async function getOutputArguments(providerId: string) {
 		"--output",
 		dirname(temporaryPath)
 	];
+}
+
+export function getPropertyArguments(properties: DotNetSettings["properties"]) {
+	if (!properties)
+		return [];
+
+	const keys = _.keys(properties);
+	return keys.map(k => `/p:${k}=${properties[k]}`);
 }
 
 export function getVerbosityArguments() {

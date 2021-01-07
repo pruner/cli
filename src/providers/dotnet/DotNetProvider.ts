@@ -5,7 +5,7 @@ import { AltCoverRoot } from "./altcover.types";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
+import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getPropertyArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
 import { getFilter } from "./filter";
@@ -17,13 +17,16 @@ import { parseFiles, parseLineCoverage, parseModules, parseTests } from "./parsi
 export type DotNetSettings = ProviderSettings & {
 	environment: {
 		[property: string]: any
-	};
+	},
+	properties: {
+		[propertyName: string]: any
+	},
 	mstest: {
 		categories: string[];
-	};
+	},
 	nunit: {
 		categories: string[];
-	};
+	},
 };
 
 const coverageXmlFileName = "coverage.xml.tmp.pruner";
@@ -50,7 +53,8 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			},
 			mstest: null,
 			nunit: null,
-			environment: null
+			environment: null,
+			properties: null
 		};
 	}
 
@@ -71,6 +75,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...getAltCoverArguments(coverageXmlFileName),
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
+			...getPropertyArguments(this.settings.properties),
 			...await getOutputArguments(this.settings.id)
 		];
 		console.debug("execute-settings", this.settings);

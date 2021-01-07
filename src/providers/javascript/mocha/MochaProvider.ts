@@ -1,6 +1,6 @@
 import { yellow } from "chalk";
 import execa from "execa";
-import _, { chain } from "lodash";
+import { chain } from "lodash";
 import { keys } from "lodash";
 import { join, resolve } from "path";
 import con, { LogSettings } from "../../../console";
@@ -67,9 +67,6 @@ export default class MochaProvider implements Provider<MochaSettings> {
 			cwd,
 			reject: false
 		});
-
-		//since Mocha returns the amount of failing tests as its exit code (https://github.com/mochajs/mocha/issues/2438), we reset the exit code to 0.
-		result.exitCode = 0;
 
 		return result;
 	}

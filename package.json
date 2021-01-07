@@ -1,6 +1,6 @@
 {
 	"name": "@pruner/cli",
-	"version": "1.0.63",
+	"version": "1.0.65",
 	"description": "The Pruner CLI that reduces the amount of time spent running tests.",
 	"main": "./dist/exports.js",
 	"type": "commonjs",
@@ -15,7 +15,7 @@
 		"dist"
 	],
 	"scripts": {
-		"pruner:install": "npm run build && npm unlink @pruner/cli && npm link",
+		"pruner:install": "npm run build && npm unlink @pruner/cli && npm link --force",
 		"pruner:run": "npm run build && node ./",
 		"type-check": "tsc --noEmit",
 		"type-check:watch": "npm run type-check -- --watch",
