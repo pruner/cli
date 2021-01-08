@@ -28,16 +28,10 @@ async function runTestsForProvider(
 	const previousState = await pruner.readState(providerId);
 	sanitizeState(previousState);
 
-	const hadFailedTestsBefore = !!previousState?.tests?.find(x => !!x.failure);
-
 	const testsToRun = await getTestsToRun(
 		provider.getGlobPatterns(),
 		previousState,
 		commitRange);
-	if (!testsToRun.hasChanges && !hadFailedTestsBefore) {
-		console.log(gray("No GIT changes were detected since the last test run, so there are no affected tests."));
-		return null;
-	}
 
 	const processResult = await con.useSpinner(
 		'Running tests',
@@ -173,13 +167,6 @@ export async function getTestsToRun(
 	const relevantGitChangedFiles = gitChangedFiles
 		.filter(f => !!globPatterns
 			.find(p => minimatch(f.filePath, p)));
-	if (relevantGitChangedFiles.length === 0) {
-		return {
-			affected: new Array<StateTest>(),
-			unaffected: previousState.tests,
-			hasChanges: false
-		};
-	}
 
 	const affectedTests = getAffectedTests(
 		relevantGitChangedFiles,

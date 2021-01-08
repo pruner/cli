@@ -54,7 +54,9 @@ export default class MochaProvider implements Provider<MochaSettings> {
 			.map(x => `(?:^(?!${regexEscape(x.name)}$).*)`)
 			.join("");
 
-		const filterArgument = [affectedFilter, unknownFilter].join("|");
+		const filterArgument = [affectedFilter, unknownFilter]
+			.filter(x => !!x)
+			.join("|");
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
