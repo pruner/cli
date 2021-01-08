@@ -89,19 +89,19 @@ async function runTestsForProvider(
 
 					if (failure.stackTrace) {
 						for (let stackTraceLine of failure.stackTrace)
-							console.error("     " + white(`${stackTraceLine}`));
+							console.error("     " + gray(`${stackTraceLine}`));
 					}
 
 					const lastStdoutMessages = takeRight(failure.stdout || [], 3);
 					if (lastStdoutMessages.length > 0) {
-						console.log();
+						console.error();
 						console.error("   " + bgGray.whiteBright(`Latest output`));
 
 						for (let message of lastStdoutMessages)
 							console.error("     " + gray(`${message}`));
-
-						console.log();
 					}
+
+					console.error();
 				}
 			}
 		}
