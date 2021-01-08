@@ -32,6 +32,7 @@ export function getFilter(tests: TestsByAffectedState, settings: DotNetSettings)
 		],
 		'&');
 
+	console.debug("get-filter", filterArgument, tests.affected, tests.unaffected);
 	return filterArgument;
 }
 

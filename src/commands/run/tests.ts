@@ -36,7 +36,7 @@ async function runTestsForProvider(
 		commitRange);
 	if (!testsToRun.hasChanges && !hadFailedTestsBefore) {
 		console.log(gray("No GIT changes were detected since the last test run, so there are no affected tests."));
-		return [];
+		return null;
 	}
 
 	const processResult = await con.useSpinner(
@@ -148,6 +148,7 @@ async function runTestsInGitStateTransaction(providers: Provider[]) {
 			await runTestsForProvider(
 				provider,
 				commitRange)));
+
 	const hasFailedTestRuns = !!results.find(x => x === null);
 	if (!hasFailedTestRuns)
 		await pruner.persistGitState(commitRange.to);
@@ -175,7 +176,7 @@ export async function getTestsToRun(
 	if (relevantGitChangedFiles.length === 0) {
 		return {
 			affected: new Array<StateTest>(),
-			unaffected: new Array<StateTest>(),
+			unaffected: previousState.tests,
 			hasChanges: false
 		};
 	}

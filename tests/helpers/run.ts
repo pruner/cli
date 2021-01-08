@@ -117,7 +117,7 @@ export function prepareRunTest(
 				join(stateDirectory, "tests.previous.json"));
 		}
 
-		return result;
+		return result.filter(x => !!x);
 	}
 
 	const context = {
