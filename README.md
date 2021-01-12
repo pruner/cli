@@ -4,6 +4,7 @@ Pruner is a universal test CLI that does the following:
 - Runs your tests as soon as the code updates.
 - Only runs the tests that are needed (the tests that run through the code you changed).
 - Highlights code coverage with test status next to each line (see video below), so you know if you broke something, as you write it.
+- Runs on your build server as well. Avoid wasting time waiting for your build server to run tests you already ran locally.
 
 # Optional: Get the Visual Studio extension
 - **Visual Studio Code:** https://marketplace.visualstudio.com/items?itemName=Pruner.vscode
