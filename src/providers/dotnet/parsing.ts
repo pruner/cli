@@ -96,6 +96,7 @@ export function parseTests(
 		.flatMap(x => x.TrackedMethod)
 		.map(x => x?.$)
 		.filter(x => !!x)
+		.uniqBy(x => x.name)
 		.map(x => {
 			const previousResult = testResults.find(t => t.name === sanitizeMethodName(x.name));
 			return {

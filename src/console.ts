@@ -1,4 +1,4 @@
-import { gray, red } from 'chalk';
+import { gray } from 'chalk';
 import execa, { Options } from 'execa';
 import ora from 'ora';
 import prompts from 'prompts';
@@ -25,7 +25,7 @@ async function execaPiped(
 	}
 
 	const onStdout = (buffer: Buffer) => console.log(gray(trimTrailingWhitespace(buffer.toString())));
-	const onStderr = (buffer: Buffer) => console.error(red(trimTrailingWhitespace(buffer.toString())));
+	const onStderr = (buffer: Buffer) => console.error(gray(trimTrailingWhitespace(buffer.toString())));
 	result.stdout.on('data', onStdout);
 	result.stderr.on('data', onStderr);
 
@@ -46,6 +46,7 @@ async function useSpinner<T>(text: string, callback: () => Promise<T>) {
 		"debug",
 		"info",
 		"trace",
+		"error",
 		"warn"
 	];
 

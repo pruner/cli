@@ -14,23 +14,33 @@ import { getLineCoverageForGitChangedFile, getNewLineNumberForLineCoverage, hasC
 import rimraf from "rimraf";
 import minimatch from "minimatch";
 
-export async function runTestsForProviders(providers: Provider[]) {
-	const results = await runTestsInGitStateTransaction(providers);
+import type { Args } from './RunCommand';
+
+export async function runTestsForProviders(providers: Provider[], args: Args) {
+	const results = await runTestsInGitStateTransaction(providers, args);
 	return flatMap(results);
 }
 
 async function runTestsForProvider(
 	provider: Provider,
-	commitRange: CommitRange
+	commitRange: CommitRange,
+	args: Args
 ) {
 	const providerId = provider.settings.id;
 
-	const previousState = await pruner.readState(providerId);
+	let previousState: ProviderState;
+	try {
+		previousState = await pruner.readState(providerId);
+	} catch (e) {
+		//may happen if GIT is in the middle of a merge for the state file.
+		return null;
+	}
+
 	sanitizeState(previousState);
 
 	const testsToRun = await getTestsToRun(
 		provider.getGlobPatterns(),
-		previousState,
+		args.all ? null : previousState,
 		commitRange);
 
 	const processResult = await con.useSpinner(
@@ -127,7 +137,7 @@ function sanitizeState(state: ProviderState) {
  * This creates a snapshot between the last pending changes and the current pending changes with a stash commit,
  * and only saves the new snapshot commit if test run is performed without errors.
  */
-async function runTestsInGitStateTransaction(providers: Provider[]) {
+async function runTestsInGitStateTransaction(providers: Provider[], args: Args) {
 	const gitState = await pruner.readGitState();
 	if (!gitState.branch)
 		rimraf.sync(await pruner.getPrunerTempPath());
@@ -141,7 +151,8 @@ async function runTestsInGitStateTransaction(providers: Provider[]) {
 		.map(async provider =>
 			await runTestsForProvider(
 				provider,
-				commitRange)));
+				commitRange,
+				args)));
 
 	const hasFailedTestRuns = !!results.find(x => x === null);
 	if (!hasFailedTestRuns)
@@ -173,9 +184,10 @@ export async function getTestsToRun(
 		previousState);
 
 	const allKnownUnaffectedTests = previousState.tests
-		.filter(x => !affectedTests.find(y => y.id === x.id));
+		?.filter(x => !affectedTests.find(y => y.id === x.id)) || [];
 
-	const failingTests = previousState.tests.filter(x => !!x.failure);
+	const failingTests = previousState.tests
+		?.filter(x => !!x.failure) || [];
 	return {
 		hasChanges: true,
 		affected:
@@ -210,6 +222,7 @@ export function getAffectedTests(
 	return chain(correctedLineCoverage)
 		.flatMap(lineCoverage => lineCoverage.testIds)
 		.map(testId => getTestFromStateById(previousState, testId))
+		.filter(test => !!test)
 		.uniqBy(test => test.name)
 		.value();
 }

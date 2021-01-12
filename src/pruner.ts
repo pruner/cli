@@ -71,8 +71,8 @@ async function persistState(providerId: string, state: ProviderState) {
 
 async function readState(providerId: string, cwd?: string): Promise<ProviderState> {
 	const fileName = getStateFileName(providerId);
-	return JSON.parse(
-		await exported.readFromFile(fileName, cwd));
+	const fileContents = await exported.readFromFile(fileName, cwd);
+	return JSON.parse(fileContents);
 }
 
 async function persistSettings(settings: SettingsFile) {
@@ -90,13 +90,6 @@ async function readSettings(cwd?: string): Promise<SettingsFile> {
 
 async function readGitState() {
 	const state: GitState = JSON.parse(await exported.readFromTempFile("git.json")) || {};
-
-	const currentBranch = await git.getBranchName();
-	if (currentBranch !== state.branch) {
-		state.branch = currentBranch;
-		state.commit = null;
-	}
-
 	return state;
 }
 

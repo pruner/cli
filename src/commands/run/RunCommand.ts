@@ -10,9 +10,10 @@ import { join } from 'path';
 import { runTestsForProviders } from './tests';
 import { git } from '../../exports';
 
-type Args = DefaultArgs & {
+export type Args = DefaultArgs & {
 	provider?: string;
 	watch?: boolean;
+	all?: boolean;
 };
 
 export default {
@@ -30,6 +31,12 @@ export default {
 			type: 'boolean',
 			demandOption: false,
 			describe: 'Launches in watch mode (run tests as files change).'
+		})
+		.option('all', {
+			alias: 'a',
+			type: 'boolean',
+			demandOption: false,
+			describe: 'Run all tests instead of affected tests.'
 		}),
 	handler
 } as Command<Args>;
@@ -45,17 +52,17 @@ export async function handler(args: Args) {
 	}
 
 	const providers = await createProvidersFromIdOrNameOrType(args.provider);
-	const states = await runTestsForProviders(providers);
+	const states = await runTestsForProviders(providers, args);
 
 	if (args.watch) {
 		for (const provider of providers)
-			watchProvider(provider);
+			watchProvider(provider, args);
 	}
 
 	return states;
 }
 
-function watchProvider(provider: Provider) {
+function watchProvider(provider: Provider, args: Args) {
 	if (provider.settings.excludeFromWatch) {
 		console.log(yellow("A provider was excluded from watch due to the 'excludeFromWatch' setting."));
 		return;
@@ -65,7 +72,7 @@ function watchProvider(provider: Provider) {
 	let hasPending = false;
 
 	const runTests = async () => {
-		return await runTestsForProviders([provider]);
+		return await runTestsForProviders([provider], args);
 	};
 
 	const onFilesChanged = throttle(async (path: string) => {
@@ -76,6 +83,7 @@ function watchProvider(provider: Provider) {
 			return;
 
 		console.log(gray(path + " changed."));
+		console.log();
 
 		if (isRunning) {
 			hasPending = true;
@@ -95,9 +103,7 @@ function watchProvider(provider: Provider) {
 				await runTests();
 			}
 
-			console.log();
 			console.log(gray('Waiting for further file changes...'));
-			console.log();
 		} finally {
 			isRunning = false;
 		}

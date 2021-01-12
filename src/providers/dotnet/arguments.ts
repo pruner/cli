@@ -22,6 +22,7 @@ export function getAltCoverArguments(reportName: string) {
 	const callContextArgument = getCallContextArgument();
 	return [
 		"/p:AltCover=true",
+		"/p:AltCoverSingle=true",
 		"/p:AltCoverLineCover=true",
 		"/p:AltCoverVisibleBranches=true",
 		"/p:AltCoverSourceLink=false",
