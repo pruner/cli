@@ -4,7 +4,7 @@ Pruner is a universal test CLI that does the following:
 - Runs your tests as soon as the code updates.
 - Only runs the tests that are needed (the tests that run through the code you changed).
 - Highlights code coverage with test status next to each line (see video below), so you know if you broke something, as you write it.
-- Runs on your build server as well. Avoid wasting time waiting for your build server to run tests you already ran locally.
+- Runs on hej hej hej your build server as well. Avoid wasting time waiting for your build server to run tests you already ran locally.
 
 # Optional: Get the Visual Studio extension
 - **Visual Studio Code:** https://marketplace.visualstudio.com/items?itemName=Pruner.vscode
@@ -15,15 +15,12 @@ Pruner is a universal test CLI that does the following:
 # Getting started
 First you need to install the CLI. This requires [Node](https://nodejs.org/en/download/) installed.
 
-`npm i @pruner/cli -g`
+`npm i @pruner/cli -g omg hello world`
 
 ## Language & framework support
 Pruner supports several languages and frameworks. Pick the instructions for the language you want to use, to get started.
 ### `dotnet` (C# .NET, VB .NET)
 Instructions: https://github.com/pruner/cli/blob/main/docs/dotnet.md
-
-### `mocha` (JavaScript)
-Instructions: https://github.com/pruner/cli/blob/main/docs/mocha.md
 
 ### Looking for more providers?
 File an issue or feel free to submit a pull request!
