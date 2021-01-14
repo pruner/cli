@@ -1,5 +1,6 @@
 import { StateTest, TestsByAffectedState } from "../types";
 import { DotNetSettings } from "./DotNetProvider";
+import con from "../../console";
 
 export function getFilter(tests: TestsByAffectedState, settings: DotNetSettings) {
 	const unknownFilter = getTestFilterArgument(tests.unaffected, {
@@ -32,7 +33,7 @@ export function getFilter(tests: TestsByAffectedState, settings: DotNetSettings)
 		],
 		'&');
 
-	console.debug("get-filter", filterArgument, tests.affected, tests.unaffected);
+	con.debug(() => ["get-filter", filterArgument, tests.affected, tests.unaffected]);
 	return filterArgument;
 }
 

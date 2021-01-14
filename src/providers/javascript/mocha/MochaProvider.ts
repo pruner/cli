@@ -24,7 +24,7 @@ export default class MochaProvider implements Provider<MochaSettings> {
 	}
 
 	constructor(private readonly _settings: MochaSettings) {
-		console.debug("mocha-init", _settings);
+		con.debug(() => ["mocha-init", _settings]);
 	}
 
 	public getGlobPatterns() {
@@ -99,7 +99,7 @@ export default class MochaProvider implements Provider<MochaSettings> {
 				if (!test) {
 					test = {
 						name: coverageRoot.name,
-						id: allTests.length,
+						id: `t${allTests.length}`,
 						duration: coverageRoot.duration || null,
 						failure: coverageRoot.state === "failed" ?
 							{
@@ -136,7 +136,7 @@ export default class MochaProvider implements Provider<MochaSettings> {
 				if (!file) {
 					file = {
 						path: normalizedFileName,
-						id: allFiles.length
+						id: `f${allFiles.length}`
 					};
 					allFiles.push(file);
 				}

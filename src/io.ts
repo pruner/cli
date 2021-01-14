@@ -3,6 +3,7 @@ import { glob as internalGlob } from 'glob';
 import fs from "fs";
 import { dirname, join } from 'path';
 import rimraf from 'rimraf';
+import con from "./console";
 
 const exported = {
 	glob,
@@ -32,7 +33,7 @@ async function globContents(globPattern: string, options?: {
 		options?.workingDirectory,
 		globPattern);
 
-	console.debug("file-glob-results", options?.workingDirectory, globPattern, filePaths);
+	con.debug(() => ["file-glob-results", options?.workingDirectory, globPattern, filePaths]);
 
 	const coverageFileBuffers = await Promise.all(filePaths
 		.map(filePath => fs.promises.readFile(

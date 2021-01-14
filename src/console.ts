@@ -7,8 +7,20 @@ const declarations = {
 	useSpinner,
 	ask,
 	applyVerbosityLevel,
-	execaPiped
+	execaPiped,
+	debug
 };
+
+function debug(valueAccessor: () => object[] | object) {
+	if (LogSettings.verbosity !== "verbose")
+		return;
+
+	let returnValue = valueAccessor();
+	if (!Array.isArray(returnValue))
+		returnValue = [returnValue];
+
+	console.debug(...(returnValue as object[]));
+}
 
 async function execaPiped(
 	file: string,
@@ -38,9 +50,6 @@ async function execaPiped(
 }
 
 async function useSpinner<T>(text: string, callback: () => Promise<T>) {
-	const spinner = ora(text);
-	spinner.start();
-
 	const methodsToProxy: Array<keyof typeof console> = [
 		"log",
 		"debug",
@@ -52,16 +61,19 @@ async function useSpinner<T>(text: string, callback: () => Promise<T>) {
 
 	const oldMethods: { [name: string]: any } = {};
 
-	for (let method of methodsToProxy) {
-		oldMethods[method] = global.console[method];
-		global.console[method] = <any>((...args: any[]) => {
-			spinner.stop();
-			oldMethods[method](...args);
-			spinner.start(text);
-		});
-	}
-
+	const spinner = ora(text);
 	try {
+		spinner.start();
+
+		for (let method of methodsToProxy) {
+			oldMethods[method] = global.console[method];
+			global.console[method] = <any>((...args: any[]) => {
+				spinner.stop();
+				oldMethods[method](...args);
+				spinner.start(text);
+			});
+		}
+
 		return await callback();
 	} finally {
 		spinner.stop();

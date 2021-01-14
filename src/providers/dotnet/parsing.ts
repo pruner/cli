@@ -2,6 +2,8 @@ import { chain, first, range } from "lodash";
 import { AltCoverRoot, ModuleModule } from "./altcover.types";
 import { TrxRoot } from "./trx.types";
 import io from "../../io";
+import { StateFile, StateLineCoverage, StateTest } from "../types";
+import con from "../../console";
 
 export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
 	return chain(altCoverXmlAsJson)
@@ -12,7 +14,7 @@ export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
 		.value();
 }
 
-export function parseFiles(modules: ModuleModule[], projectRootDirectory: string) {
+export function parseFiles(modules: ModuleModule[], projectRootDirectory: string): StateFile[] {
 	return chain(modules)
 		.flatMap((x) => x.Files)
 		.flatMap((x) => x.File)
@@ -23,8 +25,9 @@ export function parseFiles(modules: ModuleModule[], projectRootDirectory: string
 			path: io.normalizePathSeparators(x.fullPath),
 		}))
 		.filter((x) => x.path.startsWith(projectRootDirectory))
-		.map((x) => ({
+		.map((x) => <StateFile>({
 			...x,
+			id: `f${x.id}`,
 			path: sanitizeStatePath(projectRootDirectory, x.path),
 		}))
 		.value();
@@ -33,7 +36,7 @@ export function parseFiles(modules: ModuleModule[], projectRootDirectory: string
 export function parseTests(
 	altCoverModules: ModuleModule[],
 	trxSummary: TrxRoot[]
-) {
+): StateTest[] {
 	const testRuns = trxSummary.map(x => x.TestRun);
 	const testDefinitions = chain(testRuns)
 		.flatMap(x => x.TestDefinitions)
@@ -89,7 +92,7 @@ export function parseTests(
 		})
 		.value();
 
-	console.debug("test-results", testResults);
+	con.debug(() => ["test-results", testResults]);
 
 	return chain(altCoverModules)
 		.flatMap(x => x.TrackedMethods)
@@ -99,13 +102,13 @@ export function parseTests(
 		.uniqBy(x => x.name)
 		.map(x => {
 			const previousResult = testResults.find(t => t.name === sanitizeMethodName(x.name));
-			return {
+			return <StateTest>{
 				failure: null,
 				errorMessage: void 0,
 				stdout: void 0,
 				...previousResult,
 				name: sanitizeMethodName(x.name),
-				id: +x.uid
+				id: `t${+x.uid}`
 			};
 		})
 		.value();
@@ -115,7 +118,7 @@ function parseDuration() {
 	return -1;
 }
 
-export function parseLineCoverage(modules: ModuleModule[]) {
+export function parseLineCoverage(modules: ModuleModule[]): StateLineCoverage[] {
 	return chain(modules)
 		.flatMap((x) => x.Classes)
 		.flatMap((x) => x.Class)
@@ -126,14 +129,14 @@ export function parseLineCoverage(modules: ModuleModule[]) {
 		.flatMap((x) => x.SequencePoints)
 		.flatMap((x) => x.SequencePoint)
 		.filter((x) => !!x)
-		.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => ({
+		.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => <StateLineCoverage>({
 			testIds: chain(x.TrackedMethodRefs || [])
 				.flatMap((m) => m.TrackedMethodRef)
 				.map((m) => m?.$)
 				.filter((m) => !!m)
-				.map((m) => +m.uid)
+				.map((m) => `t${+m.uid}`)
 				.value(),
-			fileId: +x?.$.fileid,
+			fileId: `f${+x?.$.fileid}`,
 			lineNumber: l,
 		})))
 		.filter((x) =>

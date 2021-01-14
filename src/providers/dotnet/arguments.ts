@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { dirname, join } from "path";
+import { dirname, join, sep } from "path";
 import { LogSettings } from "../../console";
 import { pruner } from "../../exports";
 import { DotNetSettings } from "./DotNetProvider";
@@ -44,20 +44,20 @@ export function getRunSettingArguments(runSettingFilePath: string) {
 	];
 }
 
-export async function getOutputArguments(providerId: string) {
-	const temporaryPath = await pruner.writeToTempFile(join(providerId, "build", ".gitignore"), "**");
+export async function getPropertyArguments(providerId: string, properties: DotNetSettings["properties"]) {
+	const temporaryFilePath = await pruner.writeToTempFile(join(providerId, "build", ".gitignore"), "**");
+	const temporaryDirectoryPath = dirname(temporaryFilePath);
+
+	const keys = _.keys(properties || {});
+	const propertyArguments = keys.map(k => `/p:${k}=${properties[k]}`);
+
 	return [
-		"--output",
-		dirname(temporaryPath)
+		...propertyArguments,
+		`/p:GenerateTargetFrameworkAttribute=False`,
+		`/p:GenerateAssemblyInfo=False`,
+		`--output`,
+		`${join(temporaryDirectoryPath, "bin")}`
 	];
-}
-
-export function getPropertyArguments(properties: DotNetSettings["properties"]) {
-	if (!properties)
-		return [];
-
-	const keys = _.keys(properties);
-	return keys.map(k => `/p:${k}=${properties[k]}`);
 }
 
 export function getVerbosityArguments() {

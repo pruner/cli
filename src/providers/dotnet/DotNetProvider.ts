@@ -5,7 +5,7 @@ import { AltCoverRoot } from "./altcover.types";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getLoggerArguments, getOutputArguments, getPropertyArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
+import { getAltCoverArguments, getLoggerArguments, getPropertyArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
 import { getFilter } from "./filter";
@@ -42,7 +42,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	}
 
 	constructor(private readonly _settings: DotNetSettings) {
-		console.debug("dotnet-init", _settings);
+		con.debug(() => ["dotnet-init", _settings]);
 	}
 
 	public static getInitQuestions(): SettingsQuestions<DotNetSettings> {
@@ -75,11 +75,10 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...getAltCoverArguments(coverageXmlFileName),
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
-			...getPropertyArguments(this.settings.properties),
-			...await getOutputArguments(this.settings.id)
+			...await getPropertyArguments(this.settings.id, this.settings.properties)
 		];
-		console.debug("execute-settings", this.settings);
-		console.debug("execute-args", args.join(' '));
+		con.debug(() => ["execute-settings", this.settings]);
+		con.debug(() => ["execute-args", args.join(' ')]);
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),

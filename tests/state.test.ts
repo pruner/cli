@@ -1,113 +1,108 @@
 import { merge } from "../src/commands/run/state";
 
-test("merge identical identifiers", () => {
+test("state: merge identical identifiers", () => {
 	const oldObject = {
-		id: 1,
+		id: "x1",
 		name: "foo"
 	};
 
 	const newObject = {
-		id: 1,
+		id: "x2",
 		name: "blah"
 	};
 
-	let identifierBefore = 0;
-	let identifierAfter = 0;
+	let identifierChanges = [];
 
 	const merged = merge({
 		a: [oldObject],
 		b: [newObject],
 		groupingKeyProperty: "name",
-		identifierProperty: "id",
+		idProperty: "id",
 		onIdentifierChanged: (a, b) => {
-			identifierBefore = a;
-			identifierAfter = b;
+			identifierChanges.push([a, b]);
 		}
 	});
 
 	expect(merged).toStrictEqual([
 		{
-			id: 1,
-			name: "foo"
+			id: "x1",
+			name: "blah"
 		},
 		{
-			id: 2,
-			name: "blah"
-		}
-	]);
-
-	expect(identifierBefore).toBe(1);
-	expect(identifierAfter).toBe(2);
-});
-
-test("merge identical grouping keys", () => {
-	const oldObject = {
-		id: 2,
-		name: "foo"
-	};
-
-	const newObject = {
-		id: 1,
-		name: "foo"
-	};
-
-	let identifierBefore = 0;
-	let identifierAfter = 0;
-
-	const merged = merge({
-		a: [oldObject],
-		b: [newObject],
-		groupingKeyProperty: "name",
-		identifierProperty: "id",
-		onIdentifierChanged: (a, b) => {
-			identifierBefore = a;
-			identifierAfter = b;
-		}
-	});
-
-	expect(merged).toStrictEqual([
-		{
-			id: 1,
+			id: "x2",
 			name: "foo"
 		}
 	]);
 
-	expect(identifierBefore).toBe(0);
-	expect(identifierAfter).toBe(0);
-});
-
-test("merge identical grouping keys", () => {
-	const oldObject = {
-		id: 1,
-		name: "foo"
-	};
-
-	const newObject = {
-		id: 2,
-		name: "foo"
-	};
-
-	let identifierBefore = 0;
-	let identifierAfter = 0;
-
-	const merged = merge({
-		a: [oldObject],
-		b: [newObject],
-		groupingKeyProperty: "name",
-		identifierProperty: "id",
-		onIdentifierChanged: (a, b) => {
-			identifierBefore = a;
-			identifierAfter = b;
-		}
-	});
-
-	expect(merged).toStrictEqual([
-		{
-			id: 2,
-			name: "foo"
-		}
+	expect(identifierChanges).toBe([
+		["x2", "x1"]
 	]);
-
-	expect(identifierBefore).toBe(0);
-	expect(identifierAfter).toBe(0);
 });
+
+// test("state: merge identical grouping keys", () => {
+// 	const oldObject = {
+// 		id: "x2",
+// 		name: "foo"
+// 	};
+
+// 	const newObject = {
+// 		id: "x1",
+// 		name: "foo"
+// 	};
+
+// 	let identifierChanges = [];
+
+// 	const merged = merge({
+// 		a: [oldObject],
+// 		b: [newObject],
+// 		groupingKeyProperty: "name",
+// 		idProperty: "id",
+// 		onIdentifierChanged: (a, b) => {
+// 			identifierChanges.push([a, b]);
+// 		}
+// 	});
+
+// 	expect(merged).toStrictEqual([
+// 		{
+// 			id: "x1",
+// 			name: "foo"
+// 		}
+// 	]);
+
+// 	expect(identifierChanges).toBe("");
+// 	expect(identifierChanges).toBe("");
+// });
+
+// test("state: merge identical grouping keys", () => {
+// 	const oldObject = {
+// 		id: "x1",
+// 		name: "foo"
+// 	};
+
+// 	const newObject = {
+// 		id: "x2",
+// 		name: "foo"
+// 	};
+
+// 	let identifierChanges = [];
+
+// 	const merged = merge({
+// 		a: [oldObject],
+// 		b: [newObject],
+// 		groupingKeyProperty: "name",
+// 		idProperty: "id",
+// 		onIdentifierChanged: (a, b) => {
+// 			identifierChanges.push([a, b]);
+// 		}
+// 	});
+
+// 	expect(merged).toStrictEqual([
+// 		{
+// 			id: "x2",
+// 			name: "foo"
+// 		}
+// 	]);
+
+// 	expect(identifierChanges).toBe("");
+// 	expect(identifierChanges).toBe("");
+// });

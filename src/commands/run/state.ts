@@ -1,53 +1,216 @@
-import _, { chain, last, remove } from "lodash";
-import { ProviderState, StateLineCoverage, StateTest } from "../../providers/types";
+import _, { chain, last, min, minBy, remove, sortBy } from "lodash";
+import { ProviderState, StateFile, StateFileId, StateLineCoverage, StateTest, StateTestId } from "../../providers/types";
+
+type StateReferenceIdChangedCallback = (fromId: string, toId: string) => void;
+
+type Reference = {
+	changeId?(to: string);
+}
+class StateReferences<T extends Reference> {
+	private readonly idChangedListeners: StateReferenceIdChangedCallback[];
+
+	public readonly byId: Map<string, T>;
+	public readonly byName: Map<string, T>;
+
+	public readonly all: T[];
+
+	constructor(
+		private readonly references: T[],
+		private readonly idAccessor: (input: T) => string,
+		private readonly nameAccessor: (input: T) => string) {
+
+		this.idChangedListeners = [];
+		this.all = [];
+
+		this.byName = new Map<string, T[]>();
+		this.byId = new Map<string, T[]>();
+
+		for (let reference of references) {
+			this.all.push(reference);
+
+			this.byId.set(idAccessor(reference), reference);
+			this.byName.set(nameAccessor(reference), reference);
+		}
+	}
+
+	public addIdChangeListener(callback: StateReferenceIdChangedCallback) {
+		this.idChangedListeners.push(callback);
+	}
+
+	public changeId(from: string, to: string) {
+		const old = this.byId[from];
+		this.byId.delete(from);
+		this.byId.set(this.idAccessor(old), old);
+
+		for (let listener of this.idChangedListeners)
+			listener(from, to);
+	}
+}
+
+class StateDecorator {
+	public readonly files: StateReferences<StateFileDecorator>;
+	public readonly tests: StateReferences<StateTestDecorator>;
+	public readonly coverage: StateReferences<StateLineCoverageDecorator>;
+
+	constructor(inner: ProviderState) {
+		this.files = new StateReferences(inner.files.map(x => new StateFileDecorator(this, x)));
+		this.tests = new StateReferences(inner.tests.map(x => new StateTestDecorator(this, x)));
+		this.coverage = new StateReferences(inner.coverage.map(x => new StateLineCoverageDecorator(this, x)));
+	}
+}
+
+class StateFileDecorator implements Reference, StateFile {
+	get id() {
+		return this.inner.id;
+	}
+
+	get path() {
+		return this.inner.path;
+	}
+
+	constructor(
+		private readonly state: StateDecorator,
+		private readonly inner: StateFile) {
+
+	}
+
+	public changeId(to: string) {
+		this.state.files.changeId(this.inner.id, to);
+		this.inner.id = to;
+	}
+}
+
+class StateTestDecorator implements Reference, StateTest {
+	get name() {
+		return this.inner.name;
+	}
+
+	get id() {
+		return this.inner.id;
+	}
+
+	get duration() {
+		return this.inner.duration;
+	}
+
+	get failure() {
+		return this.inner.failure;
+	}
+
+	constructor(
+		private readonly state: StateDecorator,
+		private readonly inner: StateTest) {
+	}
+
+	public changeId(to: string) {
+		this.state.tests.changeId(this.inner.id, to);
+		this.inner.id = to;
+	}
+}
+
+class StateLineCoverageDecorator {
+	public readonly file: StateFileDecorator;
+	public readonly tests: StateTestDecorator[];
+
+	constructor(
+		private readonly state: StateDecorator,
+		private readonly inner: StateLineCoverage) {
+
+		this.file = new StateFileDecorator(state, state.files.byId(inner.fileId));
+		this.tests = inner.testIds.map(testId => new StateTestDecorator(state, state.tests.byId(testId)));
+
+		state.files.addIdChangeListener((from, to) => {
+			if (from === this.inner.fileId)
+				this.inner.fileId = to;
+		});
+
+		state.tests.addIdChangeListener((from, to) => {
+			const index = this.inner.testIds.indexOf(from);
+			if (index === -1)
+				continue;
+
+			this.inner.testIds.splice(index, 1);
+			this.inner.testIds.push(to);
+		});
+	}
+}
+
+function getOffsetFromId(id: string) {
+	return +id.substr(1);
+}
+
+function getTypeFromId(id: string) {
+	return id.substr(0, 1);
+}
 
 export function merge<T>(args: {
 	a: T[],
 	b: T[],
-	identifierProperty: keyof T,
-	groupingKeyProperty: keyof T,
-	onIdentifierChanged: (a: number, b: number) => void
+	idProperty: string,
+	groupingKeyProperty: string,
+	onIdentifierChanged: (a: any, b: any) => void
 }) {
-	const merged = [...args.a, ...args.b];
+	const renameInstructions = new Array<{
+		target: T,
+		fromId: string,
+		toId: string
+	}>();
 
-	avoidIdentifierCollisions();
+	const mergeInstructions = new Array<{
+		target: T,
+	}>();
 
-	return chain(merged)
-		.groupBy(x => x[args.groupingKeyProperty])
-		.map(last)
-		.value();
+	const getId = (x: T) => x[args.idProperty];
+	const getGroupingKey = (x: T) => x[args.groupingKeyProperty];
 
-	function avoidIdentifierCollisions() {
-		const illegalIdentifiers = new Map<number, T>();
-		const seenIdentifiers = new Map<number, T>();
-		for (let item of merged) {
-			const identifier = item[args.identifierProperty as string];
-			const groupingKey = item[args.groupingKeyProperty as string];
-			if (seenIdentifiers.has(identifier)) {
-				const seenIdentifierItem = seenIdentifiers.get(identifier);
-				if (seenIdentifierItem[args.groupingKeyProperty as string] !== groupingKey)
-					illegalIdentifiers.set(identifier, item);
-			} else {
-				seenIdentifiers.set(identifier, item);
-			}
-		}
+	const allById = new Map<string, T[]>();
 
-		for (let item of args.b) {
-			let identifier = item[args.identifierProperty as string];
-			const oldIdentifier = identifier;
+	const aById = new Map<string, T>();
+	for (let a of args.a) {
+		aById.set(getId(a), a);
 
-			while (illegalIdentifiers.has(identifier))
-				identifier++;
+		if (!allById.has(getId(a)))
+			allById.set(getId(a), []);
 
-			if (identifier === oldIdentifier)
-				continue;
-
-			illegalIdentifiers.set(identifier, item);
-			item[args.identifierProperty as string] = identifier;
-
-			args.onIdentifierChanged(oldIdentifier, identifier);
-		}
+		allById.get(getId(a)).push(a);
 	}
+
+	const bById = new Map<string, T>();
+	for (let b of args.b) {
+		bById.set(getId(b), b);
+
+		if (!allById.has(getId(b)))
+			allById.set(getId(b), []);
+
+		allById.get(getId(b)).push(b);
+	}
+
+	for (let item of allById.values()) {
+
+	}
+
+	const merged = sortBy(
+		[
+			...args.a,
+			...args.b.filter(b => !aById.has(getId(b)))
+		],
+		getGroupingKey);
+
+	let offset = 1;
+	for (let item of merged) {
+		const oldIdentifier = getId(item);
+		const newIdentifier = getTypeFromId(oldIdentifier) + (offset++);
+		if (oldIdentifier === newIdentifier)
+			continue;
+
+		if (allById.has(newIdentifier))
+			newIdentifier += "-temp";
+
+		item[args.idProperty] = newIdentifier;
+		args.onIdentifierChanged(oldIdentifier, newIdentifier);
+	}
+
+	return merged;
 }
 
 export async function mergeStates(
@@ -58,7 +221,7 @@ export async function mergeStates(
 	const mergedFiles = merge({
 		a: previousState?.files || [],
 		b: newState.files,
-		identifierProperty: "id",
+		idProperty: "id",
 		groupingKeyProperty: "path",
 		onIdentifierChanged: (oldId, newId) => {
 			const coveredLinesInFile = newState.coverage.filter(x => x.fileId === oldId);
@@ -70,7 +233,7 @@ export async function mergeStates(
 	const mergedTests = merge({
 		a: previousState?.tests || [],
 		b: newState.tests,
-		identifierProperty: "id",
+		idProperty: "id",
 		groupingKeyProperty: "name",
 		onIdentifierChanged: (oldId, newId) => {
 			const coveredLinesWithTest = newState.coverage.filter(x => x.testIds.indexOf(oldId) > -1);
@@ -162,7 +325,7 @@ function getLinesPresentInOldCoverageButNotNew(previousState: ProviderState, new
 	return linesToRemove;
 }
 
-export function getLineCoverageForFileFromState(state: ProviderState, fileId: number) {
+export function getLineCoverageForFileFromState(state: ProviderState, fileId: StateFileId) {
 	return state.coverage.filter(
 		previousStateLine => previousStateLine.fileId === fileId);
 }
@@ -175,6 +338,6 @@ export function getFileIdFromStateForPath(state: ProviderState, path: string) {
 	return file.id;
 }
 
-export function getTestFromStateById(state: ProviderState, id: number): StateTest {
+export function getTestFromStateById(state: ProviderState, id: StateTestId): StateTest {
 	return state.tests.find(y => y.id === id);
 }

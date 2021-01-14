@@ -77,7 +77,7 @@ function watchProvider(provider: Provider, args: Args) {
 
 	const onFilesChanged = throttle(async (path: string) => {
 		const isFileInGitIgnore = await git.isFileInGitIgnore(path);
-		console.debug("file-changed", path, isFileInGitIgnore);
+		con.debug(() => ["file-changed", path, isFileInGitIgnore]);
 
 		if (isFileInGitIgnore)
 			return;
@@ -88,6 +88,7 @@ function watchProvider(provider: Provider, args: Args) {
 		if (isRunning) {
 			hasPending = true;
 			console.log(yellow('Changes have been detected during the current test run. A new test run has been scheduled after the current one is complete.'));
+			console.log();
 			return;
 		}
 

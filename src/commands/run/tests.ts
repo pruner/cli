@@ -61,9 +61,9 @@ async function runTestsForProvider(
 	);
 	sanitizeState(mergedState);
 
-	console.debug('previous-state', previousState);
-	console.debug('new-state', newState);
-	console.debug('merged-state', newState);
+	con.debug(() => ['previous-state', JSON.stringify(previousState, null, ' ')]);
+	con.debug(() => ['new-state', JSON.stringify(newState, null, ' ')]);
+	con.debug(() => ['merged-state', JSON.stringify(mergedState, null, ' ')]);
 
 	if (processResult.exitCode !== 0) {
 		if (processResult.exitCode === undefined) {
@@ -111,7 +111,9 @@ async function runTestsForProvider(
 		}
 	} else {
 		await pruner.persistState(providerId, mergedState);
+
 		console.log(bgGreen.whiteBright('✔ Tests ran successfully!'));
+		console.log();
 	}
 
 	const actualTestRuns = chain(newState.coverage)

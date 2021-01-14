@@ -1,5 +1,6 @@
 import execa from "execa";
 import io from "./io";
+import con from "./console";
 import parseGitDiff from "git-diff-parser";
 import fs from 'fs';
 import { chain } from "lodash";
@@ -64,19 +65,24 @@ async function isFileInGitIgnore(path: string) {
 		const gitIgnoreFile = files.find(x => basename(x) === ".gitignore");
 		if (!!gitIgnoreFile) {
 			const gitIgnorePath = join(currentPath, gitIgnoreFile);
-			console.debug('is-file-in-gitignore detected', gitIgnorePath);
+			con.debug(() => ['is-file-in-gitignore detected', gitIgnorePath]);
 
 			const contentsBuffer = await fs.promises.readFile(gitIgnorePath);
 			const contents = contentsBuffer.toString();
-			gitIgnoreLines.push(...contents
+			const lines = contents
 				.replace(/\r/g, "")
-				.split('\n')
+				.split('\n');
+			gitIgnoreLines.push(...chain(lines)
+				.map(x => x.trim())
+				.filter(x => !!x)
+				.filter(x => x.substr(0, 1) !== '#')
 				.map(p => join(
 					currentPath,
 					p))
-				.map(p => p.endsWith(sep) ?
+				.flatMap(p => p.endsWith(sep) ?
 					p + "**" :
-					p));
+					[p, join(p, sep, "**")])
+				.value());
 		}
 
 		currentPath = dirname(currentPath);
@@ -84,13 +90,13 @@ async function isFileInGitIgnore(path: string) {
 			break;
 	}
 
-	console.debug('is-file-in-gitignore result', path, gitIgnoreLines);
+	con.debug(() => ['is-file-in-gitignore result', path, gitIgnoreLines]);
 	return !!gitIgnoreLines.find(line => minimatch(path, line));
 }
 
 async function getGitTopDirectory() {
 	const path = await runGitCommand("rev-parse", "--show-toplevel");
-	console.debug('git-top-directory', path);
+	con.debug(() => ['git-top-directory', path]);
 
 	if (!path)
 		return path;
