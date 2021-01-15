@@ -1,5 +1,5 @@
 import _, { chain, last, min, minBy, remove, sortBy } from "lodash";
-import { ProviderState, StateFile, StateFileId, StateLineCoverage, StateTest, StateTestId } from "../../providers/types";
+import { Provider, ProviderState, StateFile, StateFileId, StateLineCoverage, StateTest, StateTestId } from "../../providers/types";
 
 type StateReferenceIdChangedCallback = (fromId: string, toId: string) => void;
 
@@ -143,149 +143,27 @@ function getTypeFromId(id: string) {
 	return id.substr(0, 1);
 }
 
-export function merge<T>(args: {
-	a: T[],
-	b: T[],
-	idProperty: string,
-	groupingKeyProperty: string,
-	onIdentifierChanged: (a: any, b: any) => void
-}) {
-	const renameInstructions = new Array<{
-		target: T,
-		fromId: string,
-		toId: string
-	}>();
-
-	const mergeInstructions = new Array<{
-		target: T,
-	}>();
-
-	const getId = (x: T) => x[args.idProperty];
-	const getGroupingKey = (x: T) => x[args.groupingKeyProperty];
-
-	const allById = new Map<string, T[]>();
-
-	const aById = new Map<string, T>();
-	for (let a of args.a) {
-		aById.set(getId(a), a);
-
-		if (!allById.has(getId(a)))
-			allById.set(getId(a), []);
-
-		allById.get(getId(a)).push(a);
-	}
-
-	const bById = new Map<string, T>();
-	for (let b of args.b) {
-		bById.set(getId(b), b);
-
-		if (!allById.has(getId(b)))
-			allById.set(getId(b), []);
-
-		allById.get(getId(b)).push(b);
-	}
-
-	for (let item of allById.values()) {
-
-	}
-
-	const merged = sortBy(
-		[
-			...args.a,
-			...args.b.filter(b => !aById.has(getId(b)))
-		],
-		getGroupingKey);
-
-	let offset = 1;
-	for (let item of merged) {
-		const oldIdentifier = getId(item);
-		const newIdentifier = getTypeFromId(oldIdentifier) + (offset++);
-		if (oldIdentifier === newIdentifier)
-			continue;
-
-		if (allById.has(newIdentifier))
-			newIdentifier += "-temp";
-
-		item[args.idProperty] = newIdentifier;
-		args.onIdentifierChanged(oldIdentifier, newIdentifier);
-	}
-
-	return merged;
-}
-
 export async function mergeStates(
 	affectedTests: StateTest[],
 	previousState: ProviderState,
 	newState: ProviderState,
 ): Promise<ProviderState> {
-	const mergedFiles = merge({
-		a: previousState?.files || [],
-		b: newState.files,
-		idProperty: "id",
-		groupingKeyProperty: "path",
-		onIdentifierChanged: (oldId, newId) => {
-			const coveredLinesInFile = newState.coverage.filter(x => x.fileId === oldId);
-			for (let coveredLine of coveredLinesInFile)
-				coveredLine.fileId = newId;
+	const previousStateDecorator = new StateDecorator(previousState);
+	const newStateDecorator = new StateDecorator(newState);
+
+	//TODO: call changeId on all existing tests and files on the previous and new states, and rename to GUIDs first, or something similar. then no conflicts will occur on merge.
+
+	for (let newFile of newStateDecorator.files.all) {
+		const previousFile = previousStateDecorator.files.byName.get(newFile.path);
+		if (!previousFile)
+			continue;
+
+		if (previousFile.id !== newFile.id) {
+			newFile.changeId(previousFile.id + "-temp");
 		}
-	});
 
-	const mergedTests = merge({
-		a: previousState?.tests || [],
-		b: newState.tests,
-		idProperty: "id",
-		groupingKeyProperty: "name",
-		onIdentifierChanged: (oldId, newId) => {
-			const coveredLinesWithTest = newState.coverage.filter(x => x.testIds.indexOf(oldId) > -1);
-			for (let coveredLine of coveredLinesWithTest) {
-				remove(coveredLine.testIds, testId => testId === oldId);
-				coveredLine.testIds.push(newId);
-			}
-		}
-	});
-
-	const linesToRemove = getLinesPresentInOldCoverageButNotNew(previousState, newState);
-
-	const mergedState: ProviderState = {
-		tests: mergedTests,
-		files: mergedFiles,
-		coverage: _
-			.chain([
-				previousState?.coverage || [],
-				newState.coverage
-			])
-			.flatMap()
-			.filter(x => !linesToRemove.find(l =>
-				l.fileId === x.fileId &&
-				l.lineNumber === x.lineNumber))
-			.groupBy(x => `${x.fileId}_${x.lineNumber}`)
-			.map(x => ({
-				fileId: last(x).fileId,
-				lineNumber: last(x).lineNumber,
-				testIds: _.chain(x)
-					.flatMap(t => t.testIds)
-					.uniq()
-					.value()
-			}))
-			.value()
-	};
-
-	for (const testInFilter of affectedTests) {
-		const newStateTestIndex = newState.tests.findIndex(x => x.name === testInFilter.name);
-		const mergedStateTestIndex = mergedState.tests.findIndex(x => x.name === testInFilter.name);
-		if (newStateTestIndex === -1 && mergedStateTestIndex > -1) {
-			mergedState.tests.splice(mergedStateTestIndex, 1);
-
-			mergedState.coverage.forEach(lineCoverage =>
-				remove(lineCoverage.testIds, x => x === testInFilter.id));
-		}
+		//TODO: change all coverage files of newStateDecorator for file to point to previous file.
 	}
-
-	remove(
-		mergedState.coverage,
-		x => x.testIds.length === 0);
-
-	return mergedState;
 }
 
 function getLinesPresentInOldCoverageButNotNew(previousState: ProviderState, newState: ProviderState) {
