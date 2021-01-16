@@ -38,6 +38,8 @@ test("state: merge two providers with same test ids, but different file paths", 
 	expect(merged).toStrictEqual({
 		tests: [
 			{
+				failure: null,
+				duration: null,
 				name: "x1",
 				fileCoverage: [
 					{
