@@ -1,111 +1,55 @@
-// import { merge } from "../src/commands/run/state";
+import { mergeStates } from "../src/commands/run/state";
+import { ProviderState, StateTest } from "../src/providers/types";
 
-test("state: merge identical identifiers", () => {
-	throw new Error("Not implemented");
-	// const oldObject = {
-	// 	id: "x1",
-	// 	name: "foo"
-	// };
+test("state: merge two providers with same test ids, but different file paths", async () => {
+	const oldObject: ProviderState = {
+		tests: [
+			{
+				name: "x1",
+				fileCoverage: [
+					{
+						path: "path2.cs",
+						lineCoverage: [1]
+					}
+				]
+			} as StateTest
+		]
+	};
 
-	// const newObject = {
-	// 	id: "x2",
-	// 	name: "blah"
-	// };
+	const newObject: ProviderState = {
+		tests: [
+			{
+				name: "x1",
+				fileCoverage: [
+					{
+						path: "path1.cs",
+						lineCoverage: [2]
+					}
+				]
+			} as StateTest
+		]
+	};
 
-	// let identifierChanges = [];
+	const merged = await mergeStates(
+		[],
+		oldObject,
+		newObject);
 
-	// const merged = merge({
-	// 	a: [oldObject],
-	// 	b: [newObject],
-	// 	groupingKeyProperty: "name",
-	// 	idProperty: "id",
-	// 	onIdentifierChanged: (a, b) => {
-	// 		identifierChanges.push([a, b]);
-	// 	}
-	// });
-
-	// expect(merged).toStrictEqual([
-	// 	{
-	// 		id: "x1",
-	// 		name: "blah"
-	// 	},
-	// 	{
-	// 		id: "x2",
-	// 		name: "foo"
-	// 	}
-	// ]);
-
-	// expect(identifierChanges).toBe([
-	// 	["x2", "x1"]
-	// ]);
-});
-
-test("state: merge identical grouping keys", () => {
-	throw new Error("Not implemented");
-	// const oldObject = {
-	// 	id: "x2",
-	// 	name: "foo"
-	// };
-
-	// const newObject = {
-	// 	id: "x1",
-	// 	name: "foo"
-	// };
-
-	// let identifierChanges = [];
-
-	// const merged = merge({
-	// 	a: [oldObject],
-	// 	b: [newObject],
-	// 	groupingKeyProperty: "name",
-	// 	idProperty: "id",
-	// 	onIdentifierChanged: (a, b) => {
-	// 		identifierChanges.push([a, b]);
-	// 	}
-	// });
-
-	// expect(merged).toStrictEqual([
-	// 	{
-	// 		id: "x1",
-	// 		name: "foo"
-	// 	}
-	// ]);
-
-	// expect(identifierChanges).toBe("");
-	// expect(identifierChanges).toBe("");
-});
-
-test("state: merge identical grouping keys", () => {
-	throw new Error("Not implemented");
-	// const oldObject = {
-	// 	id: "x1",
-	// 	name: "foo"
-	// };
-
-	// const newObject = {
-	// 	id: "x2",
-	// 	name: "foo"
-	// };
-
-	// let identifierChanges = [];
-
-	// const merged = merge({
-	// 	a: [oldObject],
-	// 	b: [newObject],
-	// 	groupingKeyProperty: "name",
-	// 	idProperty: "id",
-	// 	onIdentifierChanged: (a, b) => {
-	// 		identifierChanges.push([a, b]);
-	// 	}
-	// });
-
-	// expect(merged).toStrictEqual([
-	// 	{
-	// 		id: "x2",
-	// 		name: "foo"
-	// 	}
-	// ]);
-
-	// expect(identifierChanges).toBe("");
-	// expect(identifierChanges).toBe("");
+	expect(merged).toStrictEqual({
+		tests: [
+			{
+				name: "x1",
+				fileCoverage: [
+					{
+						path: "path1.cs",
+						lineCoverage: [2]
+					},
+					{
+						path: "path2.cs",
+						lineCoverage: [1]
+					}
+				]
+			} as StateTest
+		]
+	});
 });

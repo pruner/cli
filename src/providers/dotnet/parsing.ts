@@ -87,7 +87,8 @@ export async function parseTests(
 			const previousDefinition = testDefinitions.find(t => t.id === x.$.testId);
 			return ({
 				duration: parseDuration() || null,
-				...previousDefinition,
+				id: previousDefinition.id,
+				name: previousDefinition.name,
 				failure: passed ? null : {
 					stdout: stdout.length > 0 ? stdout : null,
 					message: message || null,
@@ -106,12 +107,10 @@ export async function parseTests(
 		.filter(x => !!x)
 		.uniqBy(x => x.name)
 		.map(x => {
-			const previousResult = testResults.find(t => t.name === sanitizeMethodName(x.name));
+			const testResult = testResults.find(t => t.name === sanitizeMethodName(x.name));
 			return <StateTest>{
-				failure: null,
-				errorMessage: void 0,
-				stdout: void 0,
-				...previousResult,
+				duration: testResult?.duration || null,
+				failure: testResult?.failure || null,
 				name: sanitizeMethodName(x.name),
 				fileCoverage: chain(coverage)
 					.filter(f => f.testIds.indexOf(x.uid) > -1)
@@ -146,9 +145,9 @@ export function parseLineCoverage(modules: ModuleModule[]) {
 				.flatMap((m) => m.TrackedMethodRef)
 				.map((m) => m?.$)
 				.filter((m) => !!m)
-				.map((m) => `t${+m.uid}`)
+				.map((m) => `${+m.uid}`)
 				.value(),
-			fileId: `f${+x?.$.fileid}`,
+			fileId: `${+x?.$.fileid}`,
 			lineNumber: l,
 		})))
 		.filter((x) =>

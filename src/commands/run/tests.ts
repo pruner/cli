@@ -44,9 +44,7 @@ async function runTestsForProvider(
 		'Running tests',
 		async () => await provider.executeTestProcess(testsToRun));
 
-	const newState = await provider.gatherState() || {
-		coverage: [],
-		files: [],
+	const newState = await provider.gatherState() || <ProviderState>{
 		tests: []
 	};
 
@@ -111,7 +109,7 @@ async function runTestsForProvider(
 		console.log();
 	}
 
-	return newState.tests;
+	return newState.tests.filter(t => t.fileCoverage.length > 0);
 }
 
 /**

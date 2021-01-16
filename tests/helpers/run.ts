@@ -42,35 +42,39 @@ export function prepareRunTest(
 		return states;
 	}
 
-	//[2, 3, 5, 7]
-	//[-2, -3, 5, 7]
 	const getCoveredLineNumbersForFile = async (fileName: string) => {
 		const state = await getState();
 
-		const file = chain(state.tests)
-			.flatMap(x => x.fileCoverage.map(f => ({
-				file: f,
-				test: x
-			})))
+		const coverage = chain(state.tests)
+			.flatMap(x => chain(x.fileCoverage)
+				.uniqBy(f => f.path)
+				.map(f => ({
+					file: f,
+					test: x
+				}))
+				.value())
+			.flatMap(x => chain(x.file.lineCoverage)
+				.uniq()
+				.map(l => ({
+					...x,
+					line: l
+				}))
+				.value())
 			.filter(x => x.file.path.endsWith(fileName))
-			.groupBy(x => x.file.path)
-			.map(resultsByPath => ({
-				file: resultsByPath[0].file,
-				tests: resultsByPath.map(y => y.test)
+			.groupBy(x => `${x.line}`)
+			.map(x => ({
+				tests: x.map(y => y.test),
+				line: x[0].line
 			}))
-			.first()
 			.value();
-		if (!file)
-			throw new Error("File not covered.");
+		if (coverage.length === 0)
+			return [];
 
-		return chain(file.tests)
-			.flatMap(x => x.fileCoverage.map(l => ({
-				lineNumber: l,
-				test: x
-			})))
-			.map(x => x.test.failure ?
-				-x.lineNumber :
-				x.lineNumber)
+		return chain(coverage)
+			.map(x => x.tests.find(t => t.failure) ?
+				-x.line :
+				x.line)
+			.uniq()
 			.orderBy(Math.abs)
 			.value();
 	}

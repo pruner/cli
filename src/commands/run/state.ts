@@ -1,4 +1,4 @@
-import { chain, orderBy } from "lodash";
+import { chain, flatMap, orderBy } from "lodash";
 import { ProviderState, StateTest } from "../../providers/types";
 
 export async function mergeStates(
@@ -8,36 +8,47 @@ export async function mergeStates(
 ): Promise<ProviderState> {
 	//https://github.com/pruner/cli/blob/aeb84fa16537606d0a6bb527710ca33df8b85483/src/commands/run/state.ts
 
-	const result: ProviderState = {
-		tests: previousState.tests
+	const mergedState: ProviderState = {
+		tests: JSON.parse(JSON.stringify(previousState?.tests || []))
 	};
 
 	for (let newStateTest of newState.tests) {
-		const previousStateTest = previousState.tests.find(t => t.name === newStateTest.name);
+		const previousStateTest = mergedState.tests.find(t => t.name === newStateTest.name);
 		if (previousStateTest) {
+			previousStateTest.duration = newStateTest.duration;
+			previousStateTest.failure = newStateTest.failure;
+
 			for (let newFileCoverage of newStateTest.fileCoverage) {
 				const previousFileCoverage = previousStateTest.fileCoverage.find(x => x.path === newFileCoverage.path);
 				if (previousFileCoverage) {
-					previousFileCoverage.lineCoverage = chain([...previousFileCoverage.lineCoverage, ...newFileCoverage.lineCoverage])
-						.uniq()
-						.orderBy()
-						.value();
+					previousFileCoverage.lineCoverage = orderBy(newFileCoverage.lineCoverage);
 				} else {
 					previousStateTest.fileCoverage.push(newFileCoverage);
 				}
 			}
 		} else {
-			result.tests.push(newStateTest);
+			mergedState.tests.push(newStateTest);
 		}
 	}
 
-	result.tests = orderBy(result.tests, x => x.name);
+	removeTestsFromStateThatNoLongerExists(affectedTests, newState, mergedState);
 
-	for (let test of result.tests) {
+	mergedState.tests = orderBy(mergedState.tests, x => x.name);
+
+	for (let test of mergedState.tests) {
 		test.fileCoverage = orderBy(test.fileCoverage, x => x.path);
 	}
 
-	return result;
+	return mergedState;
+}
+
+function removeTestsFromStateThatNoLongerExists(affectedTests: StateTest[], newState: ProviderState, mergedState: ProviderState) {
+	for (const testInFilter of affectedTests) {
+		const newStateTestIndex = newState.tests.findIndex(x => x.name === testInFilter.name);
+		const mergedStateTestIndex = mergedState.tests.findIndex(x => x.name === testInFilter.name);
+		if (newStateTestIndex === -1 && mergedStateTestIndex > -1)
+			mergedState.tests.splice(mergedStateTestIndex, 1);
+	}
 }
 
 export function getLineCoverageForFileFromState(state: ProviderState, filePath: string) {
