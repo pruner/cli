@@ -16,7 +16,9 @@ export async function mergeStates(
 		const previousStateTest = mergedState.tests.find(t => t.name === newStateTest.name);
 		if (previousStateTest) {
 			previousStateTest.duration = newStateTest.duration || previousStateTest.duration || null;
-			previousStateTest.failure = newStateTest.failure || previousStateTest.failure || null;
+
+			if (newStateTest.fileCoverage.length > 0)
+				previousStateTest.failure = newStateTest.failure || null;
 
 			for (let newFileCoverage of newStateTest.fileCoverage) {
 				const previousFileCoverage = previousStateTest.fileCoverage.find(x => x.path === newFileCoverage.path);
