@@ -6,6 +6,8 @@ export async function mergeStates(
 	previousState: ProviderState,
 	newState: ProviderState
 ): Promise<ProviderState> {
+	//https://github.com/pruner/cli/blob/aeb84fa16537606d0a6bb527710ca33df8b85483/src/commands/run/state.ts
+
 	const result: ProviderState = {
 		tests: previousState.tests
 	};
