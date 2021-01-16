@@ -86,30 +86,31 @@ export default class MochaProvider implements Provider<MochaSettings> {
 
 		const coverageRoots = JSON.parse(coverageRootJson) as MochaCoverageContext[];
 
-		const allFiles = new Array<StateFileCoverage>();
-		const allLineCoverage = new Array<StateLineCoverage>();
-		const allTests = new Array<StateTest>();
+		const tests = new Array<StateTest>();
 
 		for (let coverageRoot of coverageRoots) {
 			const testNames = keys(coverageRoot.coverage);
 			for (let testName of testNames) {
 				const testData = coverageRoot.coverage[testName];
 
-				let test = allTests.find(x => x.name === coverageRoot.name);
+				let test = tests.find(x => x.name === coverageRoot.name);
 				if (!test) {
 					test = {
 						name: coverageRoot.name,
-						id: `t${allTests.length}`,
-						duration: coverageRoot.duration || null,
-						failure: coverageRoot.state === "failed" ?
-							{
-								message: coverageRoot.error?.message,
-								stackTrace: (coverageRoot.error && 'stack' in coverageRoot.error && coverageRoot.error['stack']) || null,
-								stdout: null
-							} : null
+						fileCoverage: [],
+						duration: null,
+						failure: null
 					};
-					allTests.push(test);
+					tests.push(test);
 				}
+
+				test.duration = coverageRoot.duration || null;
+				test.failure = coverageRoot.state === "failed" ?
+					{
+						message: coverageRoot.error?.message,
+						stackTrace: (coverageRoot.error && 'stack' in coverageRoot.error && coverageRoot.error['stack']) || null,
+						stdout: null
+					} : null;
 
 				const fileName = testData.path;
 
@@ -132,35 +133,26 @@ export default class MochaProvider implements Provider<MochaSettings> {
 				if (coveredLineNumbers.length === 0)
 					continue;
 
-				let file = allFiles.find(x => x.path === normalizedFileName);
+				let file = test.fileCoverage.find(x => x.path === normalizedFileName);
 				if (!file) {
 					file = {
 						path: normalizedFileName,
-						id: `f${allFiles.length}`
+						lineCoverage: []
 					};
-					allFiles.push(file);
+					test.fileCoverage.push(file);
 				}
 
 				for (let coveredLineNumber of coveredLineNumbers) {
-					let lineCoverage = allLineCoverage.find(x =>
-						x.fileId === file.id &&
-						x.lineNumber === coveredLineNumber);
+					let lineCoverage = file.lineCoverage.find(x => x === coveredLineNumber);
 					if (!lineCoverage) {
-						lineCoverage = {
-							fileId: file.id,
-							lineNumber: coveredLineNumber,
-							testIds: []
-						};
-						allLineCoverage.push(lineCoverage);
+						file.lineCoverage.push(coveredLineNumber);
 					}
-
-					lineCoverage.testIds.push(test.id);
 				}
 			}
 		}
 
 		return {
-			tests: allTests
+			tests: tests
 		};
 	}
 }
