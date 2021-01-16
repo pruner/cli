@@ -7,12 +7,10 @@ export type SettingsQuestions<TSettings> = TSettings extends ProviderSettings & 
 	}
 	: never;
 
-export type StateTestId = `t${number}`;
-
 export type StateTest = {
 	name: string;
-	id: StateTestId;
 	duration: number;
+	fileCoverage: StateFileCoverage[];
 	failure: {
 		stdout?: string[];
 		message?: string;
@@ -20,23 +18,13 @@ export type StateTest = {
 	}
 };
 
-export type StateLineCoverage = {
-	lineNumber: number;
-	fileId: StateFileId;
-	testIds: StateTestId[];
-};
-
-export type StateFileId = `f${number}`;
-
-export type StateFile = {
-	id: StateFileId;
+export type StateFileCoverage = {
 	path: string;
+	lineCoverage: number[];
 }
 
 export type ProviderState = {
 	tests: StateTest[];
-	files: StateFile[];
-	coverage: StateLineCoverage[];
 };
 
 export type ProviderSettings = {

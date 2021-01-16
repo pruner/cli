@@ -1,6 +1,6 @@
 import { basename, dirname, extname, join } from 'path';
 import { handler } from '../../src/commands/run/RunCommand';
-import _ from 'lodash';
+import _, { chain } from 'lodash';
 import { copy, copyFile, existsSync } from 'fs-extra';
 
 import git from '../../src/git';
@@ -34,8 +34,6 @@ export function prepareRunTest(
 		const result = await io.readFromFile(join(stateDirectory, "tests.json"));
 		if (!result) {
 			return {
-				coverage: [],
-				files: [],
 				tests: []
 			};
 		}
@@ -44,22 +42,33 @@ export function prepareRunTest(
 		return states;
 	}
 
+	//[2, 3, 5, 7]
+	//[-2, -3, 5, 7]
 	const getCoveredLineNumbersForFile = async (fileName: string) => {
 		const state = await getState();
 
-		const file = state.files.find(x => x.path.endsWith(fileName));
+		const file = chain(state.tests)
+			.flatMap(x => x.fileCoverage.map(f => ({
+				file: f,
+				test: x
+			})))
+			.filter(x => x.file.path.endsWith(fileName))
+			.groupBy(x => x.file.path)
+			.map(resultsByPath => ({
+				file: resultsByPath[0].file,
+				tests: resultsByPath.map(y => y.test)
+			}))
+			.first()
+			.value();
 		if (!file)
 			throw new Error("File not covered.");
 
-		return _.chain(state.coverage)
-			.filter(x => x.fileId === file.id)
-			.map(x => ({
-				...x,
-				tests: x.testIds.map(testId => state
-					.tests
-					.find(t => t.id === testId))
-			}))
-			.map(x => x.tests.find(y => !!y.failure) ?
+		return chain(file.tests)
+			.flatMap(x => x.fileCoverage.map(l => ({
+				lineNumber: l,
+				test: x
+			})))
+			.map(x => x.test.failure ?
 				-x.lineNumber :
 				x.lineNumber)
 			.orderBy(Math.abs)

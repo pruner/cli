@@ -2,7 +2,8 @@ import { chain, first, range } from "lodash";
 import { AltCoverRoot, ModuleModule } from "./altcover.types";
 import { TrxRoot } from "./trx.types";
 import io from "../../io";
-import { StateFile, StateLineCoverage, StateTest } from "../types";
+import git from "../../git";
+import { StateFileCoverage, StateTest } from "../types";
 import con from "../../console";
 
 export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
@@ -14,29 +15,33 @@ export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
 		.value();
 }
 
-export function parseFiles(modules: ModuleModule[], projectRootDirectory: string): StateFile[] {
+function parseFiles(modules: ModuleModule[], projectRootDirectory: string) {
 	return chain(modules)
 		.flatMap((x) => x.Files)
 		.flatMap((x) => x.File)
 		.map((x) => x?.$)
 		.filter((x) => !!x)
 		.map((x) => ({
-			id: +x.uid,
+			id: x.uid,
 			path: io.normalizePathSeparators(x.fullPath),
 		}))
 		.filter((x) => x.path.startsWith(projectRootDirectory))
-		.map((x) => <StateFile>({
+		.map((x) => ({
 			...x,
-			id: `f${x.id}`,
 			path: sanitizeStatePath(projectRootDirectory, x.path),
 		}))
 		.value();
 }
 
-export function parseTests(
+export async function parseTests(
 	altCoverModules: ModuleModule[],
 	trxSummary: TrxRoot[]
-): StateTest[] {
+): Promise<StateTest[]> {
+	const projectRootDirectory = await git.getGitTopDirectory();
+
+	const files = parseFiles(altCoverModules, projectRootDirectory);
+	const coverage = parseLineCoverage(altCoverModules);
+
 	const testRuns = trxSummary.map(x => x.TestRun);
 	const testDefinitions = chain(testRuns)
 		.flatMap(x => x.TestDefinitions)
@@ -108,7 +113,14 @@ export function parseTests(
 				stdout: void 0,
 				...previousResult,
 				name: sanitizeMethodName(x.name),
-				id: `t${+x.uid}`
+				fileCoverage: chain(coverage)
+					.filter(f => f.testIds.indexOf(x.uid) > -1)
+					.groupBy(f => f.fileId)
+					.map(g => <StateFileCoverage>({
+						path: files.find(f => f.id === g[0].fileId).path,
+						lineCoverage: g.map(l => l.lineNumber)
+					}))
+					.value()
 			};
 		})
 		.value();
@@ -118,7 +130,7 @@ function parseDuration() {
 	return -1;
 }
 
-export function parseLineCoverage(modules: ModuleModule[]): StateLineCoverage[] {
+export function parseLineCoverage(modules: ModuleModule[]) {
 	return chain(modules)
 		.flatMap((x) => x.Classes)
 		.flatMap((x) => x.Class)
@@ -129,7 +141,7 @@ export function parseLineCoverage(modules: ModuleModule[]): StateLineCoverage[] 
 		.flatMap((x) => x.SequencePoints)
 		.flatMap((x) => x.SequencePoint)
 		.filter((x) => !!x)
-		.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => <StateLineCoverage>({
+		.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => ({
 			testIds: chain(x.TrackedMethodRefs || [])
 				.flatMap((m) => m.TrackedMethodRef)
 				.map((m) => m?.$)

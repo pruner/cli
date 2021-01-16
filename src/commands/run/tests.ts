@@ -1,7 +1,6 @@
 import { flatMap, chain, takeRight, orderBy } from "lodash";
 import { CommitRange, FileChanges } from "../../git";
 import { ProviderState, StateTest } from "../../providers/types";
-import { getTestFromStateById } from "./state";
 
 import { red, gray, bgGreen, bgRed, white, bgGray, yellow } from "chalk";
 import { Provider } from "../../providers/types";
@@ -36,8 +35,6 @@ async function runTestsForProvider(
 		return null;
 	}
 
-	sanitizeState(previousState);
-
 	const testsToRun = await getTestsToRun(
 		provider.getGlobPatterns(),
 		args.all ? null : previousState,
@@ -52,14 +49,12 @@ async function runTestsForProvider(
 		files: [],
 		tests: []
 	};
-	sanitizeState(newState);
 
 	const mergedState = await mergeStates(
 		testsToRun.affected,
 		previousState,
 		newState
 	);
-	sanitizeState(mergedState);
 
 	con.debug(() => ['previous-state', JSON.stringify(previousState, null, ' ')]);
 	con.debug(() => ['new-state', JSON.stringify(newState, null, ' ')]);
@@ -116,23 +111,7 @@ async function runTestsForProvider(
 		console.log();
 	}
 
-	const actualTestRuns = chain(newState.coverage)
-		.flatMap(x => x.testIds)
-		.uniq()
-		.map(x => newState
-			.tests
-			.find(y => y.id === x))
-		.value();
-	return actualTestRuns;
-}
-
-function sanitizeState(state: ProviderState) {
-	if (!state)
-		return;
-
-	state.coverage = orderBy(state.coverage, x => x.fileId);
-	state.files = orderBy(state.files, x => x.path);
-	state.tests = orderBy(state.tests, x => x.name);
+	return newState.tests;
 }
 
 /**
@@ -186,7 +165,7 @@ export async function getTestsToRun(
 		previousState);
 
 	const allKnownUnaffectedTests = previousState.tests
-		?.filter(x => !affectedTests.find(y => y.id === x.id)) || [];
+		?.filter(x => !affectedTests.find(y => y.name === x.name)) || [];
 
 	const failingTests = previousState.tests
 		?.filter(x => !!x.failure) || [];
@@ -197,7 +176,7 @@ export async function getTestsToRun(
 				...affectedTests,
 				...failingTests
 			])
-				.uniqBy(x => x.id)
+				.uniqBy(x => x.name)
 				.value(),
 		unaffected: allKnownUnaffectedTests
 	};
@@ -210,10 +189,10 @@ export function getAffectedTests(
 	const correctedLineCoverage = flatMap(
 		gitFileChanges,
 		gitChangedFile => getLineCoverageForGitChangedFile(previousState, gitChangedFile)
-			.filter(gitLineCoverage => {
+			.filter(coverage => {
 				const newLineNumber = getNewLineNumberForLineCoverage(
 					gitChangedFile,
-					gitLineCoverage);
+					coverage.lineNumber);
 
 				return (
 					hasCoverageOfLineInSurroundingLines(newLineNumber, gitChangedFile.added) ||
@@ -222,9 +201,6 @@ export function getAffectedTests(
 			}));
 
 	return chain(correctedLineCoverage)
-		.flatMap(lineCoverage => lineCoverage.testIds)
-		.map(testId => getTestFromStateById(previousState, testId))
-		.filter(test => !!test)
-		.uniqBy(test => test.name)
+		.flatMap(lineCoverage => lineCoverage.test)
 		.value();
 }

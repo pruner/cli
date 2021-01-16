@@ -6,7 +6,7 @@ import { join, resolve } from "path";
 import con, { LogSettings } from "../../../console";
 import { io, pruner } from "../../../exports";
 import git from "../../../git";
-import { Provider, ProviderSettings, ProviderState, ProviderType, SettingsQuestions, StateFile, StateLineCoverage, StateTest, TestsByAffectedState } from "../../types";
+import { Provider, ProviderSettings, ProviderState, ProviderType, SettingsQuestions, StateFileCoverage, StateTest, TestsByAffectedState } from "../../types";
 import regexEscape from 'regex-escape';
 import { MochaCoverageContext } from "./reporter";
 
@@ -74,95 +74,97 @@ export default class MochaProvider implements Provider<MochaSettings> {
 	}
 
 	public async gatherState(): Promise<ProviderState> {
-		const coverageRootJson = await pruner.readFromTempFile("mocha.json");
-		if (!coverageRootJson) {
-			console.warn(yellow(`The Mocha Pruner reporter did not report any coverage.`));
-			console.warn(yellow(`This might mean that the provider has not been set up correctly.`));
-			console.warn(yellow('Setup instructions: https://github.com/pruner/cli/blob/main/docs/mocha.md'));
-			return null;
-		}
+		// const coverageRootJson = await pruner.readFromTempFile("mocha.json");
+		// if (!coverageRootJson) {
+		// 	console.warn(yellow(`The Mocha Pruner reporter did not report any coverage.`));
+		// 	console.warn(yellow(`This might mean that the provider has not been set up correctly.`));
+		// 	console.warn(yellow('Setup instructions: https://github.com/pruner/cli/blob/main/docs/mocha.md'));
+		// 	return null;
+		// }
 
-		const gitTopDirectory = await git.getGitTopDirectory();
+		// const gitTopDirectory = await git.getGitTopDirectory();
 
-		const coverageRoots = JSON.parse(coverageRootJson) as MochaCoverageContext[];
+		// const coverageRoots = JSON.parse(coverageRootJson) as MochaCoverageContext[];
 
-		const allFiles = new Array<StateFile>();
-		const allLineCoverage = new Array<StateLineCoverage>();
-		const allTests = new Array<StateTest>();
+		// const allFiles = new Array<StateFileCoverage>();
+		// const allLineCoverage = new Array<StateLineCoverage>();
+		// const allTests = new Array<StateTest>();
 
-		for (let coverageRoot of coverageRoots) {
-			const testNames = keys(coverageRoot.coverage);
-			for (let testName of testNames) {
-				const testData = coverageRoot.coverage[testName];
+		// for (let coverageRoot of coverageRoots) {
+		// 	const testNames = keys(coverageRoot.coverage);
+		// 	for (let testName of testNames) {
+		// 		const testData = coverageRoot.coverage[testName];
 
-				let test = allTests.find(x => x.name === coverageRoot.name);
-				if (!test) {
-					test = {
-						name: coverageRoot.name,
-						id: `t${allTests.length}`,
-						duration: coverageRoot.duration || null,
-						failure: coverageRoot.state === "failed" ?
-							{
-								message: coverageRoot.error?.message,
-								stackTrace: (coverageRoot.error && 'stack' in coverageRoot.error && coverageRoot.error['stack']) || null,
-								stdout: null
-							} : null
-					};
-					allTests.push(test);
-				}
+		// 		let test = allTests.find(x => x.name === coverageRoot.name);
+		// 		if (!test) {
+		// 			test = {
+		// 				name: coverageRoot.name,
+		// 				id: `t${allTests.length}`,
+		// 				duration: coverageRoot.duration || null,
+		// 				failure: coverageRoot.state === "failed" ?
+		// 					{
+		// 						message: coverageRoot.error?.message,
+		// 						stackTrace: (coverageRoot.error && 'stack' in coverageRoot.error && coverageRoot.error['stack']) || null,
+		// 						stdout: null
+		// 					} : null
+		// 			};
+		// 			allTests.push(test);
+		// 		}
 
-				const fileName = testData.path;
+		// 		const fileName = testData.path;
 
-				const normalizedFileName = io
-					.normalizePathSeparators(fileName)
-					.substr(resolve(gitTopDirectory).length + 1);
+		// 		const normalizedFileName = io
+		// 			.normalizePathSeparators(fileName)
+		// 			.substr(resolve(gitTopDirectory).length + 1);
 
-				const statementMap = testData.statementMap;
-				const statementCoverage = testData.s;
+		// 		const statementMap = testData.statementMap;
+		// 		const statementCoverage = testData.s;
 
-				const coveredLineNumbers = chain(statementMap)
-					.keys()
-					.filter(x =>
-						typeof statementCoverage[x] === "number" &&
-						statementCoverage[x] > 0)
-					.map(x => statementMap[x])
-					.flatMap(x => x.start.line)
-					.uniq()
-					.value();
-				if (coveredLineNumbers.length === 0)
-					continue;
+		// 		const coveredLineNumbers = chain(statementMap)
+		// 			.keys()
+		// 			.filter(x =>
+		// 				typeof statementCoverage[x] === "number" &&
+		// 				statementCoverage[x] > 0)
+		// 			.map(x => statementMap[x])
+		// 			.flatMap(x => x.start.line)
+		// 			.uniq()
+		// 			.value();
+		// 		if (coveredLineNumbers.length === 0)
+		// 			continue;
 
-				let file = allFiles.find(x => x.path === normalizedFileName);
-				if (!file) {
-					file = {
-						path: normalizedFileName,
-						id: `f${allFiles.length}`
-					};
-					allFiles.push(file);
-				}
+		// 		let file = allFiles.find(x => x.path === normalizedFileName);
+		// 		if (!file) {
+		// 			file = {
+		// 				path: normalizedFileName,
+		// 				id: `f${allFiles.length}`
+		// 			};
+		// 			allFiles.push(file);
+		// 		}
 
-				for (let coveredLineNumber of coveredLineNumbers) {
-					let lineCoverage = allLineCoverage.find(x =>
-						x.fileId === file.id &&
-						x.lineNumber === coveredLineNumber);
-					if (!lineCoverage) {
-						lineCoverage = {
-							fileId: file.id,
-							lineNumber: coveredLineNumber,
-							testIds: []
-						};
-						allLineCoverage.push(lineCoverage);
-					}
+		// 		for (let coveredLineNumber of coveredLineNumbers) {
+		// 			let lineCoverage = allLineCoverage.find(x =>
+		// 				x.fileId === file.id &&
+		// 				x.lineNumber === coveredLineNumber);
+		// 			if (!lineCoverage) {
+		// 				lineCoverage = {
+		// 					fileId: file.id,
+		// 					lineNumber: coveredLineNumber,
+		// 					testIds: []
+		// 				};
+		// 				allLineCoverage.push(lineCoverage);
+		// 			}
 
-					lineCoverage.testIds.push(test.id);
-				}
-			}
-		}
+		// 			lineCoverage.testIds.push(test.id);
+		// 		}
+		// 	}
+		// }
 
-		return {
-			coverage: allLineCoverage,
-			files: allFiles,
-			tests: allTests
-		};
+		// return {
+		// 	coverage: allLineCoverage,
+		// 	files: allFiles,
+		// 	tests: allTests
+		// };
+
+		throw new Error("Not implemented.");
 	}
 }

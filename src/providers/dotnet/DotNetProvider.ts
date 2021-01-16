@@ -12,7 +12,7 @@ import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
 import { join, resolve } from "path";
 import { LogSettings } from "../../console";
-import { parseFiles, parseLineCoverage, parseModules, parseTests } from "./parsing";
+import { parseModules, parseTests } from "./parsing";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -105,15 +105,12 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 
 		const modules = parseModules(altCoverXmlAsJson);
 
-		const projectRootDirectory = await git.getGitTopDirectory();
-		const files = parseFiles(modules, projectRootDirectory);
-		const tests = parseTests(modules, summaryFileContents);
-		const coverage = parseLineCoverage(modules);
+		const tests = await parseTests(
+			modules,
+			summaryFileContents);
 
 		return {
-			tests: tests,
-			files: files,
-			coverage: coverage,
+			tests: tests
 		};
 	}
 

@@ -1,14 +1,14 @@
 import { FileChanges } from "../../git";
-import { StateLineCoverage, ProviderState } from "../../providers/types";
-import { getFileIdFromStateForPath, getLineCoverageForFileFromState } from "./state";
+import { ProviderState } from "../../providers/types";
+import { getLineCoverageForFileFromState } from "./state";
 
 
-export function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, gitLineCoverage: StateLineCoverage) {
+export function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, coveredLineNumber: number) {
 	const gitUnchangedLine = gitChangedFile.unchanged
-		.find(x => x.oldLineNumber === gitLineCoverage.lineNumber);
+		.find(x => x.oldLineNumber === coveredLineNumber);
 
 	const newLineNumber = gitUnchangedLine?.newLineNumber ||
-		gitLineCoverage.lineNumber;
+		coveredLineNumber;
 	return newLineNumber;
 }
 
@@ -31,11 +31,7 @@ export function getLineCoverageForGitChangedFile(
 	previousState: ProviderState,
 	gitChangedFile: FileChanges,
 ) {
-	const fileIdForGitChange = getFileIdFromStateForPath(
-		previousState,
-		gitChangedFile.filePath);
-
 	return getLineCoverageForFileFromState(
 		previousState,
-		fileIdForGitChange);
+		gitChangedFile.filePath);
 }
