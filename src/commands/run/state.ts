@@ -55,11 +55,11 @@ function removeTestsFromStateThatNoLongerExists(affectedTests: StateTest[], newS
 
 export function getLineCoverageForFileFromState(state: ProviderState, filePath: string) {
 	return chain(state.tests)
-		.flatMap(test => test.fileCoverage.flatMap(file => ({
+		.flatMap(test => flatMap(test.fileCoverage, file => ({
 			test: test,
 			file: file
 		})))
-		.flatMap(x => x.file.lineCoverage.flatMap(lineNumber => ({
+		.flatMap(x => flatMap(x.file.lineCoverage, lineNumber => ({
 			test: x.test,
 			file: x.file,
 			lineNumber: lineNumber
