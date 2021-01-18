@@ -145,9 +145,9 @@ export function parseLineCoverage(modules: ModuleModule[]) {
 				.flatMap((m) => m.TrackedMethodRef)
 				.map((m) => m?.$)
 				.filter((m) => !!m)
-				.map((m) => `${+m.uid}`)
+				.map((m) => m.uid)
 				.value(),
-			fileId: `${+x?.$.fileid}`,
+			fileId: x?.$.fileid,
 			lineNumber: l,
 		})))
 		.filter((x) =>

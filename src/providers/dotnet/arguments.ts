@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { dirname, join, sep } from "path";
 import { LogSettings } from "../../console";
-import { pruner } from "../../exports";
+import { io, pruner } from "../../exports";
 import { DotNetSettings } from "./DotNetProvider";
 
 export function getCallContextArgument() {
@@ -50,6 +50,8 @@ export async function getPropertyArguments(providerId: string, properties: DotNe
 
 	const keys = _.keys(properties || {});
 	const propertyArguments = keys.map(k => `/p:${k}=${properties[k]}`);
+
+	await io.writeToFile(join(temporaryDirectoryPath, "pruner.tmp.sln"), "");
 
 	return [
 		...propertyArguments,
