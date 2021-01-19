@@ -14,10 +14,13 @@ import rimraf from "rimraf";
 import minimatch from "minimatch";
 
 import type { Args } from './RunCommand';
+import { measureTime } from "../../time";
 
 export async function runTestsForProviders(providers: Provider[], args: Args) {
-	const results = await runTestsInGitStateTransaction(providers, args);
-	return flatMap(results);
+	return await measureTime("runTestsForProviders", async () => {
+		const results = await runTestsInGitStateTransaction(providers, args);
+		return flatMap(results);
+	});
 }
 
 async function runTestsForProvider(
@@ -29,34 +32,33 @@ async function runTestsForProvider(
 
 	let previousState: ProviderState;
 	try {
-		previousState = await pruner.readState(providerId);
+		previousState = await measureTime("runTestsForProviders-previousState", async () =>
+			await pruner.readState(providerId));
 	} catch (e) {
 		//may happen if GIT is in the middle of a merge for the state file.
 		return null;
 	}
 
-	const testsToRun = await getTestsToRun(
-		provider.getGlobPatterns(),
-		args.all ? null : previousState,
-		commitRange);
+	const testsToRun = await measureTime("runTestsForProviders-testsToRun", async () =>
+		await getTestsToRun(
+			provider.getGlobPatterns(),
+			args.all ? null : previousState,
+			commitRange));
 
 	const processResult = await con.useSpinner(
 		'Running tests',
 		async () => await provider.executeTestProcess(testsToRun));
 
-	const newState = await provider.gatherState() || <ProviderState>{
-		tests: []
-	};
+	const newState = await measureTime("runTestsForProviders-newState", async () =>
+		await provider.gatherState() || <ProviderState>{
+			tests: []
+		});
 
-	const mergedState = await mergeStates(
-		testsToRun.affected,
-		previousState,
-		newState
-	);
-
-	con.debug(() => ['previous-state', JSON.stringify(previousState, null, ' ')]);
-	con.debug(() => ['new-state', JSON.stringify(newState, null, ' ')]);
-	con.debug(() => ['merged-state', JSON.stringify(mergedState, null, ' ')]);
+	const mergedState = await measureTime("runTestsForProviders-mergedState", async () =>
+		await mergeStates(
+			testsToRun.affected,
+			previousState,
+			newState));
 
 	if (processResult.exitCode !== 0) {
 		if (processResult.exitCode === undefined) {
@@ -103,7 +105,8 @@ async function runTestsForProvider(
 			}
 		}
 	} else {
-		await pruner.persistState(providerId, mergedState);
+		await measureTime("runTestsForProviders-persistState", async () =>
+			await pruner.persistState(providerId, mergedState));
 
 		console.log(bgGreen.whiteBright('✔ Tests ran successfully!'));
 		console.log();

@@ -52,14 +52,15 @@ export async function handler(args: Args) {
 	}
 
 	const providers = await createProvidersFromIdOrNameOrType(args.provider);
-	const states = await runTestsForProviders(providers, args);
 
 	if (args.watch) {
 		for (const provider of providers)
 			watchProvider(provider, args);
-	}
 
-	return states;
+		return [];
+	} else {
+		return await runTestsForProviders(providers, args);
+	}
 }
 
 function watchProvider(provider: Provider, args: Args) {

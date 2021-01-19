@@ -62,9 +62,11 @@ async function getGitIgnoreContentsForPath(path: string) {
 
 	const gitIgnoreLines = new Array<string>();
 	while (true) {
-		const gitIgnoreContents = await io.globContents("./.gitignore", {
+		const gitIgnoreContents = await io.globContents(".gitignore", {
 			workingDirectory: currentPath
 		});
+		con.debug(() => ["git-ignore-contents", currentPath, gitIgnoreContents]);
+
 		const gitIgnore = gitIgnoreContents && gitIgnoreContents[0];
 		if (gitIgnore) {
 			const lines = gitIgnore
@@ -77,6 +79,9 @@ async function getGitIgnoreContentsForPath(path: string) {
 				.flatMap(p => [
 					join(currentPath, p)
 				])
+				.flatMap(p => (p.startsWith("/") || p.startsWith("\\")) ?
+					"**" + p :
+					[p, join("**", p)])
 				.flatMap(p => (p.endsWith("/") || p.endsWith("\\")) ?
 					p + "**" :
 					[p, join(p, "**")])
@@ -84,9 +89,10 @@ async function getGitIgnoreContentsForPath(path: string) {
 				.value());
 		}
 
-		currentPath = dirname(currentPath);
 		if (currentPath === ".")
 			break;
+
+		currentPath = dirname(currentPath);
 	}
 
 	return gitIgnoreLines;
@@ -94,8 +100,9 @@ async function getGitIgnoreContentsForPath(path: string) {
 
 async function isFileInGitIgnore(path: string) {
 	const gitIgnoreLines = await declarations.getGitIgnoreContentsForPath(path);
-	con.debug(() => ['is-file-in-gitignore result', path, gitIgnoreLines]);
-	return !!gitIgnoreLines.find(line => minimatch(path, line));
+	const isInIgnore = !!gitIgnoreLines.find(line => minimatch(path, line));
+	con.debug(() => ['is-file-in-gitignore result', path, gitIgnoreLines, isInIgnore]);
+	return isInIgnore;
 }
 
 async function getGitTopDirectory() {
