@@ -1,8 +1,11 @@
 import _ from "lodash";
 import { dirname, join, sep } from "path";
 import { LogSettings } from "../../console";
-import { io, pruner } from "../../exports";
+import { git, io, pruner } from "../../exports";
+import { ProviderSettings, TestsByAffectedState } from "../types";
 import { DotNetSettings } from "./DotNetProvider";
+import { getFilter } from "./filter";
+import { makeRunSettingsFile } from "./runsettings";
 
 export function getCallContextArgument() {
 	const attributes = [
@@ -37,28 +40,32 @@ export function getAltCoverArguments(reportName: string) {
 	];
 }
 
-export function getRunSettingArguments(runSettingFilePath: string) {
+export async function getRunSettingArguments(settings: DotNetSettings, tests: TestsByAffectedState) {
+	const filter = getFilter(tests, settings);
+	const runSettingsFilePath = await makeRunSettingsFile(settings, filter);
 	return [
 		"--settings",
-		runSettingFilePath
+		runSettingsFilePath
 	];
 }
 
-export async function getPropertyArguments(providerId: string, properties: DotNetSettings["properties"]) {
-	const temporaryFilePath = await pruner.writeToTempFile(join(providerId, "build", ".gitignore"), "**");
-	const temporaryDirectoryPath = join(dirname(temporaryFilePath), "bin");
+export async function getPropertyArguments(settings: DotNetSettings) {
+	const keys = _.keys(settings.properties || {});
+	const propertyArguments = keys.map(k => `/p:${k}=${settings.properties[k]}`);
 
-	const keys = _.keys(properties || {});
-	const propertyArguments = keys.map(k => `/p:${k}=${properties[k]}`);
+	const topDirectory = await git.getGitTopDirectory();
+	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
 
-	await io.writeToFile(join(temporaryDirectoryPath, "pruner.tmp.sln"), "");
+	await io.writeToFile(
+		join(temporaryDirectoryPath, ".gitignore"),
+		"**");
 
 	return [
 		...propertyArguments,
 		`/p:GenerateTargetFrameworkAttribute=False`,
 		`/p:GenerateAssemblyInfo=False`,
 		`--output`,
-		`${temporaryDirectoryPath} `
+		`${join(temporaryDirectoryPath, "bin")} `
 	];
 }
 

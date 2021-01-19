@@ -63,6 +63,8 @@ async function safeStat(path: string) {
 async function writeToFile(path: string, contents: string) {
 	await ensurePathExists(path);
 	await fs.promises.writeFile(path, contents);
+
+	return path;
 }
 
 async function readFromFile(path: string) {

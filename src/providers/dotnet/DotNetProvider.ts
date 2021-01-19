@@ -8,8 +8,6 @@ import { yellow, yellowBright } from "chalk";
 import { getAltCoverArguments, getLoggerArguments, getPropertyArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
-import { getFilter } from "./filter";
-import { makeRunSettingsFile } from "./runsettings";
 import { join, resolve } from "path";
 import { LogSettings } from "../../console";
 import { parseModules, parseTests } from "./parsing";
@@ -65,17 +63,12 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async executeTestProcess(
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
-
-		const filter = getFilter(tests, this.settings);
-
-		const runSettingsFilePath = await makeRunSettingsFile(this.settings, filter);
-
 		const args = [
-			...getRunSettingArguments(runSettingsFilePath),
+			...await getRunSettingArguments(this.settings, tests),
 			...getAltCoverArguments(coverageXmlFileName),
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
-			...await getPropertyArguments(this.settings.id, this.settings.properties)
+			...await getPropertyArguments(this.settings)
 		];
 		con.debug(() => ["execute-settings", this.settings]);
 		con.debug(() => ["execute-args", args.join(' ')]);
