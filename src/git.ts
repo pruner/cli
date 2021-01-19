@@ -16,7 +16,8 @@ const declarations = {
 	createStashCommit,
 	getBranchName,
 	hasInitialCommitBeenMade,
-	isFileInGitIgnore
+	isFileInGitIgnore,
+	getGitIgnoreContentsForPath
 };
 
 export type FileChanges = {
@@ -56,40 +57,43 @@ async function getBranchName() {
 	return await runGitCommand("rev-parse", "--abbrev-ref", "HEAD");
 }
 
-async function isFileInGitIgnore(path: string) {
+async function getGitIgnoreContentsForPath(path: string) {
 	let currentPath = dirname(path);
 
 	const gitIgnoreLines = new Array<string>();
 	while (true) {
-		const files = await fs.promises.readdir(currentPath);
-		const gitIgnoreFile = files.find(x => basename(x) === ".gitignore");
-		if (!!gitIgnoreFile) {
-			const gitIgnorePath = join(currentPath, gitIgnoreFile);
-			con.debug(() => ['is-file-in-gitignore detected', gitIgnorePath]);
-
-			const contentsBuffer = await fs.promises.readFile(gitIgnorePath);
-			const contents = contentsBuffer.toString();
-			const lines = contents
+		const gitIgnoreContents = await io.globContents("./.gitignore", {
+			workingDirectory: currentPath
+		});
+		const gitIgnore = gitIgnoreContents && gitIgnoreContents[0];
+		if (gitIgnore) {
+			const lines = gitIgnore
 				.replace(/\r/g, "")
 				.split('\n');
 			gitIgnoreLines.push(...chain(lines)
 				.map(x => x.trim())
 				.filter(x => !!x)
 				.filter(x => x.substr(0, 1) !== '#')
-				.map(p => join(
-					currentPath,
-					p))
-				.flatMap(p => p.endsWith(sep) ?
+				.flatMap(p => [
+					join(currentPath, p)
+				])
+				.flatMap(p => (p.endsWith("/") || p.endsWith("\\")) ?
 					p + "**" :
-					[p, join(p, sep, "**")])
+					[p, join(p, "**")])
+				.map(x => x.replace(/\\/g, "/"))
 				.value());
 		}
 
 		currentPath = dirname(currentPath);
-		if (currentPath.indexOf(sep) === -1 || currentPath.lastIndexOf(sep) === currentPath.length - 1)
+		if (currentPath === ".")
 			break;
 	}
 
+	return gitIgnoreLines;
+}
+
+async function isFileInGitIgnore(path: string) {
+	const gitIgnoreLines = await declarations.getGitIgnoreContentsForPath(path);
 	con.debug(() => ['is-file-in-gitignore result', path, gitIgnoreLines]);
 	return !!gitIgnoreLines.find(line => minimatch(path, line));
 }

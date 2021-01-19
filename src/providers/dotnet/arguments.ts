@@ -46,7 +46,7 @@ export function getRunSettingArguments(runSettingFilePath: string) {
 
 export async function getPropertyArguments(providerId: string, properties: DotNetSettings["properties"]) {
 	const temporaryFilePath = await pruner.writeToTempFile(join(providerId, "build", ".gitignore"), "**");
-	const temporaryDirectoryPath = dirname(temporaryFilePath);
+	const temporaryDirectoryPath = join(dirname(temporaryFilePath), "bin");
 
 	const keys = _.keys(properties || {});
 	const propertyArguments = keys.map(k => `/p:${k}=${properties[k]}`);
@@ -58,7 +58,7 @@ export async function getPropertyArguments(providerId: string, properties: DotNe
 		`/p:GenerateTargetFrameworkAttribute=False`,
 		`/p:GenerateAssemblyInfo=False`,
 		`--output`,
-		`${join(temporaryDirectoryPath, "bin")}`
+		`${temporaryDirectoryPath} `
 	];
 }
 
@@ -74,7 +74,7 @@ export function getVerbosityArguments() {
 export function getLoggerArguments(reportName: string) {
 	return [
 		"--logger",
-		`trx;LogFileName=../${reportName}`,
+		`trx; LogFileName =../ ${reportName} `,
 		"--logger",
 		"console;verbosity=detailed"
 	];
