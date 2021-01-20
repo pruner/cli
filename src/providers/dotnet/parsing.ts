@@ -62,13 +62,16 @@ export async function parseTests(
 			const outputs = x?.Output || [];
 
 			const stdout = chain(outputs)
-				.map(t => t?.StdOut)
+				.flatMap(t => t?.StdOut)
 				?.split('\n')
 				.filter(t => !!t)
 				.map(t => t.trim())
 				.value() || [];
 
-			const errorInformation = first(outputs)?.ErrorInfo;
+			const errorInformation = chain(outputs)
+				.flatMap(t => t?.ErrorInfo || [])
+				.first()
+				.value();
 			const stackTrace = errorInformation?.StackTrace
 				?.split('\n')
 				.filter(t => !!t)
