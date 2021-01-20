@@ -1,13 +1,14 @@
+import { chain, flatMap } from "lodash";
 import { FileChanges } from "../../git";
 import { ProviderState } from "../../providers/types";
-import { getLineCoverageForFileFromState } from "./state";
 
 
 export function getNewLineNumberForLineCoverage(gitChangedFile: FileChanges, coveredLineNumber: number) {
 	const gitUnchangedLine = gitChangedFile.unchanged
 		.find(x => x.oldLineNumber === coveredLineNumber);
 
-	const newLineNumber = gitUnchangedLine?.newLineNumber ||
+	const newLineNumber =
+		gitUnchangedLine?.newLineNumber ||
 		coveredLineNumber;
 	return newLineNumber;
 }
@@ -31,7 +32,16 @@ export function getLineCoverageForGitChangedFile(
 	previousState: ProviderState,
 	gitChangedFile: FileChanges,
 ) {
-	return getLineCoverageForFileFromState(
-		previousState,
-		gitChangedFile.filePath);
+	return chain(previousState.tests)
+		.flatMap(test => flatMap(test.fileCoverage, file => ({
+			test: test,
+			file: file
+		})))
+		.flatMap(x => flatMap(x.file.lineCoverage, lineNumber => ({
+			test: x.test,
+			file: x.file,
+			lineNumber: lineNumber
+		})))
+		.filter(x => x.file.path === gitChangedFile.filePath)
+		.value();
 }

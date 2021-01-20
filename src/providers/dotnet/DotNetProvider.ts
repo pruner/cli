@@ -1,4 +1,4 @@
-import { parseStringPromise } from "xml2js";
+import { parse } from "fast-xml-parser";
 import execa from "execa";
 import io from "../../io";
 import { AltCoverRoot } from "./altcover.types";
@@ -11,6 +11,7 @@ import { TrxRoot } from "./trx.types";
 import { join, resolve } from "path";
 import { LogSettings } from "../../console";
 import { parseModules, parseTests } from "./parsing";
+import { measureTime } from "../../time";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -86,7 +87,8 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	}
 
 	public async gatherState(): Promise<ProviderState> {
-		const altCoverXmlAsJson: AltCoverRoot[] = await this.globContentsFromXmlToJson(`**/${coverageXmlFileName}`);
+		const altCoverXmlAsJson: AltCoverRoot[] = await measureTime("gatherState-altCoverXmlAsJson", async () =>
+			await this.globContentsFromXmlToJson(`**/${coverageXmlFileName}`));
 		if (altCoverXmlAsJson.length === 0) {
 			console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}.`));
 			console.warn(yellow(`Make sure AltCover is installed in your test projects.`));
@@ -94,13 +96,16 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			return null;
 		}
 
-		const summaryFileContents: TrxRoot[] = await this.globContentsFromXmlToJson(`**/${summaryFileName}`);
+		const summaryFileContents: TrxRoot[] = await measureTime("gatherState-summaryFileContents", async () =>
+			await this.globContentsFromXmlToJson(`**/${summaryFileName}`));
 
-		const modules = parseModules(altCoverXmlAsJson);
+		const modules = await measureTime("gatherState-modules", () =>
+			parseModules(altCoverXmlAsJson));
 
-		const tests = await parseTests(
-			modules,
-			summaryFileContents);
+		const tests = await measureTime("gatherState-tests", async () =>
+			await parseTests(
+				modules,
+				summaryFileContents));
 
 		return {
 			tests: tests
@@ -114,8 +119,12 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			deleteAfterRead: LogSettings.verbosity !== "verbose"
 		});
 		return await Promise.all(
-			coverageFileContents.map((file) => parseStringPromise(file, {
-				async: true,
-			})));
+			coverageFileContents.map((file) => {
+				const result = parse(file, {
+					ignoreAttributes: false,
+					arrayMode: true
+				});
+				return result;
+			}));
 	}
 }

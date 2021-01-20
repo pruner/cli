@@ -5,38 +5,26 @@
 //   "Set quicktype target language"
 
 export interface TrxRoot {
-	TestRun: TestRun;
+	TestRun: TestRun[];
 }
 
 export interface TestRun {
-	$: TestRunClass;
-	Times: TimeElement[];
+	"@_id": string;
+	"@_name": string;
+	"@_runUser": string;
+	"@_xmlns": string;
+	Times: Time[];
 	TestSettings: TestSetting[];
 	Results: Result[];
 	TestDefinitions: TestDefinition[];
 	TestEntries: TestRunTestEntry[];
 	TestLists: TestRunTestList[];
-	ResultSummary: ResultSummaryElement[];
-}
-
-export interface TestRunClass {
-	id: string;
-	name: string;
-	runUser: string;
-	xmlns: string;
-}
-
-export interface ResultSummaryElement {
-	$: ResultSummary;
-	Counters: Counter[];
+	ResultSummary: ResultSummary[];
 }
 
 export interface ResultSummary {
-	outcome: string;
-}
-
-export interface Counter {
-	$: { [key: string]: string };
+	"@_outcome": string;
+	Counters: { [key: string]: string }[];
 }
 
 export interface Result {
@@ -44,53 +32,66 @@ export interface Result {
 }
 
 export interface UnitTestResult {
-	$: { [key: string]: string };
+	"@_executionId": string;
+	"@_testId": string;
+	"@_testName": string;
+	"@_computerName": ComputerName;
+	"@_duration": string;
+	"@_startTime": string;
+	"@_endTime": string;
+	"@_testType": string;
+	"@_outcome": Outcome;
+	"@_testListId": string;
+	"@_relativeResultsDirectory": string;
 	Output: Output[];
 }
 
-export interface Output {
-	StdOut: string[];
-	ErrorInfo: ErrorInfo[];
+export enum ComputerName {
+	Surfacestudio = "SURFACESTUDIO",
 }
 
-export interface ErrorInfo {
-	Message: string[];
-	StackTrace: string[];
+export enum Outcome {
+	Passed = "Passed",
+}
+
+export interface Output {
+	StdOut: string;
+	ErrorInfo: {
+		Message: string,
+		StackTrace: string,
+	}
 }
 
 export interface TestDefinition {
-	UnitTest: UnitTestElement[];
-}
-
-export interface UnitTestElement {
-	$: UnitTest;
-	Execution: ExecutionElement[];
-	TestMethod: TestMethodElement[];
+	UnitTest: UnitTest[];
 }
 
 export interface UnitTest {
-	name: string;
-	storage: string;
-	id: string;
-}
-
-export interface ExecutionElement {
-	$: Execution;
+	"@_name": string;
+	"@_storage": string;
+	"@_id": string;
+	Execution: Execution[];
+	TestMethod: TestMethod[];
 }
 
 export interface Execution {
-	id: string;
-}
-
-export interface TestMethodElement {
-	$: TestMethod;
+	"@_id": string;
 }
 
 export interface TestMethod {
-	codeBase: string;
-	adapterTypeName: string;
-	className: string;
-	name: string;
+	"@_codeBase": string;
+	"@_adapterTypeName": AdapterTypeName;
+	"@_className": ClassName;
+	"@_name": string;
+}
+
+export enum AdapterTypeName {
+	ExecutorMstestadapterV2 = "executor://mstestadapter/v2",
+}
+
+export enum ClassName {
+	SampleTestsDarknessSampleDarknessTests = "Sample.Tests.Darkness.SampleDarknessTests",
+	SampleTestsWorldSampleWorldTests = "Sample.Tests.World.SampleWorldTests",
 }
 
 export interface TestRunTestEntry {
@@ -98,13 +99,9 @@ export interface TestRunTestEntry {
 }
 
 export interface TestEntryTestEntry {
-	$: TestEntry;
-}
-
-export interface TestEntry {
-	testId: string;
-	executionId: string;
-	testListId: string;
+	"@_testId": string;
+	"@_executionId": string;
+	"@_testListId": string;
 }
 
 export interface TestRunTestList {
@@ -112,34 +109,23 @@ export interface TestRunTestList {
 }
 
 export interface TestListTestList {
-	$: TestList;
-}
-
-export interface TestList {
-	name: string;
-	id: string;
+	"@_name": string;
+	"@_id": string;
 }
 
 export interface TestSetting {
-	$: TestList;
-	Deployment: DeploymentElement[];
-}
-
-export interface DeploymentElement {
-	$: Deployment;
+	"@_name": string;
+	"@_id": string;
+	Deployment: Deployment[];
 }
 
 export interface Deployment {
-	runDeploymentRoot: string;
-}
-
-export interface TimeElement {
-	$: Time;
+	"@_runDeploymentRoot": string;
 }
 
 export interface Time {
-	creation: string;
-	queuing: string;
-	start: string;
-	finish: string;
+	"@_creation": string;
+	"@_queuing": string;
+	"@_start": string;
+	"@_finish": string;
 }

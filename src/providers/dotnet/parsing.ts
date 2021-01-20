@@ -1,4 +1,4 @@
-import { chain, first, range } from "lodash";
+import { chain, first, flatMap, range } from "lodash";
 import { AltCoverRoot, ModuleModule } from "./altcover.types";
 import { TrxRoot } from "./trx.types";
 import io from "../../io";
@@ -8,22 +8,21 @@ import con from "../../console";
 
 export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
 	return chain(altCoverXmlAsJson)
-		.map((x) => x.CoverageSession)
-		.flatMap((x) => x.Modules)
-		.flatMap((x) => x.Module)
+		.flatMap((x) => x?.CoverageSession || [])
+		.flatMap((x) => x?.Modules || [])
+		.flatMap((x) => x?.Module || [])
 		.filter((x) => !!x)
 		.value();
 }
 
 function parseFiles(modules: ModuleModule[], projectRootDirectory: string) {
 	return chain(modules)
-		.flatMap((x) => x.Files)
-		.flatMap((x) => x.File)
-		.map((x) => x?.$)
+		.flatMap((x) => x?.Files || [])
+		.flatMap((x) => x?.File || [])
 		.filter((x) => !!x)
 		.map((x) => ({
-			id: x.uid,
-			path: io.normalizePathSeparators(x.fullPath),
+			id: x["@_uid"],
+			path: io.normalizePathSeparators(x["@_fullPath"]),
 		}))
 		.filter((x) => x.path.startsWith(projectRootDirectory))
 		.map((x) => ({
@@ -42,49 +41,42 @@ export async function parseTests(
 	const files = parseFiles(altCoverModules, projectRootDirectory);
 	const coverage = parseLineCoverage(altCoverModules);
 
-	const testRuns = trxSummary.map(x => x.TestRun);
+	const testRuns = chain(trxSummary)
+		.flatMap(x => x.TestRun)
+		.value();
 	const testDefinitions = chain(testRuns)
-		.flatMap(x => x.TestDefinitions)
-		.flatMap(x => x?.UnitTest)
+		.flatMap(x => x.TestDefinitions || [])
+		.flatMap(x => x?.UnitTest || [])
 		.filter(x => !!x)
-		.flatMap(x => x
-			.TestMethod
-			.map(t => ({
-				id: x.$.id,
-				name: `${t.$.className}.${t.$.name}`
-			})))
+		.flatMap(x => flatMap(x.TestMethod, t => ({
+			id: x["@_id"],
+			name: `${t["@_className"]}.${t["@_name"]}`
+		})))
 		.value();
 	const testResults = chain(testRuns)
-		.flatMap(x => x.Results)
-		.flatMap(x => x?.UnitTestResult)
+		.flatMap(x => x.Results || [])
+		.flatMap(x => x?.UnitTestResult || [])
 		.filter(x => !!x)
 		.map(x => {
-			const passed = x.$.outcome === "Passed";
+			const passed = x["@_outcome"] === "Passed";
 			const outputs = x?.Output || [];
 
 			const stdout = chain(outputs)
-				.flatMap(t => t?.StdOut || [])
-				.first()
-				.split('\n')
+				.map(t => t?.StdOut)
+				?.split('\n')
 				.filter(t => !!t)
 				.map(t => t.trim())
-				.value();
+				.value() || [];
 
-			const errorInformation = chain(outputs)
-				.flatMap(t => t?.ErrorInfo || [])
-				.first()
-				.value();
-
-			const stackTrace = chain(errorInformation?.StackTrace || [])
-				.first()
-				.split('\n')
+			const errorInformation = first(outputs)?.ErrorInfo;
+			const stackTrace = errorInformation?.StackTrace
+				?.split('\n')
 				.filter(t => !!t)
-				.map(t => t.trim())
-				.value();
+				.map(t => t.trim()) || [];
 
-			const message = first(errorInformation?.Message || [])?.trim();
+			const message = errorInformation?.Message?.trim();
 
-			const previousDefinition = testDefinitions.find(t => t.id === x.$.testId);
+			const previousDefinition = testDefinitions.find(t => t.id === x["@_testId"]);
 			return ({
 				duration: parseDuration() || null,
 				id: previousDefinition.id,
@@ -100,20 +92,18 @@ export async function parseTests(
 
 	con.debug(() => ["test-results", testResults]);
 
-	return chain(altCoverModules)
-		.flatMap(x => x.TrackedMethods)
-		.flatMap(x => x.TrackedMethod)
-		.map(x => x?.$)
+	const tests = chain(altCoverModules)
+		.flatMap(x => x?.TrackedMethods || [])
+		.flatMap(x => x?.TrackedMethod || [])
 		.filter(x => !!x)
-		.uniqBy(x => x.name)
 		.map(x => {
-			const testResult = testResults.find(t => t.name === sanitizeMethodName(x.name));
+			const testResult = testResults.find(t => t.name === sanitizeMethodName(x["@_name"]));
 			return <StateTest>{
 				duration: testResult?.duration || null,
 				failure: testResult?.failure || null,
-				name: sanitizeMethodName(x.name),
+				name: sanitizeMethodName(x["@_name"]),
 				fileCoverage: chain(coverage)
-					.filter(f => f.testIds.indexOf(x.uid) > -1)
+					.filter(f => f.testIds.indexOf(x["@_uid"]) > -1)
 					.groupBy(f => f.fileId)
 					.map(g => <StateFileCoverage>({
 						path: files.find(f => f.id === g[0].fileId).path,
@@ -123,6 +113,7 @@ export async function parseTests(
 			};
 		})
 		.value();
+	return tests;
 }
 
 function parseDuration() {
@@ -131,23 +122,22 @@ function parseDuration() {
 
 export function parseLineCoverage(modules: ModuleModule[]) {
 	return chain(modules)
-		.flatMap((x) => x.Classes)
-		.flatMap((x) => x.Class)
+		.flatMap((x) => x?.Classes || [])
+		.flatMap((x) => x?.Class || [])
 		.filter((x) => !!x)
-		.flatMap((x) => x.Methods)
-		.flatMap((x) => x.Method)
+		.flatMap((x) => x?.Methods || [])
+		.flatMap((x) => x?.Method || [])
 		.filter((x) => !!x)
-		.flatMap((x) => x.SequencePoints)
-		.flatMap((x) => x.SequencePoint)
+		.flatMap((x) => x?.SequencePoints || [])
+		.flatMap((x) => x?.SequencePoint || [])
 		.filter((x) => !!x)
-		.flatMap((x) => range(+x.$.sl, +x.$.el + 1).map((l) => ({
+		.flatMap((x) => range(+x["@_sl"], +x["@_el"] + 1).map((l) => ({
 			testIds: chain(x.TrackedMethodRefs || [])
-				.flatMap((m) => m.TrackedMethodRef)
-				.map((m) => m?.$)
+				.flatMap(m => m?.TrackedMethodRef || [])
 				.filter((m) => !!m)
-				.map((m) => m.uid)
+				.map((m) => m["@_uid"])
 				.value(),
-			fileId: x?.$.fileid,
+			fileId: x?.["@_fileid"],
 			lineNumber: l,
 		})))
 		.filter((x) =>

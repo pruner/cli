@@ -49,16 +49,20 @@ async function runTestsForProvider(
 		'Running tests',
 		async () => await provider.executeTestProcess(testsToRun));
 
-	const newState = await measureTime("runTestsForProviders-newState", async () =>
-		await provider.gatherState() || <ProviderState>{
-			tests: []
-		});
+	const newState = await con.useSpinner(
+		'Collecting coverage',
+		async () => await measureTime("runTestsForProviders-newState",
+			async () => await provider.gatherState() || <ProviderState>{
+				tests: []
+			}));
 
-	const mergedState = await measureTime("runTestsForProviders-mergedState", async () =>
-		await mergeStates(
-			testsToRun.affected,
-			previousState,
-			newState));
+	const mergedState = await con.useSpinner(
+		'Generating report',
+		async () => await measureTime("runTestsForProviders-mergedState",
+			async () => await mergeStates(
+				testsToRun.affected,
+				previousState,
+				newState)));
 
 	if (processResult.exitCode !== 0) {
 		if (processResult.exitCode === undefined) {
@@ -187,19 +191,24 @@ export function getAffectedTests(
 	gitFileChanges: FileChanges[],
 	previousState: ProviderState,
 ) {
-	const correctedLineCoverage = flatMap(
-		gitFileChanges,
-		gitChangedFile => getLineCoverageForGitChangedFile(previousState, gitChangedFile)
-			.filter(coverage => {
+	const correctedLineCoverage = chain(gitFileChanges)
+		.flatMap(gitChangedFile => {
+			const linesCoverage = getLineCoverageForGitChangedFile(previousState, gitChangedFile);
+			const filteredLinesCoverage = linesCoverage.filter(lineCoverage => {
 				const newLineNumber = getNewLineNumberForLineCoverage(
 					gitChangedFile,
-					coverage.lineNumber);
+					lineCoverage.lineNumber);
 
-				return (
+				const hasCoverage = (
 					hasCoverageOfLineInSurroundingLines(newLineNumber, gitChangedFile.added) ||
 					hasCoverageOfLineInSurroundingLines(newLineNumber, gitChangedFile.deleted)
 				);
-			}));
+				return hasCoverage;
+			});
+
+			return filteredLinesCoverage;
+		})
+		.value();
 
 	return chain(correctedLineCoverage)
 		.flatMap(lineCoverage => lineCoverage.test)

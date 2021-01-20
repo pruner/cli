@@ -54,6 +54,9 @@ export async function handler(args: Args) {
 	const providers = await createProvidersFromIdOrNameOrType(args.provider);
 
 	if (args.watch) {
+		if (args.verbosity !== "verbose")
+			await runTestsForProviders(providers, args);
+
 		for (const provider of providers)
 			watchProvider(provider, args);
 

@@ -6,8 +6,6 @@ export async function mergeStates(
 	previousState: ProviderState,
 	newState: ProviderState
 ): Promise<ProviderState> {
-	//https://github.com/pruner/cli/blob/aeb84fa16537606d0a6bb527710ca33df8b85483/src/commands/run/state.ts
-
 	const mergedState: ProviderState = {
 		tests: JSON.parse(JSON.stringify(previousState?.tests || []))
 	};
@@ -44,26 +42,15 @@ export async function mergeStates(
 	return mergedState;
 }
 
-function removeTestsFromStateThatNoLongerExists(affectedTests: StateTest[], newState: ProviderState, mergedState: ProviderState) {
+function removeTestsFromStateThatNoLongerExists(
+	affectedTests: StateTest[],
+	newState: ProviderState,
+	mergedState: ProviderState
+) {
 	for (const testInFilter of affectedTests) {
 		const newStateTestIndex = newState.tests.findIndex(x => x.name === testInFilter.name);
 		const mergedStateTestIndex = mergedState.tests.findIndex(x => x.name === testInFilter.name);
 		if (newStateTestIndex === -1 && mergedStateTestIndex > -1)
 			mergedState.tests.splice(mergedStateTestIndex, 1);
 	}
-}
-
-export function getLineCoverageForFileFromState(state: ProviderState, filePath: string) {
-	return chain(state.tests)
-		.flatMap(test => flatMap(test.fileCoverage, file => ({
-			test: test,
-			file: file
-		})))
-		.flatMap(x => flatMap(x.file.lineCoverage, lineNumber => ({
-			test: x.test,
-			file: x.file,
-			lineNumber: lineNumber
-		})))
-		.filter(x => x.file.path === filePath)
-		.value();
 }
