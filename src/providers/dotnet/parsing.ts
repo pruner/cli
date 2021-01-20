@@ -1,10 +1,11 @@
-import { chain, first, flatMap, range } from "lodash";
+import { chain, flatMap, range } from "lodash";
 import { AltCoverRoot, ModuleModule } from "./altcover.types";
 import { TrxRoot } from "./trx.types";
 import io from "../../io";
 import git from "../../git";
 import { StateFileCoverage, StateTest } from "../types";
 import con from "../../console";
+import { decode, encode } from 'html-entities';
 
 export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
 	return chain(altCoverXmlAsJson)
@@ -62,10 +63,11 @@ export async function parseTests(
 			const outputs = x?.Output || [];
 
 			const stdout = chain(outputs)
-				.flatMap(t => t?.StdOut)
+				.flatMap(t => t?.StdOut || "")
+				.first()
 				?.split('\n')
 				.filter(t => !!t)
-				.map(t => t.trim())
+				.map(t => decode(t).trim())
 				.filter(t => !!t)
 				.value() || [];
 
@@ -76,9 +78,9 @@ export async function parseTests(
 			const stackTrace = errorInformation?.StackTrace
 				?.split('\n')
 				.filter(t => !!t)
-				.map(t => t.trim()) || [];
+				.map(t => decode(t).trim()) || [];
 
-			const message = errorInformation?.Message?.trim();
+			const message = decode(errorInformation?.Message || "").trim();
 
 			const previousDefinition = testDefinitions.find(t => t.id === x["@_testId"]);
 			return ({

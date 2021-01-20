@@ -88,7 +88,12 @@ async function runTestsForProvider(
 					console.error(red(`❌ ${failedTest.name}`));
 
 					const failure = failedTest.failure;
-					failure.message && console.error("   " + yellow(`${failure.message}`));
+					const messageSpacing = "   ";
+					const message = failure.message
+						.split('\n')
+						.map(x => messageSpacing + x.trim())
+						.join('\n');
+					failure.message && console.error(yellow(`${message}`));
 
 					if (failure.stackTrace) {
 						for (let stackTraceLine of failure.stackTrace)

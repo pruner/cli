@@ -1,0 +1,520 @@
+{
+	"tests": [
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_10s_HelloDarkness",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs",
+					"lineCoverage": [
+						23,
+						24,
+						25,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_1s_HelloDarkness",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs",
+					"lineCoverage": [
+						41,
+						42,
+						43,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_30s_HelloDarkness",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs",
+					"lineCoverage": [
+						17,
+						18,
+						19,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_3s_HelloDarkness",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs",
+					"lineCoverage": [
+						35,
+						36,
+						37,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_5s_HelloDarkness",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs",
+					"lineCoverage": [
+						29,
+						30,
+						31,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.Darkness.SampleDarknessTests.Test_60s_HelloDarkness",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleDarknessTests.cs",
+					"lineCoverage": [
+						11,
+						12,
+						13,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_10s_HelloWorld",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs",
+					"lineCoverage": [
+						24,
+						25,
+						26,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_1s_HelloWorld",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs",
+					"lineCoverage": [
+						42,
+						43,
+						44,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_30s_HelloWorld",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs",
+					"lineCoverage": [
+						18,
+						19,
+						20,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_3s_HelloWorld",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs",
+					"lineCoverage": [
+						36,
+						37,
+						38,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_5s_HelloWorld",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs",
+					"lineCoverage": [
+						30,
+						31,
+						32,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						33
+					]
+				}
+			]
+		},
+		{
+			"duration": -1,
+			"failure": null,
+			"name": "Sample.Tests.World.SampleWorldTests.Test_60s_HelloWorld",
+			"fileCoverage": [
+				{
+					"path": "tests/dotnet/sample/Sample.Tests/SampleWorldTests.cs",
+					"lineCoverage": [
+						12,
+						13,
+						14,
+						48,
+						49,
+						50,
+						51,
+						52,
+						53,
+						54,
+						49,
+						49,
+						55
+					]
+				},
+				{
+					"path": "tests/dotnet/sample/Sample/SomeClass.cs",
+					"lineCoverage": [
+						10,
+						11,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						33
+					]
+				}
+			]
+		}
+	]
+}
