@@ -66,6 +66,7 @@ export async function parseTests(
 				?.split('\n')
 				.filter(t => !!t)
 				.map(t => t.trim())
+				.filter(t => !!t)
 				.value() || [];
 
 			const errorInformation = chain(outputs)
