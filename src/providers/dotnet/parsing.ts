@@ -5,7 +5,7 @@ import io from "../../io";
 import git from "../../git";
 import { StateFileCoverage, StateTest } from "../types";
 import con from "../../console";
-import { decode, encode } from 'html-entities';
+import { decode } from 'html-entities';
 
 export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
 	return chain(altCoverXmlAsJson)
@@ -84,7 +84,7 @@ export async function parseTests(
 
 			const previousDefinition = testDefinitions.find(t => t.id === x["@_testId"]);
 			return ({
-				duration: parseDuration() || null,
+				duration: parseDuration(x["@_duration"]) || null,
 				id: previousDefinition.id,
 				name: previousDefinition.name,
 				failure: passed ? null : {
@@ -113,7 +113,11 @@ export async function parseTests(
 					.groupBy(f => f.fileId)
 					.map(g => <StateFileCoverage>({
 						path: files.find(f => f.id === g[0].fileId).path,
-						lineCoverage: g.map(l => l.lineNumber)
+						lineCoverage: chain(g)
+							.map(l => l.lineNumber)
+							.uniq()
+							.orderBy()
+							.value()
 					}))
 					.value()
 			};
@@ -122,8 +126,31 @@ export async function parseTests(
 	return tests;
 }
 
-function parseDuration() {
-	return -1;
+function parseDuration(duration: string) {
+	if (!duration)
+		return null;
+
+	const daySegments = duration.split('.', 2);
+
+	const days = daySegments[0] ?
+		+daySegments[0] :
+		0;
+
+	const split = daySegments[1].split(':');
+	const hours = +split[0];
+	const minutes = +split[1];
+
+	const secondSegments = split[2].split('.');
+	const seconds = +secondSegments[0];
+	const milliseconds = secondSegments[1] ?
+		+secondSegments[1] :
+		0;
+
+	return milliseconds +
+		(days * 24 * 60 * 60 * 1000) +
+		(hours * 60 * 60 * 1000) +
+		(minutes * 60 * 1000) +
+		(seconds * 1000);
 }
 
 export function parseLineCoverage(modules: ModuleModule[]) {

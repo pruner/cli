@@ -21,7 +21,10 @@ export async function mergeStates(
 			for (let newFileCoverage of newStateTest.fileCoverage) {
 				const previousFileCoverage = previousStateTest.fileCoverage.find(x => x.path === newFileCoverage.path);
 				if (previousFileCoverage) {
-					previousFileCoverage.lineCoverage = orderBy(newFileCoverage.lineCoverage);
+					previousFileCoverage.lineCoverage = chain(newFileCoverage.lineCoverage)
+						.uniq()
+						.orderBy()
+						.value();
 				} else {
 					previousStateTest.fileCoverage.push(newFileCoverage);
 				}
