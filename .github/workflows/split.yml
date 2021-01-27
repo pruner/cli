@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  chunk:
+  test-chunk:
     runs-on: ubuntu-latest
 
     strategy:
