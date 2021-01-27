@@ -1,0 +1,33 @@
+name: Test splitting CI example
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        chunk: [0, 1]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10
+        registry-url: "https://registry.npmjs.org"
+
+    - run: |
+        npm i @pruner/cli -g
+        pruner split 2 ${{ matrix.chunk }} "**/*Tests.cs"
+      working-directory: tests/dotnet/sample

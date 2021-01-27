@@ -4,3 +4,4 @@ node_modules/
 .pruner/state.json
 check
 .nyc_output/
+.pruner-bin/
