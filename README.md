@@ -1,4 +1,4 @@
-<img src="https://github.com/pruner/vscode/raw/main/resources/icon.png" alt="Pruner logo" height="100"/>
+<img src="https://github.com/pruner/vscode/raw/main/resources/icon.png" alt="Pruner logo" height="150"/>
 
 [![Downloads](https://badgen.net/npm/dt/@pruner/cli)](https://www.npmjs.com/package/@pruner/cli)
 
