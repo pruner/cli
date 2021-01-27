@@ -20,6 +20,9 @@ First you need to install the CLI. This requires [Node](https://nodejs.org/en/do
 
 ## Language & framework support
 Pruner supports several languages and frameworks. Pick the instructions for the language you want to use, to get started.
+
+**Note:** If you are only using Pruner for test-splitting and don't want to split based on timing data, all languages are supported out of the box, and no setup is required.
+
 ### `dotnet` (C# .NET, VB .NET)
 Instructions: https://github.com/pruner/cli/blob/main/docs/dotnet.md
 
