@@ -5,6 +5,7 @@ Pruner is a universal test CLI that does the following:
 - Only runs the tests that are needed (the tests that run through the code you changed).
 - Highlights code coverage with test status next to each line (see video below), so you know if you broke something, as you write it.
 - Runs on your build server as well. Avoid wasting time waiting for your build server to run tests you already ran locally.
+- Allows you to split tests in several chunks, useful for running tests in parallel across machines on a build server.
 
 # Optional: Get the Visual Studio extension
 - **Visual Studio Code:** https://marketplace.visualstudio.com/items?itemName=Pruner.vscode
@@ -37,6 +38,49 @@ When you want to run your affected tests, use:
 There's also a watch mode available, which will automatically run affected tests as you save files in your projects:
 
 `pruner run --watch`
+
+# Splitting tests
+The syntax for splitting tests is `pruner split <total-chunks> <chunk-offset> <glob-pattern>`.
+
+- `<total-chunks>` is the amount of total chunks you want to split your tests in.
+- `<chunk-offset>` the zero-based chunk index to keep on disk.
+- `<glob-pattern>` the glob-pattern for your tests.
+
+## Example
+Let's say you have the following files in your repository:
+```
+tests/BarTest.cs
+tests/BuzTest.cs
+tests/FooTest.cs
+tests/FuzTest.cs
+tests/Helpers.cs
+tests/SomeOtherFile.cs
+```
+
+If you then run the command `pruner split 2 0 "**/*Test.cs"`, Pruner will split your tests in `2` chunks, and only keep chunk `0` (the first chunk) on the disk:
+
+```
+tests/BarTest.cs
+tests/BuzTest.cs
+tests/Helpers.cs
+tests/SomeOtherFile.cs
+```
+
+If you instead run the command `pruner split 2 1 "**/*Test.cs"` Pruner will split your tests in `2` chunks, but instead keep chunk `1` (the second chunk) on the disk:
+```
+tests/FooTest.cs
+tests/FuzTest.cs
+tests/Helpers.cs
+tests/SomeOtherFile.cs
+```
+
+This is super useful if you want to parallelize your test runs across multiple build agents. You simply clone your repository on each agent, then run the split command, and specify a new offset for every agent. The result is a reduced test amount that runs faster.
+
+## Splitting by timing data
+By default, the tests are split based on the file count (an even file count on each chunk). If you want to split by timing data, you can do the following:
+`pruner split <total-chunks> <chunk-offset> <glob-pattern> --by timings`
+
+This requires that you have run `pruner run` before, and committed your Pruner state file into GIT, so that Pruner has historic timing data to work with.
 
 # Comparison with other tools
 ## As an alternative to NCrunch

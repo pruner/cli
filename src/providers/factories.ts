@@ -8,8 +8,10 @@ export const allProviderClasses: ProviderClass[] = [
 	MochaProvider
 ];
 
-export async function createProvidersFromProvider(provider: string) {
+export async function createProvidersFromIdOrNameOrType(provider?: string) {
 	const settings = await pruner.readSettings();
+	if (!settings)
+		return [];
 
 	return settings.providers
 		.filter(x =>

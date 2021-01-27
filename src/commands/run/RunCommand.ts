@@ -4,7 +4,7 @@ import { Command, DefaultArgs } from '../Command';
 import chokidar from 'chokidar';
 import pruner from '../../pruner';
 import con from '../../console';
-import { allProviderClasses, createProvidersFromProvider as createProvidersFromIdOrNameOrType } from '../../providers/factories';
+import { allProviderClasses, createProvidersFromIdOrNameOrType } from '../../providers/factories';
 import { Provider } from '../../providers/types';
 import { join } from 'path';
 import { runTestsForProviders } from './tests';

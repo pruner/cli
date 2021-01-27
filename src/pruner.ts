@@ -84,8 +84,12 @@ async function persistSettings(settings: SettingsFile) {
 
 async function readSettings(cwd?: string): Promise<SettingsFile> {
 	const fileName = getSettingsFileName();
-	return JSON.parse(
-		await exported.readFromFile(fileName, cwd));
+
+	const contents = await exported.readFromFile(fileName, cwd);
+	if (!contents)
+		return null;
+
+	return JSON.parse(contents);
 }
 
 async function readGitState() {
