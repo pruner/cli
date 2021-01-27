@@ -134,7 +134,7 @@ async function getAllTestFilesMatchingGlob(args: Args): Promise<FileDuration[]> 
 			return result;
 	}
 
-	if (args.by === "automatic") {
+	if (args.by === "automatic" && providers.length === 0) {
 		console.warn(yellow(`Pruner has not been initialized yet with ${white("pruner init")}.`));
 		console.warn(yellow(`This means that the glob pattern will apply to all files in the current directory, and not just test files in the given provider.`));
 		console.warn(yellow(`It also means that the test splits are not based on timing data, but instead are split equally based on file count.`));
