@@ -32,5 +32,5 @@ jobs:
       working-directory: tests/dotnet/sample
 
     - name: Run tests using dotnet test
-      run: pruner run
+      run: dotnet test --logger=console;verbosity=detailed
       working-directory: tests/dotnet/sample
