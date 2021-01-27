@@ -30,4 +30,5 @@ jobs:
     - run: |
         npm i @pruner/cli -g
         pruner split 2 ${{ matrix.chunk }} "**/*Tests.cs"
+        dotnet test
       working-directory: tests/dotnet/sample
