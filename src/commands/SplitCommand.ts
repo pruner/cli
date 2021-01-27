@@ -5,7 +5,6 @@ import minimatch from 'minimatch';
 import con from '../console';
 import { io, pruner } from '../exports';
 import { allProviderClasses, createProvidersFromIdOrNameOrType } from '../providers/factories';
-import { Provider, ProviderSettings } from '../providers/types';
 import { Command, DefaultArgs } from './Command';
 
 type Args = DefaultArgs & {

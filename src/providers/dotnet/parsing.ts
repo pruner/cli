@@ -130,7 +130,9 @@ function parseDuration(duration: string) {
 	if (!duration)
 		return null;
 
-	const daySegments = duration.split('.', 2);
+	let daySegments = duration.split('.', 2);
+	if (daySegments[0].indexOf(':') > -1)
+		daySegments = ['0', daySegments[0]];
 
 	const days = daySegments[0] ?
 		+daySegments[0] :

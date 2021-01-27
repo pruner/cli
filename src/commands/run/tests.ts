@@ -90,10 +90,10 @@ async function runTestsForProvider(
 					const failure = failedTest.failure;
 					const messageSpacing = "   ";
 					const message = failure.message
-						.split('\n')
+						?.split('\n')
 						.map(x => messageSpacing + x.trim())
 						.join('\n');
-					failure.message && console.error(yellow(`${message}`));
+					message && console.error(yellow(`${message}`));
 
 					if (failure.stackTrace) {
 						for (let stackTraceLine of failure.stackTrace)
