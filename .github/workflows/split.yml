@@ -27,8 +27,12 @@ jobs:
         node-version: 10
         registry-url: "https://registry.npmjs.org"
 
-    - run: |
+    - name: Split tests using Pruner CLI
+      run: |
         npm i @pruner/cli -g
         pruner split 2 ${{ matrix.chunk }} "**/*Tests.cs"
-        dotnet test
+      working-directory: tests/dotnet/sample
+
+    - name: Run tests using dotnet test
+      run: dotnet test
       working-directory: tests/dotnet/sample
