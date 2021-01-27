@@ -74,7 +74,9 @@ tests/Helpers.cs
 tests/SomeOtherFile.cs
 ```
 
-This is super useful if you want to parallelize your test runs across multiple build agents. You simply clone your repository on each agent, then run the split command, and specify a new offset for every agent. The result is a reduced test amount that runs faster.
+### GitHub Actions
+See the build that triggers automatically on each push here: 
+https://github.com/pruner/cli/blob/main/.github/workflows/split.yml
 
 ## Splitting by timing data
 By default, the tests are split based on the file count (an even file count on each chunk). If you want to split by timing data, you can do the following:
