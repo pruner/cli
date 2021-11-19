@@ -1,5 +1,4 @@
 import { chain, flatMap, range } from "lodash";
-import { AltCoverRoot, ModuleModule } from "./altcover.types";
 import { TrxRoot } from "./trx.types";
 import io from "../../io";
 import git from "../../git";
@@ -7,41 +6,9 @@ import { StateFileCoverage, StateTest } from "../types";
 import con from "../../console";
 import { decode } from 'html-entities';
 
-export function parseModules(altCoverXmlAsJson: AltCoverRoot[]) {
-	return chain(altCoverXmlAsJson)
-		.flatMap((x) => x?.CoverageSession || [])
-		.flatMap((x) => x?.Modules || [])
-		.flatMap((x) => x?.Module || [])
-		.filter((x) => !!x)
-		.value();
-}
-
-function parseFiles(modules: ModuleModule[], projectRootDirectory: string) {
-	return chain(modules)
-		.flatMap((x) => x?.Files || [])
-		.flatMap((x) => x?.File || [])
-		.filter((x) => !!x)
-		.map((x) => ({
-			id: x["@_uid"],
-			path: io.normalizePathSeparators(x["@_fullPath"]),
-		}))
-		.filter((x) => x.path.startsWith(projectRootDirectory))
-		.map((x) => ({
-			...x,
-			path: sanitizeStatePath(projectRootDirectory, x.path),
-		}))
-		.value();
-}
-
 export async function parseTests(
-	altCoverModules: ModuleModule[],
 	trxSummary: TrxRoot[]
 ): Promise<StateTest[]> {
-	const projectRootDirectory = await git.getGitTopDirectory();
-
-	const files = parseFiles(altCoverModules, projectRootDirectory);
-	const coverage = parseLineCoverage(altCoverModules);
-
 	const testRuns = chain(trxSummary)
 		.flatMap(x => x.TestRun)
 		.value();
@@ -98,31 +65,6 @@ export async function parseTests(
 
 	con.debug(() => ["test-results", testResults]);
 
-	const tests = chain(altCoverModules)
-		.flatMap(x => x?.TrackedMethods || [])
-		.flatMap(x => x?.TrackedMethod || [])
-		.filter(x => !!x)
-		.map(x => {
-			const testResult = testResults.find(t => t.name === sanitizeMethodName(x["@_name"]));
-			return <StateTest>{
-				duration: testResult?.duration || null,
-				failure: testResult?.failure || null,
-				name: sanitizeMethodName(x["@_name"]),
-				fileCoverage: chain(coverage)
-					.filter(f => f.testIds.indexOf(x["@_uid"]) > -1)
-					.groupBy(f => f.fileId)
-					.map(g => <StateFileCoverage>({
-						path: files.find(f => f.id === g[0].fileId).path,
-						lineCoverage: chain(g)
-							.map(l => l.lineNumber)
-							.uniq()
-							.orderBy()
-							.value()
-					}))
-					.value()
-			};
-		})
-		.value();
 	return tests;
 }
 

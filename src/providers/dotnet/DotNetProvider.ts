@@ -5,13 +5,14 @@ import { AltCoverRoot } from "./altcover.types";
 import git from "../../git";
 import con from "../../console";
 import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getLoggerArguments, getPropertyArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
+import { getLoggerArguments, getPropertyArguments, getRunSettingArguments, getTestArguments, getVerbosityArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
 import { join, resolve } from "path";
 import { LogSettings } from "../../console";
 import { parseModules, parseTests } from "./parsing";
 import { measureTime } from "../../time";
+import { downloadInstrumenter, runInstrumenter } from "./instrumenter";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -64,24 +65,37 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async executeTestProcess(
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
-		const args = [
-			...await getRunSettingArguments(this.settings, tests),
-			...getAltCoverArguments(coverageXmlFileName),
-			...getLoggerArguments(summaryFileName),
-			...getVerbosityArguments(),
-			...await getPropertyArguments(this.settings)
-		];
 		con.debug(() => ["execute-settings", this.settings]);
-		con.debug(() => ["execute-args", args.join(' ')]);
+
+		const instrumenterDownloadPromise = downloadInstrumenter();
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
 			this.settings.workingDirectory));
 
-		const result = await con.execaPiped("dotnet", ["test", ...args], {
+		await con.execaPiped("dotnet", ["build"], {
 			cwd,
 			reject: false
 		});
+
+		await instrumenterDownloadPromise;
+
+		await runInstrumenter(cwd, this.settings.id, "Instrument");
+
+		const dotnetTestArgs = [
+			...await getRunSettingArguments(this.settings, tests),
+			...getLoggerArguments(summaryFileName),
+			...getVerbosityArguments(),
+			...getTestArguments(),
+			...await getPropertyArguments(this.settings)
+		];
+		con.debug(() => ["execute-args", dotnetTestArgs.join(' ')]);
+		const result = await con.execaPiped("dotnet", ["test", ...dotnetTestArgs], {
+			cwd,
+			reject: false
+		});
+
+		await runInstrumenter(cwd, this.settings.id, "Collect");
 
 		return result;
 	}
