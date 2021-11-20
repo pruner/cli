@@ -1,10 +1,5 @@
 # `dotnet` recipe
 
-## Prerequisites
-To use Pruner in your C# project, you must install the `AltCover` [NuGet package](https://www.nuget.org/packages/altcover/) to all your test projects.
-
-`Install-Package AltCover`
-
 ## Initializing for first-time use
 `pruner init dotnet`
 
