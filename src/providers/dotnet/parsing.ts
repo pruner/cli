@@ -6,7 +6,7 @@ import { StateFileCoverage, StateTest } from "../types";
 import con from "../../console";
 import { decode } from 'html-entities';
 
-export async function parseTests(
+export async function parseTrxSummary(
 	trxSummary: TrxRoot[]
 ): Promise<StateTest[]> {
 	const testRuns = chain(trxSummary)
@@ -51,9 +51,10 @@ export async function parseTests(
 
 			const previousDefinition = testDefinitions.find(t => t.id === x["@_testId"]);
 			return ({
-				duration: parseDuration(x["@_duration"]) || null,
+				duration: parseDuration(x["@_duration"]),
 				id: previousDefinition.id,
 				name: previousDefinition.name,
+				fileCoverage: [],
 				failure: passed ? null : {
 					stdout: stdout.length > 0 ? stdout : null,
 					message: message || null,
@@ -65,10 +66,16 @@ export async function parseTests(
 
 	con.debug(() => ["test-results", testResults]);
 
-	return tests;
+	return testResults;
 }
 
-function parseDuration(duration: string) {
+function parseDuration(duration: string | number | null | undefined) {
+	if (duration === "0")
+		return 0;
+
+	if (typeof duration === "number")
+		return duration;
+
 	if (!duration)
 		return null;
 
@@ -95,43 +102,4 @@ function parseDuration(duration: string) {
 		(hours * 60 * 60 * 1000) +
 		(minutes * 60 * 1000) +
 		(seconds * 1000);
-}
-
-export function parseLineCoverage(modules: ModuleModule[]) {
-	return chain(modules)
-		.flatMap((x) => x?.Classes || [])
-		.flatMap((x) => x?.Class || [])
-		.filter((x) => !!x)
-		.flatMap((x) => x?.Methods || [])
-		.flatMap((x) => x?.Method || [])
-		.filter((x) => !!x)
-		.flatMap((x) => x?.SequencePoints || [])
-		.flatMap((x) => x?.SequencePoint || [])
-		.filter((x) => !!x)
-		.flatMap((x) => range(+x["@_sl"], +x["@_el"] + 1).map((l) => ({
-			testIds: chain(x.TrackedMethodRefs || [])
-				.flatMap(m => m?.TrackedMethodRef || [])
-				.filter((m) => !!m)
-				.map((m) => m["@_uid"])
-				.value(),
-			fileId: x?.["@_fileid"],
-			lineNumber: l,
-		})))
-		.filter((x) =>
-			!!x.fileId &&
-			x.testIds.length > 0)
-		.value();
-}
-
-function sanitizeStatePath(projectRootDirectory: string, path: string): string {
-	path = path.substring(projectRootDirectory.length + 1);
-	return path;
-}
-
-function sanitizeMethodName(name: string) {
-	const typeSplit = name.split(" ");
-
-	const namespaceAndName = typeSplit[1].replace(/::/g, ".");
-
-	return namespaceAndName.substr(0, namespaceAndName.indexOf("("));
 }

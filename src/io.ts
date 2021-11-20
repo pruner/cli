@@ -12,7 +12,8 @@ const exported = {
 	writeToFile,
 	readFromFile,
 	normalizePathSeparators,
-	removeDirectory
+	removeDirectory,
+	ensurePathExists
 };
 
 async function glob(workingDirectory: string, pattern: string): Promise<string[]> {

@@ -22,7 +22,7 @@ export function getTestArguments() {
 	];
 }
 
-export async function getPropertyArguments(settings: DotNetSettings) {
+export async function getBuildArguments(settings: DotNetSettings) {
 	const keys = _.keys(settings.properties || {});
 	const propertyArguments = keys.map(k => `/p:${k}=${settings.properties[k]}`);
 
