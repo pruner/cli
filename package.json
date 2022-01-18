@@ -81,7 +81,7 @@
 		"git-diff-parser": "^1.0.0",
 		"glob": "^7.1.6",
 		"html-entities": "^2.0.2",
-		"istanbul-lib-coverage": "^3.0.0",
+		"istanbul-lib-coverage": "^3.2.0",
 		"istanbul-lib-source-maps": "^4.0.0",
 		"lodash": "^4.17.20",
 		"minimatch": "^3.0.4",
