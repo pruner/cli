@@ -65,7 +65,7 @@ export async function getPropertyArguments(settings: DotNetSettings) {
 		`/p:GenerateTargetFrameworkAttribute=False`,
 		`/p:GenerateAssemblyInfo=False`,
 		`--output`,
-		`${join(temporaryDirectoryPath, "bin")} `
+		`${join(temporaryDirectoryPath, "bin")}`
 	];
 }
 
