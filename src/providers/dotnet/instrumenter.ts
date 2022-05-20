@@ -1,8 +1,9 @@
 import io from "../../io";
 import pruner from "../../pruner";
 import { join } from 'path';
-import con from "../../console";
+import con, { LogSettings } from "../../console";
 import download from "download";
+import { node } from "execa";
 
 export async function downloadInstrumenter(cwd: string, settingsId: string) {
 	const existingInstrumenterPath = join(
@@ -19,9 +20,9 @@ export async function downloadInstrumenter(cwd: string, settingsId: string) {
 		await getInstrumenterDirectoryPath(settingsId));
 	con.debug(() => ["downloading-instrumenter", path]);
 
-	await download(
-		"https://github.com/pruner/dotnet/releases/download/latest/Pruner.Instrumenter.exe",
-		path);
+	await Promise.all([
+		download("https://github.com/pruner/dotnet/releases/download/latest/Pruner.Instrumenter.exe", path),
+		download("https://github.com/pruner/dotnet/releases/download/latest/Pruner.Instrumenter.pdb", path)]);
 }
 
 export async function runInstrumenter(cwd: string, settingsId: string, command: string) {
@@ -38,7 +39,9 @@ export async function runInstrumenter(cwd: string, settingsId: string, command: 
 			cwd,
 			reject: true
 		},
-		["stderr"]);
+		LogSettings.verbosity === "verbose" ?
+			["stderr", "stdout"] :
+			["stderr"]);
 }
 
 async function getInstrumenterExecutablePath(settingsId: string) {

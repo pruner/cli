@@ -42,6 +42,8 @@ async function execaPiped(
 		stderr: (buffer: Buffer) => console.error(gray(trimTrailingWhitespace(buffer.toString())))
 	};
 
+	debug(() => ["executing", file, args, options, pipes]);
+
 	const allPipes = ["stdout", "stderr"];
 	const pipesToListen = LogSettings.verbosity === "verbose" ?
 		allPipes :
