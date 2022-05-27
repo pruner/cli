@@ -51,8 +51,7 @@ test('dotnet: run - check coverage', async () => {
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.passedLineRange(11, 20),
-		...context.passedLineRange(23, 31)
+		...context.passedLineRange(10, 32)
 	]);
 });
 
