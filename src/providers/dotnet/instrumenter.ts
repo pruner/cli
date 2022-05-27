@@ -4,6 +4,7 @@ import { join } from 'path';
 import con, { LogSettings } from "../../console";
 import download from "download";
 import { node } from "execa";
+import extract from "extract-zip";
 
 export async function downloadInstrumenter(cwd: string, settingsId: string) {
 	const existingInstrumenterPath = join(
@@ -20,9 +21,11 @@ export async function downloadInstrumenter(cwd: string, settingsId: string) {
 		await getInstrumenterDirectoryPath(settingsId));
 	con.debug(() => ["downloading-instrumenter", path]);
 
-	await Promise.all([
-		download("https://github.com/pruner/dotnet/releases/download/latest/Pruner.Instrumenter.exe", path),
-		download("https://github.com/pruner/dotnet/releases/download/latest/Pruner.Instrumenter.pdb", path)]);
+	const zipFileName = "Pruner.Instrumenter.zip";
+	await download(`https://github.com/pruner/dotnet/releases/download/latest/${zipFileName}`, path);
+	await extract(
+		join(path, zipFileName),
+		{ dir: path });
 }
 
 export async function runInstrumenter(cwd: string, settingsId: string, command: string) {
@@ -30,8 +33,9 @@ export async function runInstrumenter(cwd: string, settingsId: string, command: 
 	con.debug(() => ["running instrumenter", cwd, instrumenterPath, settingsId, command]);
 
 	await con.execaPiped(
-		instrumenterPath,
+		"dotnet",
 		[
+			instrumenterPath,
 			settingsId,
 			command
 		],
@@ -50,12 +54,13 @@ async function getInstrumenterExecutablePath(settingsId: string) {
 
 	return join(
 		directoryPath,
-		"Pruner.Instrumenter.exe");
+		"Pruner.Instrumenter.dll");
 }
 
 async function getInstrumenterDirectoryPath(settingsId: string) {
 	return join(
 		".pruner",
 		"temp",
-		settingsId);
+		settingsId,
+		"instrumenter");
 }

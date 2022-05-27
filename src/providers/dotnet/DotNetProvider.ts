@@ -3,7 +3,7 @@ import execa from "execa";
 import io from "../../io";
 import git from "../../git";
 import con from "../../console";
-import { getLoggerArguments, getBuildArguments, getRunSettingArguments, getTestArguments, getVerbosityArguments } from "./arguments";
+import { getLoggerArguments, getBuildArguments, getRunSettingArguments, getTestArguments, getVerbosityArguments, getOutputArguments } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
 import { join, resolve } from "path";
@@ -90,7 +90,8 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...await getRunSettingArguments(this.settings, tests),
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
-			...getTestArguments()
+			...getTestArguments(),
+			...await getOutputArguments(this.settings)
 		];
 		con.debug(() => ["execute-args", dotnetTestArgs.join(' ')]);
 		const result = await con.execaPiped("dotnet", ["test", ...dotnetTestArgs], {

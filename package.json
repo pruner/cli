@@ -80,6 +80,7 @@
 		"chokidar": "^3.4.3",
 		"download": "^8.0.0",
 		"execa": "^4.1.0",
+		"extract-zip": "^2.0.1",
 		"fast-xml-parser": "^3.17.6",
 		"git-diff-parser": "^1.0.0",
 		"glob": "^7.1.6",

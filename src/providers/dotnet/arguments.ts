@@ -37,6 +37,15 @@ export async function getBuildArguments(settings: DotNetSettings) {
 		...propertyArguments,
 		`/p:GenerateTargetFrameworkAttribute=False`,
 		`/p:GenerateAssemblyInfo=False`,
+		...await getOutputArguments(settings)
+	];
+}
+
+export async function getOutputArguments(settings: DotNetSettings) {
+	const topDirectory = await git.getGitTopDirectory();
+	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
+
+	return [
 		`--output`,
 		`${join(temporaryDirectoryPath, "bin")}`
 	];
