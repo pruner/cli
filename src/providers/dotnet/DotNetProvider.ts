@@ -3,7 +3,7 @@ import execa from "execa";
 import io from "../../io";
 import git from "../../git";
 import con from "../../console";
-import { getLoggerArguments, getBuildArguments, getRunSettingArguments, getTestArguments, getVerbosityArguments, getOutputArguments } from "./arguments";
+import { getLoggerArguments, getBuildArguments, getRunSettingArguments, getTestArguments, getVerbosityArguments, getOutputArguments, getPrunerBinDirectory } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
 import { join, resolve } from "path";
@@ -71,11 +71,18 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 
 		const instrumenterDownloadPromise = downloadInstrumenter(cwd, this.settings.id);
 
+		const prunerBinDirectory = await getPrunerBinDirectory(this.settings);
+		await io.removeDirectory(join(prunerBinDirectory, "bin"));
+
+		await io.writeToFile(
+			join(prunerBinDirectory, ".gitignore"),
+			"**");
+
 		await con.execaPiped(
 			"dotnet",
 			[
 				"build",
-				...await getBuildArguments(this.settings)
+				...await getBuildArguments(this.settings, prunerBinDirectory)
 			],
 			{
 				cwd,
@@ -91,7 +98,7 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 			...getLoggerArguments(summaryFileName),
 			...getVerbosityArguments(),
 			...getTestArguments(),
-			...await getOutputArguments(this.settings)
+			...getOutputArguments(prunerBinDirectory)
 		];
 		con.debug(() => ["execute-args", dotnetTestArgs.join(' ')]);
 		const result = await con.execaPiped("dotnet", ["test", ...dotnetTestArgs], {

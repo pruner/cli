@@ -22,33 +22,31 @@ export function getTestArguments() {
 	];
 }
 
-export async function getBuildArguments(settings: DotNetSettings) {
+export async function getBuildArguments(settings: DotNetSettings, prunerBinDirectory: string) {
 	const keys = _.keys(settings.properties || {});
 	const propertyArguments = keys.map(k => `/p:${k}=${settings.properties[k]}`);
 
-	const topDirectory = await git.getGitTopDirectory();
-	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
-
-	await io.writeToFile(
-		join(temporaryDirectoryPath, ".gitignore"),
-		"**");
-
 	return [
 		...propertyArguments,
+		`--no-incremental`,
+		`--nologo`,
 		`/p:GenerateTargetFrameworkAttribute=False`,
 		`/p:GenerateAssemblyInfo=False`,
-		...await getOutputArguments(settings)
+		...getOutputArguments(prunerBinDirectory)
 	];
 }
 
-export async function getOutputArguments(settings: DotNetSettings) {
-	const topDirectory = await git.getGitTopDirectory();
-	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
-
+export function getOutputArguments(prunerBinDirectory: string) {
 	return [
 		`--output`,
-		`${join(temporaryDirectoryPath, "bin")}`
+		join(prunerBinDirectory, "bin")
 	];
+}
+
+export async function getPrunerBinDirectory(settings: DotNetSettings) {
+	const topDirectory = await git.getGitTopDirectory();
+	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
+	return temporaryDirectoryPath;
 }
 
 export function getVerbosityArguments() {

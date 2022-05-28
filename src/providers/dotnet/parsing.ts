@@ -79,27 +79,13 @@ function parseDuration(duration: string | number | null | undefined) {
 	if (!duration)
 		return null;
 
-	let daySegments = duration.split('.', 2);
-	if (daySegments[0].indexOf(':') > -1)
-		daySegments = ['0', daySegments[0]];
-
-	const days = daySegments[0] ?
-		+daySegments[0] :
-		0;
-
-	const split = daySegments[1].split(':');
+	const split = duration.split(':');
 	const hours = +split[0];
 	const minutes = +split[1];
 
-	const secondSegments = split[2].split('.');
-	const seconds = +secondSegments[0];
-	const milliseconds = secondSegments[1] ?
-		+secondSegments[1] :
-		0;
+	const seconds = +split[2];
 
-	return milliseconds +
-		(days * 24 * 60 * 60 * 1000) +
-		(hours * 60 * 60 * 1000) +
+	return (hours * 60 * 60 * 1000) +
 		(minutes * 60 * 1000) +
 		(seconds * 1000);
 }
