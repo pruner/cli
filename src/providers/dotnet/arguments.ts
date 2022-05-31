@@ -1,44 +1,11 @@
 import _ from "lodash";
-import { dirname, join, sep } from "path";
+import { join } from "path";
 import { LogSettings } from "../../console";
-import { git, io, pruner } from "../../exports";
-import { ProviderSettings, TestsByAffectedState } from "../types";
+import { git, io } from "../../exports";
+import { TestsByAffectedState } from "../types";
 import { DotNetSettings } from "./DotNetProvider";
 import { getFilter } from "./filter";
 import { makeRunSettingsFile } from "./runsettings";
-
-export function getCallContextArgument() {
-	const attributes = [
-		"TestMethod",
-		"Test",
-		"Fact",
-		"Theory"
-	];
-
-	const callContextArgument = attributes
-		.map(attribute => `[${attribute}]`)
-		.join('|');
-	return callContextArgument;
-}
-
-export function getAltCoverArguments(reportName: string) {
-	const callContextArgument = getCallContextArgument();
-	return [
-		"/p:AltCover=true",
-		"/p:AltCoverSingle=true",
-		"/p:AltCoverLineCover=true",
-		"/p:AltCoverVisibleBranches=true",
-		"/p:AltCoverSourceLink=false",
-		`/p:AltCoverCallContext=${callContextArgument}`,
-		"/p:AltCoverForce=false",
-		`/p:AltCoverXmlReport=${reportName}`,
-		"/p:AltCoverSummaryFormat=N",
-		"/p:AltCoverLocalSource=true",
-		`/p:AltCoverVerbosity=${LogSettings.verbosity === "verbose" ?
-			"Info" :
-			"Warning"}`
-	];
-}
 
 export async function getRunSettingArguments(settings: DotNetSettings, tests: TestsByAffectedState) {
 	const filter = getFilter(tests, settings);
@@ -49,24 +16,37 @@ export async function getRunSettingArguments(settings: DotNetSettings, tests: Te
 	];
 }
 
-export async function getPropertyArguments(settings: DotNetSettings) {
+export function getTestArguments() {
+	return [
+		"--no-build"
+	];
+}
+
+export async function getBuildArguments(settings: DotNetSettings, prunerBinDirectory: string) {
 	const keys = _.keys(settings.properties || {});
 	const propertyArguments = keys.map(k => `/p:${k}=${settings.properties[k]}`);
 
-	const topDirectory = await git.getGitTopDirectory();
-	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
-
-	await io.writeToFile(
-		join(temporaryDirectoryPath, ".gitignore"),
-		"**");
-
 	return [
 		...propertyArguments,
+		`--no-incremental`,
+		`--nologo`,
 		`/p:GenerateTargetFrameworkAttribute=False`,
 		`/p:GenerateAssemblyInfo=False`,
-		`--output`,
-		`${join(temporaryDirectoryPath, "bin")}`
+		...getOutputArguments(prunerBinDirectory)
 	];
+}
+
+export function getOutputArguments(prunerBinDirectory: string) {
+	return [
+		`--output`,
+		join(prunerBinDirectory, "bin")
+	];
+}
+
+export async function getPrunerBinDirectory(settings: DotNetSettings) {
+	const topDirectory = await git.getGitTopDirectory();
+	const temporaryDirectoryPath = join(topDirectory, settings.workingDirectory, ".pruner-bin");
+	return temporaryDirectoryPath;
 }
 
 export function getVerbosityArguments() {

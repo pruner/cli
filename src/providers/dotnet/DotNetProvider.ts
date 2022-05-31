@@ -1,17 +1,17 @@
 import { parse } from "fast-xml-parser";
 import execa from "execa";
 import io from "../../io";
-import { AltCoverRoot } from "./altcover.types";
 import git from "../../git";
 import con from "../../console";
-import { yellow, yellowBright } from "chalk";
-import { getAltCoverArguments, getLoggerArguments, getPropertyArguments, getRunSettingArguments, getVerbosityArguments } from "./arguments";
+import { getLoggerArguments, getBuildArguments, getRunSettingArguments, getTestArguments, getVerbosityArguments, getOutputArguments, getPrunerBinDirectory } from "./arguments";
 import { ProviderSettings, Provider, SettingsQuestions, TestsByAffectedState, ProviderState, ProviderType } from "../types";
 import { TrxRoot } from "./trx.types";
 import { join, resolve } from "path";
 import { LogSettings } from "../../console";
-import { parseModules, parseTests } from "./parsing";
+import { parseTrxSummary } from "./parsing";
 import { measureTime } from "../../time";
+import { downloadInstrumenter, runInstrumenter } from "./instrumenter";
+import pruner from "../../pruner";
 
 export type DotNetSettings = ProviderSettings & {
 	environment: {
@@ -28,7 +28,6 @@ export type DotNetSettings = ProviderSettings & {
 	},
 };
 
-const coverageXmlFileName = "coverage.xml.tmp.pruner";
 const summaryFileName = "summary.trx.tmp.pruner";
 
 export default class DotNetProvider implements Provider<DotNetSettings> {
@@ -64,52 +63,79 @@ export default class DotNetProvider implements Provider<DotNetSettings> {
 	public async executeTestProcess(
 		tests: TestsByAffectedState
 	): Promise<execa.ExecaReturnValue<string>> {
-		const args = [
-			...await getRunSettingArguments(this.settings, tests),
-			...getAltCoverArguments(coverageXmlFileName),
-			...getLoggerArguments(summaryFileName),
-			...getVerbosityArguments(),
-			...await getPropertyArguments(this.settings)
-		];
 		con.debug(() => ["execute-settings", this.settings]);
-		con.debug(() => ["execute-args", args.join(' ')]);
 
 		const cwd = resolve(join(
 			await git.getGitTopDirectory(),
 			this.settings.workingDirectory));
 
-		const result = await con.execaPiped("dotnet", ["test", ...args], {
+		const instrumenterDownloadPromise = downloadInstrumenter(cwd, this.settings.id);
+
+		const prunerBinDirectory = await getPrunerBinDirectory(this.settings);
+		await io.removeDirectory(join(prunerBinDirectory, "bin"));
+
+		await io.writeToFile(
+			join(prunerBinDirectory, ".gitignore"),
+			"**");
+
+		await con.execaPiped(
+			"dotnet",
+			[
+				"build",
+				...await getBuildArguments(this.settings, prunerBinDirectory)
+			],
+			{
+				cwd,
+				reject: false
+			});
+
+		await instrumenterDownloadPromise;
+
+		await runInstrumenter(cwd, this.settings.id, "Instrument");
+
+		const dotnetTestArgs = [
+			...await getRunSettingArguments(this.settings, tests),
+			...getLoggerArguments(summaryFileName),
+			...getVerbosityArguments(),
+			...getTestArguments(),
+			...getOutputArguments(prunerBinDirectory)
+		];
+		con.debug(() => ["execute-args", dotnetTestArgs.join(' ')]);
+		const result = await con.execaPiped("dotnet", ["test", ...dotnetTestArgs], {
 			cwd,
 			reject: false
 		});
+
+		await runInstrumenter(cwd, this.settings.id, "Collect");
 
 		return result;
 	}
 
 	public async gatherState(): Promise<ProviderState> {
-		const altCoverXmlAsJson: AltCoverRoot[] = await measureTime("gatherState-altCoverXmlAsJson", async () =>
-			await this.globContentsFromXmlToJson(`**/${coverageXmlFileName}`));
-		if (altCoverXmlAsJson.length === 0) {
-			console.warn(yellow(`Could not find any coverage data from AltCover recursively within ${yellowBright(this.settings.workingDirectory)}.`));
-			console.warn(yellow(`Make sure AltCover is installed in your test projects.`));
-			console.warn(yellow('Setup instructions: https://github.com/pruner/cli/blob/main/docs/dotnet.md'));
-			return null;
+		const state: ProviderState = JSON.parse(
+			await pruner.readFromTempFile(
+				join(
+					this.settings.id,
+					"state.json")));
+
+		if (state?.tests) {
+			const summaryFileContents: TrxRoot[] = await measureTime("gatherState-summaryFileContents", async () =>
+				await this.globContentsFromXmlToJson(`**/${summaryFileName}`));
+
+			const trxSummaryTests = await measureTime("gatherState-tests", async () =>
+				await parseTrxSummary(
+					summaryFileContents));
+			for (let trxSummaryTest of trxSummaryTests) {
+				const matchingTest = state.tests.find(test => test.name === trxSummaryTest.name);
+				if (!matchingTest)
+					throw new Error("Test not found in state: " + trxSummaryTest.name);
+
+				matchingTest.duration = trxSummaryTest.duration;
+				matchingTest.failure = trxSummaryTest.failure;
+			}
 		}
 
-		const summaryFileContents: TrxRoot[] = await measureTime("gatherState-summaryFileContents", async () =>
-			await this.globContentsFromXmlToJson(`**/${summaryFileName}`));
-
-		const modules = await measureTime("gatherState-modules", () =>
-			parseModules(altCoverXmlAsJson));
-
-		const tests = await measureTime("gatherState-tests", async () =>
-			await parseTests(
-				modules,
-				summaryFileContents));
-
-		return {
-			tests: tests
-		};
+		return state;
 	}
 
 	private async globContentsFromXmlToJson(glob: string) {

@@ -23,9 +23,8 @@ test('dotnet: run - run - check coverage', async () => {
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.passedLineRange(10, 20),
-		...context.passedLineRange(22, 31),
-		...context.passedLineRange(33)
+		...context.passedLineRange(11, 20),
+		...context.passedLineRange(23, 31)
 	]);
 });
 
@@ -39,9 +38,8 @@ test('dotnet: run - change condition - run - check coverage', async () => {
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.failedLineRange(10, 11),
-		...context.failedLineRange(22, 31),
-		...context.failedLineRange(33)
+		...context.failedLineRange(11),
+		...context.failedLineRange(23, 31)
 	]);
 });
 
@@ -51,9 +49,8 @@ test('dotnet: run - check coverage', async () => {
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.passedLineRange(10, 20),
-		...context.passedLineRange(22, 31),
-		...context.passedLineRange(33)
+		...context.passedLineRange(11, 20),
+		...context.passedLineRange(23, 31)
 	]);
 });
 
@@ -71,9 +68,8 @@ test('dotnet: run - change condition - run - revert condition - check coverage',
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.passedLineRange(10, 20),
-		...context.passedLineRange(22, 31),
-		...context.passedLineRange(33)
+		...context.passedLineRange(11, 20),
+		...context.passedLineRange(23, 31)
 	]);
 });
 
@@ -90,8 +86,7 @@ test('dotnet: run - comment out test - run - check coverage', async () => {
 
 	const coverageForClass = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverageForClass).toEqual([
-		...context.passedLineRange(10, 20),
-		...context.passedLineRange(33)
+		...context.passedLineRange(11, 20)
 	]);
 });
 
@@ -105,10 +100,9 @@ test('dotnet: run - make darkness tests fail - run - check coverage', async () =
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.failedLineRange(10, 11),
+		...context.failedLineRange(11),
 		...context.passedLineRange(12, 20),
-		...context.failedLineRange(22, 31),
-		...context.failedLineRange(33)
+		...context.failedLineRange(23, 31)
 	]);
 });
 
@@ -122,8 +116,7 @@ test('dotnet: run - make change in first if-branch - run - check coverage', asyn
 
 	const coverage = await context.getCoveredLineNumbersForFile("Sample/SomeClass.cs");
 	expect(coverage).toEqual([
-		...context.passedLineRange(10, 20),
-		...context.passedLineRange(22, 31),
-		...context.passedLineRange(33)
+		...context.passedLineRange(11, 20),
+		...context.passedLineRange(23, 31)
 	]);
 });

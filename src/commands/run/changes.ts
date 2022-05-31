@@ -42,6 +42,7 @@ export function getLineCoverageForGitChangedFile(
 			file: x.file,
 			lineNumber: lineNumber
 		})))
-		.filter(x => x.file.path === gitChangedFile.filePath)
+		.filter(x =>
+			x.file.path === gitChangedFile.filePath)
 		.value();
 }

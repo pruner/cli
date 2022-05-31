@@ -9,8 +9,8 @@ import { mergeStates } from "./state";
 import git from '../../git';
 import pruner from '../../pruner';
 import con from '../../console';
+import io from '../../io';
 import { getLineCoverageForGitChangedFile, getNewLineNumberForLineCoverage, hasCoverageOfLineInSurroundingLines } from "./changes";
-import rimraf from "rimraf";
 import minimatch from "minimatch";
 
 import type { Args } from './RunCommand';
@@ -36,6 +36,7 @@ async function runTestsForProvider(
 			await pruner.readState(providerId));
 	} catch (e) {
 		//may happen if GIT is in the middle of a merge for the state file.
+		con.debug(() => ["warning during reading state", e]);
 		return null;
 	}
 
@@ -130,8 +131,10 @@ async function runTestsForProvider(
  */
 async function runTestsInGitStateTransaction(providers: Provider[], args: Args) {
 	const gitState = await pruner.readGitState();
-	if (!gitState.branch)
-		rimraf.sync(await pruner.getPrunerTempPath());
+	if (!gitState.branch) {
+		await io.removeDirectory(
+			await pruner.getPrunerTempPath());
+	}
 
 	const commitRange: CommitRange = {
 		from: gitState.commit,

@@ -25,7 +25,8 @@ function debug(valueAccessor: () => object[] | object) {
 async function execaPiped(
 	file: string,
 	args?: string[],
-	options?: Options
+	options?: Options,
+	pipes?: Array<"stdout" | "stderr">
 ) {
 	const result = execa(file, args, options);
 
@@ -36,16 +37,25 @@ async function execaPiped(
 		return text;
 	}
 
-	const onStdout = (buffer: Buffer) => console.log(gray(trimTrailingWhitespace(buffer.toString())));
-	const onStderr = (buffer: Buffer) => console.error(gray(trimTrailingWhitespace(buffer.toString())));
-	result.stdout.on('data', onStdout);
-	result.stderr.on('data', onStderr);
+	const events = {
+		stdout: (buffer: Buffer) => console.log(gray(trimTrailingWhitespace(buffer.toString()))),
+		stderr: (buffer: Buffer) => console.error(gray(trimTrailingWhitespace(buffer.toString())))
+	};
+
+	debug(() => ["executing", file, args, options, pipes]);
+
+	const allPipes = ["stdout", "stderr"];
+	const pipesToListen = LogSettings.verbosity === "verbose" ?
+		allPipes :
+		(pipes || allPipes);
+	for (let pipe of pipesToListen)
+		result[pipe].on("data", events[pipe]);
 
 	try {
 		return await result;
 	} finally {
-		result.stdout.off('data', onStdout);
-		result.stderr.off('data', onStderr);
+		for (let pipe of pipesToListen)
+			result[pipe].off("data", events[pipe]);
 	}
 }
 

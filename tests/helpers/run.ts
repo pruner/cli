@@ -120,7 +120,7 @@ export function prepareRunTest(
 	const runHandler = async () => {
 		const result = await handler({
 			provider: providerType,
-			verbosity: "normal"
+			verbosity: "verbose"
 		});
 
 		const stateJsonFilePath = join(stateDirectory, "tests.json");

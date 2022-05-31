@@ -23,8 +23,10 @@
 		"build:types": "tsc --emitDeclarationOnly",
 		"build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
 		"test": "jest --verbose false",
+		"test:dotnet": "jest --verbose false -t \"dotnet\"",
 		"test:watch": "jest --watch --verbose false",
-		"test:watch:git": "jest --watch --verbose false -t \"git\""
+		"test:watch:git": "jest --watch --verbose false -t \"git\"",
+		"test:watch:dotnet": "jest --watch --verbose false -t \"dotnet\""
 	},
 	"repository": {
 		"type": "git",
@@ -76,7 +78,9 @@
 		"@fluffy-spoon/name-of": "^1.4.0",
 		"chalk": "^4.1.0",
 		"chokidar": "^3.4.3",
+		"download": "^8.0.0",
 		"execa": "^4.1.0",
+		"extract-zip": "^2.0.1",
 		"fast-xml-parser": "^3.17.6",
 		"git-diff-parser": "^1.0.0",
 		"glob": "^7.1.6",
