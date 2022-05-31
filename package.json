@@ -1,6 +1,6 @@
 {
 	"name": "@pruner/cli",
-	"version": "2.1.1",
+	"version": "2.2.0",
 	"description": "The Pruner CLI that reduces the amount of time spent running tests.",
 	"main": "./dist/exports.js",
 	"type": "commonjs",
