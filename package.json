@@ -83,7 +83,7 @@
 		"extract-zip": "^2.0.1",
 		"fast-xml-parser": "^3.17.6",
 		"git-diff-parser": "^1.0.0",
-		"glob": "^7.1.6",
+		"glob": "^8.0.3",
 		"html-entities": "^2.3.3",
 		"istanbul-lib-coverage": "^3.0.0",
 		"istanbul-lib-source-maps": "^4.0.0",
